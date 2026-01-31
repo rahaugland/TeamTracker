@@ -1,9 +1,7 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
-// @ts-ignore - Optional plugin
 // import { visualizer } from 'rollup-plugin-visualizer';
-// @ts-ignore - Optional plugin
 // import viteCompression from 'vite-plugin-compression';
 
 // https://vite.dev/config/
@@ -76,7 +74,7 @@ export default defineConfig({
     // Increase chunk size warning limit
     chunkSizeWarningLimit: 1000,
   },
-  // @ts-ignore - vitest types
+  // @ts-expect-error - vitest types
   test: {
     globals: true,
     environment: 'node',
