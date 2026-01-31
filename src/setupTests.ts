@@ -1,0 +1,15 @@
+import { expect, afterEach, vi } from 'vitest';
+import { cleanup } from '@testing-library/react';
+import '@testing-library/jest-dom/vitest';
+
+// Cleanup after each test case (e.g., clearing jsdom)
+afterEach(() => {
+  cleanup();
+});
+
+// Mock environment variables
+vi.stubEnv('VITE_SUPABASE_URL', 'https://test.supabase.co');
+vi.stubEnv('VITE_SUPABASE_ANON_KEY', 'test-anon-key');
+
+// Global test utilities
+(global as any).expect = expect;

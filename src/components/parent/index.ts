@@ -1,0 +1,1 @@
+export { LinkedPlayerCard } from './LinkedPlayerCard';
