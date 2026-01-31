@@ -137,6 +137,7 @@ export function TeamDetailPage() {
           <TeamHeader
             teamName={team.name}
             seasonName={team.season.name}
+            inviteCode={team.invite_code}
             teamRating={teamRating}
             formStreak={formStreak}
             isLoading={isLoadingTeamStats}

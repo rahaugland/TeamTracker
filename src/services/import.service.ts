@@ -1,5 +1,5 @@
 import Papa from 'papaparse';
-import * as XLSX from 'xlsx';
+import ExcelJS from 'exceljs';
 import type { AttendanceStatus, EventType } from '@/types/database.types';
 import { createPlayer, searchPlayers, addPlayerToTeam, getTeamMembership } from './players.service';
 import { createEvent, getEventsByTeam } from './events.service';
@@ -110,105 +110,100 @@ function excelDateToISO(excelDate: number): string {
  * - Row 1: Empty/stats columns, then event titles
  * - Subsequent rows: Player names and attendance (1 = attended, empty = not attended)
  */
-export function parseXLSX(fileBuffer: ArrayBuffer): Promise<ParseResult> {
-  return new Promise((resolve) => {
-    try {
-      const workbook = XLSX.read(fileBuffer, { type: 'array' });
+export async function parseXLSX(fileBuffer: ArrayBuffer): Promise<ParseResult> {
+  try {
+    const workbook = new ExcelJS.Workbook();
+    await workbook.xlsx.load(fileBuffer);
 
-      if (workbook.SheetNames.length === 0) {
-        resolve({
-          data: [],
-          columns: [],
-          error: 'No sheets found in Excel file',
-        });
-        return;
-      }
+    if (workbook.worksheets.length === 0) {
+      return { data: [], columns: [], error: 'No sheets found in Excel file' };
+    }
 
-      const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+    const worksheet = workbook.worksheets[0];
 
-      // Get raw data as array of arrays
-      const rawData = XLSX.utils.sheet_to_json(worksheet, {
-        header: 1,
-        defval: '',
-        raw: false, // Get formatted values
-      }) as any[][];
+    // Read all rows as arrays of values
+    const rawData: any[][] = [];
+    worksheet.eachRow({ includeEmpty: false }, (row) => {
+      rawData.push(row.values as any[]);
+    });
 
-      if (rawData.length < 3) {
-        resolve({
-          data: [],
-          columns: [],
-          error: 'Excel file must have at least 3 rows (headers, event titles, and data)',
-        });
-        return;
-      }
-
-      const headerRow = rawData[0];
-      const eventTitleRow = rawData[1];
-      const dataRows = rawData.slice(2);
-
-      // Find where the event columns start (after summary stats)
-      // Typically column 7, but we'll detect it by finding the first numeric date
-      let eventStartColumn = 7;
-      for (let i = 1; i < headerRow.length; i++) {
-        const val = headerRow[i];
-        if (typeof val === 'string' && !isNaN(parseFloat(val)) && parseFloat(val) > 40000) {
-          eventStartColumn = i;
-          break;
-        }
-      }
-
-      // Transform matrix format into row-per-attendance format
-      const transformedData: CSVRow[] = [];
-      const columns = ['playerName', 'date', 'eventTitle', 'status'];
-
-      dataRows.forEach((row) => {
-        const playerName = String(row[0] || '').trim();
-        if (!playerName) return; // Skip empty rows
-
-        // Process each event column
-        for (let i = eventStartColumn; i < headerRow.length; i++) {
-          const dateStr = String(headerRow[i] || '').trim();
-          const eventTitle = String(eventTitleRow[i] || '').trim();
-          const attendanceValue = String(row[i] || '').trim();
-
-          // Skip if no date or event title
-          if (!dateStr || !eventTitle) continue;
-
-          // Convert Excel serial date to ISO format
-          let parsedDate: string;
-          try {
-            const excelDate = parseFloat(dateStr);
-            if (isNaN(excelDate)) continue;
-            parsedDate = excelDateToISO(excelDate);
-          } catch {
-            continue;
-          }
-
-          // Determine attendance status
-          // In Spond exports: 1 = attended, empty = not attended
-          const status = attendanceValue === '1' ? 'present' : 'absent';
-
-          transformedData.push({
-            playerName,
-            date: parsedDate,
-            eventTitle,
-            status,
-          });
-        }
-      });
-
-      resolve({
-        data: transformedData,
-        columns,
-      });
-    } catch (error) {
-      resolve({
+    if (rawData.length < 3) {
+      return {
         data: [],
         columns: [],
-        error: error instanceof Error ? error.message : 'Unknown error parsing Excel file',
-      });
+        error: 'Excel file must have at least 3 rows (headers, event titles, and data)',
+      };
     }
-  });
+
+    // ExcelJS row.values is 1-indexed (index 0 is undefined), so shift
+    const toArray = (row: any[]) => row.slice(1);
+    const headerRow = toArray(rawData[0]);
+    const eventTitleRow = toArray(rawData[1]);
+    const dataRows = rawData.slice(2).map(toArray);
+
+    // Find where the event columns start (after summary stats)
+    // Typically column 7, but we'll detect it by finding the first numeric date
+    let eventStartColumn = 7;
+    for (let i = 1; i < headerRow.length; i++) {
+      const val = headerRow[i];
+      if (typeof val === 'number' && val > 40000) {
+        eventStartColumn = i;
+        break;
+      }
+      if (typeof val === 'string' && !isNaN(parseFloat(val)) && parseFloat(val) > 40000) {
+        eventStartColumn = i;
+        break;
+      }
+    }
+
+    // Transform matrix format into row-per-attendance format
+    const transformedData: CSVRow[] = [];
+    const columns = ['playerName', 'date', 'eventTitle', 'status'];
+
+    dataRows.forEach((row) => {
+      const playerName = String(row[0] || '').trim();
+      if (!playerName) return;
+
+      for (let i = eventStartColumn; i < headerRow.length; i++) {
+        const rawDate = headerRow[i];
+        const eventTitle = String(eventTitleRow[i] || '').trim();
+        const attendanceValue = String(row[i] || '').trim();
+
+        if (!rawDate || !eventTitle) continue;
+
+        // Convert Excel serial date or Date object to ISO format
+        let parsedDate: string;
+        try {
+          if (rawDate instanceof Date) {
+            parsedDate = rawDate.toISOString();
+          } else {
+            const excelDate = typeof rawDate === 'number' ? rawDate : parseFloat(String(rawDate));
+            if (isNaN(excelDate)) continue;
+            parsedDate = excelDateToISO(excelDate);
+          }
+        } catch {
+          continue;
+        }
+
+        const status = attendanceValue === '1' ? 'present' : 'absent';
+
+        transformedData.push({
+          playerName,
+          date: parsedDate,
+          eventTitle,
+          status,
+        });
+      }
+    });
+
+    return { data: transformedData, columns };
+  } catch (error) {
+    return {
+      data: [],
+      columns: [],
+      error: error instanceof Error ? error.message : 'Unknown error parsing Excel file',
+    };
+  }
 }
 
 /**

@@ -132,9 +132,26 @@ export async function getUserById(userId: string): Promise<UserWithTeams | null>
 
 /**
  * Update a user's role
- * Only head coaches should be able to call this
+ * Only head coaches can call this. Enforced both here and via RLS.
  */
 export async function updateUserRole(userId: string, role: UserRole): Promise<Profile> {
+  const { data: { user: currentUser } } = await supabase.auth.getUser();
+  if (!currentUser) throw new Error('Not authenticated');
+
+  if (currentUser.id === userId) {
+    throw new Error('Cannot change your own role');
+  }
+
+  const { data: currentProfile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', currentUser.id)
+    .single();
+
+  if (currentProfile?.role !== 'head_coach') {
+    throw new Error('Only head coaches can change user roles');
+  }
+
   const { data, error } = await supabase
     .from('profiles')
     .update({

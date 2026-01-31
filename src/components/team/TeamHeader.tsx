@@ -1,11 +1,15 @@
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Copy, Check } from 'lucide-react';
 import type { TeamRating, FormStreak } from '@/services/team-stats.service';
 
 interface TeamHeaderProps {
   teamName: string;
   seasonName: string;
+  inviteCode?: string;
   teamRating: TeamRating | null;
   formStreak: FormStreak | null;
   isLoading?: boolean;
@@ -18,11 +22,20 @@ interface TeamHeaderProps {
 export function TeamHeader({
   teamName,
   seasonName,
+  inviteCode,
   teamRating,
   formStreak,
   isLoading = false,
 }: TeamHeaderProps) {
   const { t } = useTranslation();
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyCode = async () => {
+    if (!inviteCode) return;
+    await navigator.clipboard.writeText(inviteCode);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   if (isLoading) {
     return (
@@ -65,6 +78,15 @@ export function TeamHeader({
           <div>
             <h1 className="text-3xl font-bold">{teamName}</h1>
             <p className="text-muted-foreground mt-1">{seasonName}</p>
+            {inviteCode && (
+              <div className="flex items-center gap-2 mt-2">
+                <span className="text-sm text-muted-foreground">{t('team.inviteCode')}:</span>
+                <code className="text-sm font-mono bg-muted px-2 py-0.5 rounded">{inviteCode}</code>
+                <Button variant="ghost" size="icon" className="h-6 w-6" onClick={handleCopyCode}>
+                  {copied ? <Check className="h-3.5 w-3.5 text-green-500" /> : <Copy className="h-3.5 w-3.5" />}
+                </Button>
+              </div>
+            )}
           </div>
 
           {/* Team Rating & Form */}
