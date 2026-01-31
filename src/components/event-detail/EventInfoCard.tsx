@@ -59,7 +59,7 @@ export function EventInfoCard({
           <div>
             <span className="text-sm font-medium">{t('event.opponentTier.label')}:</span>
             <p className="text-sm text-muted-foreground">
-              {t(`event.opponentTier.tier${opponentTier}`)} ({opponentTier}/9)
+              {t(`event.opponentTier.tier${opponentTier}` as any)} ({opponentTier}/9)
             </p>
           </div>
         )}

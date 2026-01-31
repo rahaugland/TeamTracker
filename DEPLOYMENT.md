@@ -199,6 +199,8 @@ After deployment, verify these features work:
 - [ ] Images and icons load
 - [ ] Form submissions work
 - [ ] Data persists after refresh
+- [ ] Game finalization works (locks stats, shows awards)
+- [ ] Season creation and finalization works
 
 ### Testing PWA Features
 

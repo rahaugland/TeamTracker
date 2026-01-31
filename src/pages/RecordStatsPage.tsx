@@ -194,7 +194,7 @@ export function RecordStatsPage() {
         setting_errors: row.settingErrors,
         sets_played: row.setsPlayed,
         rotations_played: row.rotationsPlayed,
-        rotation: row.rotation,
+        rotation: (row.rotation as 1 | 2 | 3 | 4 | 5 | 6 | undefined) ?? undefined,
       };
 
       if (row.statEntryId) {
@@ -241,6 +241,13 @@ export function RecordStatsPage() {
           ball_handling_errors: row.ballHandlingErrors,
           pass_attempts: row.passAttempts,
           pass_sum: row.passSum,
+          block_touches: row.blockTouches,
+          set_attempts: row.setAttempts,
+          set_sum: row.setSum,
+          setting_errors: row.settingErrors,
+          sets_played: row.setsPlayed,
+          rotations_played: row.rotationsPlayed,
+          rotation: (row.rotation as 1 | 2 | 3 | 4 | 5 | 6 | undefined) ?? undefined,
         };
 
         if (row.statEntryId) {

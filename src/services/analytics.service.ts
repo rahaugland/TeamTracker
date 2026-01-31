@@ -414,7 +414,7 @@ export async function getUpcomingEventsWithRSVPs(
 
         if (rsvpError) {
           console.error('Error fetching RSVPs:', rsvpError);
-          return { ...event, rsvpCounts: { attending: 0, not_attending: 0, maybe: 0, pending: 0 } };
+          return { ...event, rsvpCounts: { attending: 0, not_attending: 0, maybe: 0, pending: 0 }, totalRSVPs: 0 };
         }
 
         const rsvpCounts = {

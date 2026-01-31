@@ -6,6 +6,19 @@ This directory contains SQL migration files for the TeamTracker database.
 
 - `20260123_initial_schema.sql` - Complete database schema with all tables, indexes, and triggers
 - `20260123_rls_policies.sql` - Row Level Security policies for role-based access control
+- `20260123_remaining_schema.sql` - Additional schema objects
+- `20260123_fix_profile_trigger.sql` - Fix profile creation trigger
+- `20260124_seed_drills.sql` - Seed data for drill library
+- `20260124_update_drills_rls.sql` - Updated RLS policies for drills
+- `20260124_team_invite_codes.sql` - Team invite code support
+- `20260125_fix_orphaned_players.sql` - Fix orphaned player records
+- `20260127_player_stats_schema.sql` - Player statistics tables
+- `20260128_opponent_tier_1_9.sql` - Opponent tier 1-9 scale
+- `20260128_add_not_selected_status.sql` - "Not selected" attendance status
+- `20260130_deeper_stats.sql` - Extended stat tracking fields
+- `20260130_unique_team_membership.sql` - Unique constraint on team memberships
+- `20260130_set_quality_tracking.sql` - Set quality tracking fields
+- `20260131_finalize_and_awards.sql` - Game finalization, match awards, team seasons, and season awards
 
 ## Schema Overview
 
@@ -30,9 +43,15 @@ This directory contains SQL migration files for the TeamTracker database.
 - **practice_blocks** - Drill sequences within practice plans
 - **drill_executions** - Track when drills are performed
 
-### Analytics (Phase 2)
+### Analytics & Stats
 
 - **stat_entries** - Game statistics
+- **game_awards** - Per-game match awards (MVP, top attacker, etc.)
+
+### Seasons & Awards
+
+- **team_seasons** - Coach-created seasons with date ranges
+- **season_awards** - End-of-season awards (season MVP, most improved, etc.)
 
 ### Access Control
 
@@ -59,9 +78,7 @@ supabase db push
 
 1. Open Supabase Dashboard
 2. Navigate to SQL Editor
-3. Run each migration file in order:
-   - `20260123_initial_schema.sql`
-   - `20260123_rls_policies.sql`
+3. Run each migration file in chronological order (all files in `migrations/` directory)
 
 ## Row Level Security
 

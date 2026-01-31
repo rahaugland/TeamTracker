@@ -40,7 +40,7 @@ export function EventHeaderActions({
         <div>
           <h1 className="text-3xl font-bold mb-2">{eventTitle}</h1>
           <p className="text-muted-foreground">
-            {t(`event.types.${eventType}`)}
+            {t(`event.types.${eventType}` as any)}
             {opponent && ` vs ${opponent}`}
           </p>
         </div>

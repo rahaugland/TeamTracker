@@ -102,22 +102,22 @@ export function BestXIFormation({ bestXI, isLoading = false }: BestXIFormationPr
         <div className="space-y-6">
           {/* Front Row: OHs and OPP */}
           <div className="grid grid-cols-3 gap-4">
-            <PlayerCard player={bestXI?.outsideHitter1} label={t('team.dashboard.outsideHitter')} />
-            <PlayerCard player={bestXI?.opposite} label={t('team.dashboard.opposite')} />
-            <PlayerCard player={bestXI?.outsideHitter2} label={t('team.dashboard.outsideHitter')} />
+            <PlayerCard player={bestXI?.outsideHitter1 ?? null} label={t('team.dashboard.outsideHitter')} />
+            <PlayerCard player={bestXI?.opposite ?? null} label={t('team.dashboard.opposite')} />
+            <PlayerCard player={bestXI?.outsideHitter2 ?? null} label={t('team.dashboard.outsideHitter')} />
           </div>
 
           {/* Middle Row: MBs and Setter */}
           <div className="grid grid-cols-3 gap-4">
-            <PlayerCard player={bestXI?.middleBlocker1} label={t('team.dashboard.middleBlocker')} />
-            <PlayerCard player={bestXI?.setter} label={t('team.dashboard.setter')} />
-            <PlayerCard player={bestXI?.middleBlocker2} label={t('team.dashboard.middleBlocker')} />
+            <PlayerCard player={bestXI?.middleBlocker1 ?? null} label={t('team.dashboard.middleBlocker')} />
+            <PlayerCard player={bestXI?.setter ?? null} label={t('team.dashboard.setter')} />
+            <PlayerCard player={bestXI?.middleBlocker2 ?? null} label={t('team.dashboard.middleBlocker')} />
           </div>
 
           {/* Back Row: Libero */}
           <div className="flex justify-center">
             <div className="w-1/3">
-              <PlayerCard player={bestXI?.libero} label={t('team.dashboard.libero')} />
+              <PlayerCard player={bestXI?.libero ?? null} label={t('team.dashboard.libero')} />
             </div>
           </div>
         </div>

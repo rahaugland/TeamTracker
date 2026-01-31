@@ -79,7 +79,7 @@ export function MatchResultSection({
           <CardContent>
             <MatchResultForm
               initialData={
-                setsWon !== undefined && setsLost !== undefined
+                setsWon !== undefined && setsWon !== null && setsLost !== undefined && setsLost !== null
                   ? {
                       setsWon: setsWon,
                       setsLost: setsLost,

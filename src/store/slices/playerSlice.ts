@@ -1,22 +1,11 @@
 import { StateCreator } from 'zustand';
-import { PlayerPosition } from '@/lib/validations/player';
+import type { Player as DatabasePlayer } from '@/types/database.types';
 
 /**
  * Player entity based on SPEC.md
+ * Re-export the database Player type for consistency
  */
-export interface Player {
-  id: string;
-  name: string;
-  email?: string;
-  phone?: string;
-  birth_date?: string;
-  positions: PlayerPosition[];
-  photo_url?: string;
-  user_id?: string;
-  created_by: string;
-  created_at: string;
-  updated_at: string;
-}
+export type Player = DatabasePlayer;
 
 /**
  * Player slice state interface
