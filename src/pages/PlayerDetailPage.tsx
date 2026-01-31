@@ -14,6 +14,7 @@ import type { CoachNoteWithAuthor } from '@/services/coach-notes.service';
 import { Textarea } from '@/components/ui/textarea';
 import { ConfirmDialog } from '@/components/common/ConfirmDialog';
 import { AddToTeamModal } from '@/components/modals/AddToTeamModal';
+import { PlayerAwardsHighlight } from '@/components/player-stats/PlayerAwardsHighlight';
 
 /**
  * PlayerDetailPage component
@@ -161,6 +162,8 @@ export function PlayerDetailPage() {
           </div>
         </div>
       </div>
+
+      {id && <PlayerAwardsHighlight playerId={id} />}
 
       <Tabs defaultValue="info" className="space-y-4">
         <TabsList>

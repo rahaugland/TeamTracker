@@ -16,6 +16,7 @@ import { MissedEventsTimeline } from '@/components/player-stats/MissedEventsTime
 import { DrillCountBySkill } from '@/components/player-stats/DrillCountBySkill';
 import { SkillProgressionChart } from '@/components/player-stats/SkillProgressionChart';
 import { TrainingVolumeChart } from '@/components/player-stats/TrainingVolumeChart';
+import { PlayerTrophyCase } from '@/components/player-stats/PlayerTrophyCase';
 import type { TimePeriod, CustomDateRange } from '@/services/player-stats.service';
 import type { VolleyballPosition } from '@/types/database.types';
 import { getPlayer } from '@/services/players.service';
@@ -179,6 +180,13 @@ export function PlayerStatsPage() {
             aggregatedStats={rating.aggregatedStats}
             gameStats={gameStatLines}
           />
+        </div>
+      )}
+
+      {/* Trophy Case */}
+      {!isLoading && id && (
+        <div className="mb-8">
+          <PlayerTrophyCase playerId={id} />
         </div>
       )}
 
