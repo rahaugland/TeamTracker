@@ -57,6 +57,11 @@ export function JoinTeamPage() {
     setError(null);
 
     try {
+      // Debug: check auth state
+      const { supabase } = await import('@/lib/supabase');
+      const { data: { session } } = await supabase.auth.getSession();
+      console.log('DEBUG join - session user:', session?.user?.id, 'role:', session?.user?.role, 'user_id being sent:', user.id);
+
       // Create player record for the user
       const player = await createPlayer({
         name: user.name,
