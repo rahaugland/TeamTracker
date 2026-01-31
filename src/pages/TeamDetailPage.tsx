@@ -54,12 +54,6 @@ export function TeamDetailPage() {
     isLoading: isLoadingTeamStats,
   } = useTeamStats({ teamId: id || '' });
 
-  useEffect(() => {
-    if (id) {
-      loadData();
-    }
-  }, [id]);
-
   const loadData = async () => {
     if (!id) return;
 
@@ -115,6 +109,12 @@ export function TeamDetailPage() {
       setIsLoadingPlayers(false);
     }
   };
+
+  useEffect(() => {
+    if (id) {
+      loadData();
+    }
+  }, [id]);
 
   if (!team && !isLoadingPlayers) {
     return (

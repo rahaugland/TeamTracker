@@ -74,30 +74,33 @@ export function useSyncStatus() {
  */
 export function useLastSyncFormatted(): string | null {
   const { lastSync } = useSyncStatus();
+  const [formatted, setFormatted] = useState<string | null>(null);
 
-  if (!lastSync) return null;
+  useEffect(() => {
+    if (!lastSync) {
+      setFormatted(null);
+      return;
+    }
 
-  const now = Date.now();
-  const diff = now - lastSync;
+    const format = () => {
+      const diff = Date.now() - lastSync;
+      if (diff < 60000) return 'Just now';
+      if (diff < 3600000) {
+        const minutes = Math.floor(diff / 60000);
+        return `${minutes} minute${minutes !== 1 ? 's' : ''} ago`;
+      }
+      if (diff < 86400000) {
+        const hours = Math.floor(diff / 3600000);
+        return `${hours} hour${hours !== 1 ? 's' : ''} ago`;
+      }
+      const days = Math.floor(diff / 86400000);
+      return `${days} day${days !== 1 ? 's' : ''} ago`;
+    };
 
-  // Less than 1 minute
-  if (diff < 60000) {
-    return 'Just now';
-  }
+    setFormatted(format());
+    const interval = setInterval(() => setFormatted(format()), 60000);
+    return () => clearInterval(interval);
+  }, [lastSync]);
 
-  // Less than 1 hour
-  if (diff < 3600000) {
-    const minutes = Math.floor(diff / 60000);
-    return `${minutes} minute${minutes !== 1 ? 's' : ''} ago`;
-  }
-
-  // Less than 24 hours
-  if (diff < 86400000) {
-    const hours = Math.floor(diff / 3600000);
-    return `${hours} hour${hours !== 1 ? 's' : ''} ago`;
-  }
-
-  // More than 24 hours
-  const days = Math.floor(diff / 86400000);
-  return `${days} day${days !== 1 ? 's' : ''} ago`;
+  return formatted;
 }
