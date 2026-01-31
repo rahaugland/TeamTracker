@@ -54,67 +54,70 @@ export function TeamDetailPage() {
     isLoading: isLoadingTeamStats,
   } = useTeamStats({ teamId: id || '' });
 
-  const loadData = async () => {
-    if (!id) return;
-
-    try {
-      // Load team info
-      const teamData = await getTeam(id);
-      setTeam(teamData);
-
-      // Load players
-      setIsLoadingPlayers(true);
-      const playersData = await getPlayersByTeam(id);
-
-      // Load attendance rates
-      const attendance = await getPlayerAttendanceRates(id);
-      setAttendanceRates(attendance);
-
-      // Load player ratings
-      const playersWithRatings = await Promise.all(
-        playersData.map(async (player) => {
-          const primaryPosition = player.positions?.[0] || 'all_around';
-          const statEntries = await getPlayerStats(player.id, 'career', undefined, id);
-
-          let rating: number | undefined;
-          let ratingData: PlayerRating | undefined;
-
-          if (statEntries.length > 0) {
-            ratingData = calculatePlayerRating(statEntries, primaryPosition);
-            rating = ratingData.overall;
-          }
-
-          // Get jersey number from team membership
-          const membership = playersData.find((p) => p.id === player.id);
-
-          return {
-            ...player,
-            rating,
-            ratingData,
-            jerseyNumber: membership?.team_memberships?.[0]?.jersey_number,
-          } as PlayerWithRating;
-        })
-      );
-
-      setPlayers(playersWithRatings);
-      setIsLoadingPlayers(false);
-    } catch (error) {
-      console.error('Error loading team data:', error);
-      addNotification({
-        id: Date.now().toString(),
-        type: 'error',
-        message: t('common.messages.error'),
-        duration: 5000,
-      });
-      setIsLoadingPlayers(false);
-    }
-  };
-
   useEffect(() => {
-    if (id) {
-      loadData();
-    }
-  }, [id]);
+    if (!id) return;
+    let cancelled = false;
+
+    const loadData = async () => {
+      try {
+        const teamData = await getTeam(id);
+        if (cancelled) return;
+        setTeam(teamData);
+
+        setIsLoadingPlayers(true);
+        const playersData = await getPlayersByTeam(id);
+        if (cancelled) return;
+
+        const attendance = await getPlayerAttendanceRates(id);
+        if (cancelled) return;
+        setAttendanceRates(attendance);
+
+        const playersWithRatings = await Promise.all(
+          playersData.map(async (player) => {
+            const primaryPosition = player.positions?.[0] || 'all_around';
+            const statEntries = await getPlayerStats(player.id, 'career', undefined, id);
+
+            let rating: number | undefined;
+            let ratingData: PlayerRating | undefined;
+
+            if (statEntries.length > 0) {
+              ratingData = calculatePlayerRating(statEntries, primaryPosition);
+              rating = ratingData.overall;
+            }
+
+            const membership = playersData.find((p) => p.id === player.id);
+
+            return {
+              ...player,
+              rating,
+              ratingData,
+              jerseyNumber: membership?.team_memberships?.[0]?.jersey_number,
+            } as PlayerWithRating;
+          })
+        );
+
+        if (cancelled) return;
+        setPlayers(playersWithRatings);
+        setIsLoadingPlayers(false);
+      } catch (error) {
+        if (cancelled) return;
+        console.error('Error loading team data:', error);
+        addNotification({
+          id: Date.now().toString(),
+          type: 'error',
+          message: t('common.messages.error'),
+          duration: 5000,
+        });
+        setIsLoadingPlayers(false);
+      }
+    };
+
+    loadData();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [id, addNotification, t]);
 
   if (!team && !isLoadingPlayers) {
     return (

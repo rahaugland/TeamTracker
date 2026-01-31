@@ -294,13 +294,9 @@ export async function getTeamByInviteCode(code: string): Promise<TeamWithSeason 
       season:seasons(*)
     `)
     .eq('invite_code', code.toUpperCase())
-    .single();
+    .maybeSingle();
 
   if (error) {
-    if (error.code === 'PGRST116') {
-      // No rows returned - invalid code
-      return null;
-    }
     console.error('Error fetching team by invite code:', error);
     throw error;
   }

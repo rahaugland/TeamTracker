@@ -379,7 +379,12 @@ export async function createPlayer(input: CreatePlayerInput): Promise<Player> {
         await db.players.put(addSyncMetadata(data, true));
 
         return data;
-      } catch (error) {
+      } catch (error: any) {
+        // If it's an RLS/auth error, propagate it instead of falling back to offline
+        if (error?.code === '42501' || error?.code === '403') {
+          await db.players.delete(tempId);
+          throw error;
+        }
         console.error('Error syncing to Supabase, keeping offline record:', error);
         // Keep the offline record for later sync
         return newPlayer;
