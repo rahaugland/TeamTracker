@@ -136,6 +136,88 @@ export async function deleteRSVP(eventId: string, playerId: string): Promise<voi
 }
 
 /**
+ * Create pending RSVP records for a player for all upcoming events in a team
+ */
+export async function createPendingRSVPsForPlayer(
+  playerId: string,
+  teamId: string,
+  respondedBy: string
+): Promise<void> {
+  const now = new Date().toISOString();
+
+  // Get all upcoming events for the team
+  const { data: events, error: eventsError } = await supabase
+    .from('events')
+    .select('id')
+    .eq('team_id', teamId)
+    .gte('start_time', now);
+
+  if (eventsError) {
+    console.error('Error fetching upcoming events for RSVP creation:', eventsError);
+    return;
+  }
+
+  if (!events || events.length === 0) return;
+
+  // Build RSVP records, using upsert to avoid duplicates
+  const rsvpRecords = events.map((event) => ({
+    event_id: event.id,
+    player_id: playerId,
+    status: 'pending' as RsvpStatus,
+    responded_by: respondedBy,
+    responded_at: now,
+  }));
+
+  const { error } = await supabase
+    .from('rsvps')
+    .upsert(rsvpRecords, { onConflict: 'event_id,player_id' });
+
+  if (error) {
+    console.error('Error creating pending RSVPs for player:', error);
+  }
+}
+
+/**
+ * Create pending RSVP records for all active team members for an event
+ */
+export async function createPendingRSVPsForEvent(
+  eventId: string,
+  teamId: string,
+  respondedBy: string
+): Promise<void> {
+  // Get all active team members
+  const { data: memberships, error: membershipsError } = await supabase
+    .from('team_memberships')
+    .select('player_id')
+    .eq('team_id', teamId)
+    .eq('is_active', true);
+
+  if (membershipsError) {
+    console.error('Error fetching team members for RSVP creation:', membershipsError);
+    return;
+  }
+
+  if (!memberships || memberships.length === 0) return;
+
+  const now = new Date().toISOString();
+  const rsvpRecords = memberships.map((m) => ({
+    event_id: eventId,
+    player_id: m.player_id,
+    status: 'pending' as RsvpStatus,
+    responded_by: respondedBy,
+    responded_at: now,
+  }));
+
+  const { error } = await supabase
+    .from('rsvps')
+    .upsert(rsvpRecords, { onConflict: 'event_id,player_id' });
+
+  if (error) {
+    console.error('Error creating pending RSVPs for event:', error);
+  }
+}
+
+/**
  * Get RSVP summary for an event
  */
 export async function getRSVPSummary(eventId: string): Promise<{

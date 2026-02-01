@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/store';
-import { getPlayers, type PlayerWithMemberships } from '@/services/players.service';
+import { getPlayers, getPlayer, type PlayerWithMemberships } from '@/services/players.service';
 import { getUpcomingEvents } from '@/services/events.service';
 import { getPlayerAttendance } from '@/services/attendance.service';
 import { getPlayerRSVPs } from '@/services/rsvp.service';
@@ -60,17 +60,24 @@ export function PlayerDashboardPage() {
     try {
       // Find player record for this user
       const players = await getPlayers();
-      const playerRecord = players.find((p) => p.user_id === user.id);
+      const basicPlayer = players.find((p) => p.user_id === user.id);
 
+      if (!basicPlayer) {
+        setIsLoading(false);
+        return;
+      }
+
+      // Get full player with team_memberships
+      const playerRecord = await getPlayer(basicPlayer.id);
       if (!playerRecord) {
         setIsLoading(false);
         return;
       }
 
-      setPlayer(playerRecord as any);
+      setPlayer(playerRecord);
 
       // Get team IDs from player's memberships
-      const teamIds = (playerRecord as any).team_memberships?.map((tm: any) => tm.team_id) || [];
+      const teamIds = playerRecord.team_memberships?.map((tm) => tm.team_id) || [];
 
       // Load upcoming events for all teams
       const eventsPromises = teamIds.map((teamId: string) => getUpcomingEvents(teamId));
