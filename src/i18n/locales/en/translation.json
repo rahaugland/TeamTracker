@@ -102,6 +102,10 @@
       "player": "Player",
       "captain": "Captain"
     },
+    "pendingMemberships": {
+      "title": "Pending Team Requests",
+      "waitingApproval": "Waiting for coach approval"
+    },
     "noActiveSeason": "No active season. Please create and activate a season first.",
     "noTeamsAvailable": "No teams available in the active season",
     "search": {

@@ -9,10 +9,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { User, Mail, Phone, Shield, Users, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { JoinTeamCard } from '@/components/player/JoinTeamCard';
+import { PendingMemberships } from '@/components/player/PendingMemberships';
 
 export function ProfilePage() {
   const { t } = useTranslation();
   const { user: currentUser, syncSession } = useAuth();
+  const isPlayer = currentUser?.role === 'player';
+  const [joinRefreshKey, setJoinRefreshKey] = useState(0);
 
   const [profile, setProfile] = useState<UserWithTeams | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -333,6 +337,17 @@ export function ProfilePage() {
             )}
           </CardContent>
         </Card>
+
+        {/* Join Team & Pending Requests (players only) */}
+        {isPlayer && (
+          <>
+            <JoinTeamCard onJoined={() => {
+              setJoinRefreshKey((k) => k + 1);
+              loadProfile();
+            }} />
+            <PendingMemberships refreshKey={joinRefreshKey} />
+          </>
+        )}
       </div>
     </div>
   );
