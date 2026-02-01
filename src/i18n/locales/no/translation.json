@@ -80,6 +80,10 @@
     "notes": "Trenernotater",
     "noPlayers": "Ingen spillere ennå",
     "noPlayersDescription": "Legg til din første spiller for å bygge troppen",
+    "pendingMemberships": {
+      "title": "Ventende lagforespørsler",
+      "waitingApproval": "Venter på godkjenning fra trener"
+    },
     "alreadyOnTeam": "Denne spilleren er allerede et aktivt medlem av dette laget",
     "role": "Rolle",
     "roles": {

@@ -849,19 +849,7 @@ export async function approveTeamMembership(membershipId: string): Promise<void>
     await db.team_memberships.put(addSyncMetadata(data, true));
   }
 
-  // Also create RSVPs client-side as a fallback
-  if (data) {
-    // Fetch player from Supabase to get user_id (local DB may not have it)
-    const { data: player } = await supabase
-      .from('players')
-      .select('user_id')
-      .eq('id', data.player_id)
-      .single();
-    const respondedBy = player?.user_id || data.player_id;
-    createPendingRSVPsForPlayer(data.player_id, data.team_id, respondedBy).catch(err =>
-      console.warn('Failed to create pending RSVPs for approved member:', err)
-    );
-  }
+  // RSVPs are created automatically by the DB trigger fn_create_rsvps_for_new_member
 }
 
 /**

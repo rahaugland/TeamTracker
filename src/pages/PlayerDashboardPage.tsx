@@ -39,6 +39,8 @@ import {
 } from '@/components/ui/select';
 import { Calendar, Users, TrendingUp, Home, BarChart3, MessageSquare, ClipboardCheck } from 'lucide-react';
 import { format } from 'date-fns';
+import { JoinTeamCard } from '@/components/player/JoinTeamCard';
+import { PendingMemberships } from '@/components/player/PendingMemberships';
 
 export function PlayerDashboardPage() {
   const { t } = useTranslation();
@@ -53,8 +55,11 @@ export function PlayerDashboardPage() {
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
   const [rsvpStatus, setRsvpStatus] = useState<RsvpStatus>('pending');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
 
-  const teamIds = player?.team_memberships?.map((tm) => tm.team_id) || [];
+  const activeMemberships = player?.team_memberships?.filter((tm) => tm.status === 'active' || !tm.status) || [];
+  const teamIds = activeMemberships.map((tm) => tm.team_id);
+  const hasActiveTeams = teamIds.length > 0;
 
   const { announcements, pinnedAnnouncements } = useAnnouncements(teamIds);
   const { feedback, reviews, skillRatings, refetch: refetchFeedback } = usePlayerFeedback(player?.id);
@@ -85,7 +90,9 @@ export function PlayerDashboardPage() {
 
       setPlayer(playerRecord);
 
-      const playerTeamIds = playerRecord.team_memberships?.map((tm) => tm.team_id) || [];
+      const playerTeamIds = playerRecord.team_memberships
+        ?.filter((tm: any) => tm.status === 'active' || !tm.status)
+        .map((tm: any) => tm.team_id) || [];
 
       const eventsPromises = playerTeamIds.map((teamId: string) => getUpcomingEvents(teamId));
       const eventsResults = await Promise.all(eventsPromises);
@@ -143,18 +150,22 @@ export function PlayerDashboardPage() {
     );
   }
 
-  if (!player) {
+  if (!player || !hasActiveTeams) {
     return (
       <div className="container max-w-4xl mx-auto py-8 px-4">
-        <Card>
-          <CardContent className="py-12 text-center">
-            <Users className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-            <p className="text-muted-foreground mb-4">
-              No player profile found. Please contact your coach.
-            </p>
-            <Button onClick={() => navigate('/join-team')}>{t('joinTeam.title')}</Button>
-          </CardContent>
-        </Card>
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold">
+            {t('auth.profile.welcome', { name: user?.name || '' })}
+          </h1>
+          <p className="text-muted-foreground mt-1">{t('player.singular')}</p>
+        </div>
+        <div className="space-y-6">
+          <JoinTeamCard onJoined={() => {
+            setRefreshKey((k) => k + 1);
+            loadDashboardData();
+          }} />
+          <PendingMemberships refreshKey={refreshKey} />
+        </div>
       </div>
     );
   }
