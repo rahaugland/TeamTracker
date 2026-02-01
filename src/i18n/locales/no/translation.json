@@ -402,7 +402,8 @@
       "not_attending": "Kommer ikke",
       "maybe": "Kanskje",
       "pending": "Venter"
-    }
+    },
+    "noPlayersInStatus": "Ingen spillere med denne statusen"
   },
   "attendance": {
     "title": "Oppmøte",

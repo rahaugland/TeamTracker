@@ -79,7 +79,7 @@ export async function getAllUsers(roleFilter?: UserRole): Promise<UserWithTeams[
           season:seasons(id, name)
         )
       ),
-      players(
+      players!players_user_id_fkey(
         id,
         team_memberships(
           id,
@@ -132,7 +132,7 @@ export async function getUserById(userId: string): Promise<UserWithTeams | null>
           season:seasons(id, name)
         )
       ),
-      players(
+      players!players_user_id_fkey(
         id,
         team_memberships(
           id,

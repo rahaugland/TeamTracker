@@ -16,7 +16,7 @@ import { ConfirmDialog } from '@/components/common/ConfirmDialog';
 import { AddToTeamModal } from '@/components/modals/AddToTeamModal';
 import { PlayerAwardsHighlight } from '@/components/player-stats/PlayerAwardsHighlight';
 import { WriteReviewModal } from '@/components/player/WriteReviewModal';
-import { SkillRatingWidget } from '@/components/player/SkillRatingWidget';
+
 
 /**
  * PlayerDetailPage component
@@ -378,14 +378,6 @@ export function PlayerDetailPage() {
             onSaved={() => setShowReviewModal(false)}
           />
 
-          <div className="mt-6">
-            <SkillRatingWidget
-              playerId={id}
-              teamId={player.team_memberships?.[0]?.team_id || ''}
-              authorId={user.id}
-              onSaved={() => {}}
-            />
-          </div>
         </>
       )}
     </div>
