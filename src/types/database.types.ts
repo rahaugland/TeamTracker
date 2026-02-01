@@ -294,6 +294,67 @@ export interface PlayerGoal {
   updated_at: string;
 }
 
+export type SkillRatingType = 'serve' | 'pass' | 'attack' | 'block' | 'set' | 'defense';
+
+export interface Announcement {
+  id: string;
+  team_id: string;
+  author_id: string;
+  title: string;
+  content: string;
+  pinned: boolean;
+  created_at: string;
+}
+
+export interface PlayerFeedback {
+  id: string;
+  player_id: string;
+  event_id: string;
+  author_id: string;
+  content: string;
+  created_at: string;
+}
+
+export interface PlayerReview {
+  id: string;
+  player_id: string;
+  team_id: string;
+  season_id?: string;
+  author_id: string;
+  strengths: string;
+  areas_to_improve: string;
+  goals_text: string;
+  created_at: string;
+}
+
+export interface SkillRating {
+  id: string;
+  player_id: string;
+  team_id: string;
+  author_id: string;
+  skill_type: SkillRatingType;
+  rating: number;
+  rated_at: string;
+}
+
+export interface SelfAssessment {
+  id: string;
+  player_id: string;
+  event_id: string;
+  rating: number;
+  notes?: string;
+  created_at: string;
+}
+
+export interface PushSubscription {
+  id: string;
+  user_id: string;
+  endpoint: string;
+  p256dh: string;
+  auth: string;
+  created_at: string;
+}
+
 export interface SyncLogEntry {
   id: string;
   user_id: string;

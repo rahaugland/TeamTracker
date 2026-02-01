@@ -15,6 +15,7 @@
       "back": "Back",
       "next": "Next",
       "submit": "Submit",
+      "submitting": "Submitting...",
       "search": "Search",
       "filter": "Filter",
       "reset": "Reset"
@@ -915,6 +916,80 @@
       "serve_pct": "Serve %",
       "attendance": "Attendance",
       "custom": "Custom"
+    }
+  },
+  "playerExperience": {
+    "tabs": {
+      "home": "Home",
+      "myStats": "My Stats",
+      "feedback": "Feedback",
+      "selfAssessment": "Self-Assessment"
+    },
+    "home": {
+      "nextEvent": "Next Event",
+      "viewAllEvents": "View All Events"
+    },
+    "stats": {
+      "activeTeams": "Active teams"
+    },
+    "announcements": {
+      "title": "Announcements",
+      "create": "Post Announcement",
+      "titleLabel": "Title",
+      "titlePlaceholder": "Enter announcement title",
+      "content": "Content",
+      "contentPlaceholder": "Write your announcement...",
+      "pinned": "Pin to top",
+      "noAnnouncements": "No announcements yet"
+    },
+    "feedback": {
+      "title": "Coach Feedback",
+      "feedbackFor": "Feedback for {{playerName}}",
+      "yourFeedback": "Your Feedback",
+      "feedbackPlaceholder": "Share your feedback about this player's performance...",
+      "noFeedback": "No feedback yet"
+    },
+    "reviews": {
+      "title": "Reviews",
+      "writeReview": "Write Review for {{playerName}}",
+      "writeReviewAction": "Write Review",
+      "strengths": "Strengths",
+      "strengthsPlaceholder": "What does this player do well?",
+      "areasToImprove": "Areas to Improve",
+      "areasPlaceholder": "What areas could this player work on?",
+      "goals": "Goals",
+      "goalsPlaceholder": "What goals should this player focus on?",
+      "reviewBy": "Review by {{author}}"
+    },
+    "skills": {
+      "title": "Skill Ratings",
+      "rateSkills": "Rate Skills",
+      "serve": "Serve",
+      "pass": "Pass",
+      "attack": "Attack",
+      "block": "Block",
+      "set": "Set",
+      "defense": "Defense",
+      "selected": "Selected",
+      "saveRatings": "Save Ratings",
+      "noRatings": "No skill ratings yet"
+    },
+    "selfAssessment": {
+      "formTitle": "Rate Your Performance",
+      "selectEvent": "Select Event",
+      "selectEventPlaceholder": "Choose an event to rate",
+      "rating": "Rating",
+      "notes": "Notes (optional)",
+      "notesPlaceholder": "How did you feel? What went well?",
+      "noEventsToRate": "No events available to rate",
+      "noHistory": "No self-assessments yet",
+      "history": "Self-Assessment History"
+    },
+    "pushNotifications": {
+      "enable": "Enable Notifications",
+      "disable": "Disable Notifications",
+      "enabled": "Notifications enabled",
+      "disabled": "Notifications disabled"
     }
   }
 }

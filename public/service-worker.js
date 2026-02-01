@@ -108,6 +108,55 @@ self.addEventListener('sync', (event) => {
   }
 });
 
+// Push notification event
+self.addEventListener('push', (event) => {
+  console.log('[Service Worker] Push received');
+
+  let data = { title: 'TeamTracker', body: 'You have a new notification', url: '/' };
+
+  if (event.data) {
+    try {
+      data = event.data.json();
+    } catch {
+      data.body = event.data.text();
+    }
+  }
+
+  const options = {
+    body: data.body,
+    icon: '/icons/icon-192x192.png',
+    badge: '/icons/icon-192x192.png',
+    data: { url: data.url || '/' },
+    vibrate: [100, 50, 100],
+  };
+
+  event.waitUntil(
+    self.registration.showNotification(data.title, options)
+  );
+});
+
+// Notification click event
+self.addEventListener('notificationclick', (event) => {
+  console.log('[Service Worker] Notification click');
+  event.notification.close();
+
+  const url = event.notification.data?.url || '/';
+
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clients) => {
+      // Focus existing window if one exists
+      for (const client of clients) {
+        if (client.url.includes(self.location.origin) && 'focus' in client) {
+          client.navigate(url);
+          return client.focus();
+        }
+      }
+      // Otherwise open new window
+      return self.clients.openWindow(url);
+    })
+  );
+});
+
 // Message event - handle commands from the app
 self.addEventListener('message', (event) => {
   console.log('[Service Worker] Message received:', event.data);
