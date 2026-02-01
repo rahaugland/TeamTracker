@@ -15,6 +15,7 @@
       "back": "Tilbake",
       "next": "Neste",
       "submit": "Send inn",
+      "submitting": "Sender inn...",
       "search": "Søk",
       "filter": "Filtrer",
       "reset": "Tilbakestill"
@@ -832,6 +833,80 @@
       "serve_pct": "Serve %",
       "attendance": "Oppmøte",
       "custom": "Egendefinert"
+    }
+  },
+  "playerExperience": {
+    "tabs": {
+      "home": "Hjem",
+      "myStats": "Min Statistikk",
+      "feedback": "Tilbakemelding",
+      "selfAssessment": "Egenvurdering"
+    },
+    "home": {
+      "nextEvent": "Neste Hendelse",
+      "viewAllEvents": "Vis Alle Hendelser"
+    },
+    "stats": {
+      "activeTeams": "Aktive lag"
+    },
+    "announcements": {
+      "title": "Kunngjøringer",
+      "create": "Legg ut Kunngjøring",
+      "titleLabel": "Tittel",
+      "titlePlaceholder": "Skriv inn kunngjøringstittel",
+      "content": "Innhold",
+      "contentPlaceholder": "Skriv kunngjøringen din...",
+      "pinned": "Fest til toppen",
+      "noAnnouncements": "Ingen kunngjøringer ennå"
+    },
+    "feedback": {
+      "title": "Trenertilbakemelding",
+      "feedbackFor": "Tilbakemelding for {{playerName}}",
+      "yourFeedback": "Din Tilbakemelding",
+      "feedbackPlaceholder": "Del din tilbakemelding om denne spillerens prestasjon...",
+      "noFeedback": "Ingen tilbakemelding ennå"
+    },
+    "reviews": {
+      "title": "Vurderinger",
+      "writeReview": "Skriv Vurdering for {{playerName}}",
+      "writeReviewAction": "Skriv Vurdering",
+      "strengths": "Styrker",
+      "strengthsPlaceholder": "Hva gjør denne spilleren bra?",
+      "areasToImprove": "Forbedringsområder",
+      "areasPlaceholder": "Hvilke områder kan denne spilleren jobbe med?",
+      "goals": "Mål",
+      "goalsPlaceholder": "Hvilke mål bør denne spilleren fokusere på?",
+      "reviewBy": "Vurdering av {{author}}"
+    },
+    "skills": {
+      "title": "Ferdighetsvurderinger",
+      "rateSkills": "Vurder Ferdigheter",
+      "serve": "Serve",
+      "pass": "Mottak",
+      "attack": "Angrep",
+      "block": "Blokk",
+      "set": "Legg",
+      "defense": "Forsvar",
+      "selected": "Valgt",
+      "saveRatings": "Lagre Vurderinger",
+      "noRatings": "Ingen ferdighetsvurderinger ennå"
+    },
+    "selfAssessment": {
+      "formTitle": "Vurder Din Prestasjon",
+      "selectEvent": "Velg Hendelse",
+      "selectEventPlaceholder": "Velg en hendelse å vurdere",
+      "rating": "Vurdering",
+      "notes": "Notater (valgfritt)",
+      "notesPlaceholder": "Hvordan følte du deg? Hva gikk bra?",
+      "noEventsToRate": "Ingen hendelser tilgjengelig å vurdere",
+      "noHistory": "Ingen egenvurderinger ennå",
+      "history": "Egenvurderingshistorikk"
+    },
+    "pushNotifications": {
+      "enable": "Aktiver Varsler",
+      "disable": "Deaktiver Varsler",
+      "enabled": "Varsler aktivert",
+      "disabled": "Varsler deaktivert"
     }
   }
 }

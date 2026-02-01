@@ -15,10 +15,12 @@ import { Textarea } from '@/components/ui/textarea';
 import { ConfirmDialog } from '@/components/common/ConfirmDialog';
 import { AddToTeamModal } from '@/components/modals/AddToTeamModal';
 import { PlayerAwardsHighlight } from '@/components/player-stats/PlayerAwardsHighlight';
+import { WriteReviewModal } from '@/components/player/WriteReviewModal';
+import { SkillRatingWidget } from '@/components/player/SkillRatingWidget';
 
 /**
  * PlayerDetailPage component
- * Shows player profile, history, and coach notes
+ * Shows player profile, history, coach notes, reviews, and skill ratings
  */
 export function PlayerDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -37,6 +39,7 @@ export function PlayerDetailPage() {
     noteId: null,
   });
   const [showAddToTeamModal, setShowAddToTeamModal] = useState(false);
+  const [showReviewModal, setShowReviewModal] = useState(false);
 
   const isCoach = user?.role === 'head_coach' || user?.role === 'assistant_coach';
 
@@ -156,6 +159,9 @@ export function PlayerDetailPage() {
                 </Button>
                 <Button onClick={() => setShowAddToTeamModal(true)}>
                   {t('player.addToTeam')}
+                </Button>
+                <Button variant="outline" onClick={() => setShowReviewModal(true)}>
+                  {t('playerExperience.reviews.writeReviewAction')}
                 </Button>
               </>
             )}
@@ -348,6 +354,29 @@ export function PlayerDetailPage() {
           playerId={id}
           onSuccess={handleAddToTeamSuccess}
         />
+      )}
+
+      {id && player && user && isCoach && (
+        <>
+          <WriteReviewModal
+            open={showReviewModal}
+            onOpenChange={setShowReviewModal}
+            playerId={id}
+            playerName={player.name}
+            teamId={player.team_memberships?.[0]?.team_id || ''}
+            authorId={user.id}
+            onSaved={() => setShowReviewModal(false)}
+          />
+
+          <div className="mt-6">
+            <SkillRatingWidget
+              playerId={id}
+              teamId={player.team_memberships?.[0]?.team_id || ''}
+              authorId={user.id}
+              onSaved={() => {}}
+            />
+          </div>
+        </>
       )}
     </div>
   );
