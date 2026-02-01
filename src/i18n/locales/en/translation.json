@@ -485,7 +485,8 @@
       "not_attending": "Not Attending",
       "maybe": "Maybe",
       "pending": "Pending"
-    }
+    },
+    "noPlayersInStatus": "No players with this status"
   },
   "attendance": {
     "title": "Attendance",
