@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useUI } from '@/store';
+import { useAuth, useUI } from '@/store';
 import { getTeam } from '@/services/teams.service';
-import { getPlayersByTeam } from '@/services/players.service';
+import { getPlayersByTeam, getPendingPlayersByTeam } from '@/services/players.service';
 import { getPlayerAttendanceRates } from '@/services/analytics.service';
 import { getPlayerStats, calculatePlayerRating } from '@/services/player-stats.service';
 import { useTeamStats } from '@/hooks/useTeamStats';
@@ -23,6 +23,8 @@ import { AttendanceLeaderboard } from '@/components/team/AttendanceLeaderboard';
 import { TeamRatingRadar } from '@/components/team/TeamRatingRadar';
 import { BestXIFormation } from '@/components/team/BestXIFormation';
 import { PlayerComparison } from '@/components/team/PlayerComparison';
+import { PendingPlayers } from '@/components/team/PendingPlayers';
+import { usePermissions } from '@/hooks/usePermissions';
 
 interface PlayerWithRating extends PlayerWithMemberships {
   rating?: number;
@@ -39,11 +41,16 @@ export function TeamDetailPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { addNotification } = useUI();
+  const { user } = useAuth();
+  const isPlayer = user?.role === 'player';
 
+  const { isCoach } = usePermissions();
   const [team, setTeam] = useState<TeamWithDetails | null>(null);
   const [players, setPlayers] = useState<PlayerWithRating[]>([]);
+  const [pendingPlayers, setPendingPlayers] = useState<PlayerWithMemberships[]>([]);
   const [isLoadingPlayers, setIsLoadingPlayers] = useState(true);
   const [attendanceRates, setAttendanceRates] = useState<any[]>([]);
+  const [reloadKey, setReloadKey] = useState(0);
 
   // Use team stats hook
   const {
@@ -65,8 +72,12 @@ export function TeamDetailPage() {
         setTeam(teamData);
 
         setIsLoadingPlayers(true);
-        const playersData = await getPlayersByTeam(id);
+        const [playersData, pendingData] = await Promise.all([
+          getPlayersByTeam(id),
+          getPendingPlayersByTeam(id).catch(() => []),
+        ]);
         if (cancelled) return;
+        setPendingPlayers(pendingData);
 
         const attendance = await getPlayerAttendanceRates(id);
         if (cancelled) return;
@@ -117,7 +128,7 @@ export function TeamDetailPage() {
     return () => {
       cancelled = true;
     };
-  }, [id, addNotification, t]);
+  }, [id, addNotification, t, reloadKey]);
 
   if (!team && !isLoadingPlayers) {
     return (
@@ -148,58 +159,82 @@ export function TeamDetailPage() {
         </div>
       )}
 
+      {/* Pending Players (coaches only) */}
+      {isCoach && pendingPlayers.length > 0 && (
+        <div className="mb-6">
+          <PendingPlayers
+            pendingPlayers={pendingPlayers}
+            onUpdate={() => setReloadKey((k) => k + 1)}
+            addNotification={addNotification}
+          />
+        </div>
+      )}
+
       {/* Tabbed Dashboard */}
-      <Tabs defaultValue="overview" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="overview">{t('team.dashboard.tabs.overview')}</TabsTrigger>
-          <TabsTrigger value="squad">{t('team.dashboard.tabs.squad')}</TabsTrigger>
-          <TabsTrigger value="stats">{t('team.dashboard.tabs.stats')}</TabsTrigger>
-          <TabsTrigger value="compare">{t('team.dashboard.tabs.compare')}</TabsTrigger>
-        </TabsList>
+      {isPlayer ? (
+        /* Limited view for players: roster + latest results only, no stats/scores/ratings */
+        <Tabs defaultValue="overview" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="overview">{t('team.dashboard.tabs.overview')}</TabsTrigger>
+            <TabsTrigger value="squad">{t('team.dashboard.tabs.squad')}</TabsTrigger>
+          </TabsList>
 
-        {/* Overview Tab */}
-        <TabsContent value="overview" className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Team Rating Radar */}
-            <TeamRatingRadar teamRating={teamRating} isLoading={isLoadingTeamStats} />
+          {/* Overview Tab - latest results only */}
+          <TabsContent value="overview" className="space-y-6">
+            <TeamGameLog gameStats={gameStats.slice(0, 3)} isLoading={isLoadingTeamStats} />
+          </TabsContent>
 
-            {/* Best XI Formation */}
-            <BestXIFormation bestXI={bestXI} isLoading={isLoadingTeamStats} />
-          </div>
+          {/* Squad Tab - names and positions only, no ratings */}
+          <TabsContent value="squad" className="space-y-6">
+            <SquadRoster players={players} isLoading={isLoadingPlayers} hideRatings />
+          </TabsContent>
+        </Tabs>
+      ) : (
+        /* Full view for coaches */
+        <Tabs defaultValue="overview" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="overview">{t('team.dashboard.tabs.overview')}</TabsTrigger>
+            <TabsTrigger value="squad">{t('team.dashboard.tabs.squad')}</TabsTrigger>
+            <TabsTrigger value="stats">{t('team.dashboard.tabs.stats')}</TabsTrigger>
+            <TabsTrigger value="compare">{t('team.dashboard.tabs.compare')}</TabsTrigger>
+          </TabsList>
 
-          {/* Attendance Leaderboard */}
-          <AttendanceLeaderboard
-            attendanceRates={attendanceRates}
-            limit={10}
-            isLoading={isLoadingPlayers}
-          />
-        </TabsContent>
+          {/* Overview Tab */}
+          <TabsContent value="overview" className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <TeamRatingRadar teamRating={teamRating} isLoading={isLoadingTeamStats} />
+              <BestXIFormation bestXI={bestXI} isLoading={isLoadingTeamStats} />
+            </div>
+            <AttendanceLeaderboard
+              attendanceRates={attendanceRates}
+              limit={10}
+              isLoading={isLoadingPlayers}
+            />
+          </TabsContent>
 
-        {/* Squad Tab */}
-        <TabsContent value="squad" className="space-y-6">
-          <SquadRoster players={players} isLoading={isLoadingPlayers} />
-        </TabsContent>
+          {/* Squad Tab */}
+          <TabsContent value="squad" className="space-y-6">
+            <SquadRoster players={players} isLoading={isLoadingPlayers} />
+          </TabsContent>
 
-        {/* Stats Tab */}
-        <TabsContent value="stats" className="space-y-6">
-          {/* Performance Trends */}
-          <TeamPerformanceTrends gameStats={gameStats} isLoading={isLoadingTeamStats} />
+          {/* Stats Tab */}
+          <TabsContent value="stats" className="space-y-6">
+            <TeamPerformanceTrends gameStats={gameStats} isLoading={isLoadingTeamStats} />
+            <TeamGameLog gameStats={gameStats} isLoading={isLoadingTeamStats} />
+          </TabsContent>
 
-          {/* Game Log */}
-          <TeamGameLog gameStats={gameStats} isLoading={isLoadingTeamStats} />
-        </TabsContent>
-
-        {/* Compare Tab */}
-        <TabsContent value="compare" className="space-y-6">
-          <PlayerComparison
-            players={players.map((p) => ({
-              ...p,
-              rating: p.ratingData,
-            }))}
-            isLoading={isLoadingPlayers}
-          />
-        </TabsContent>
-      </Tabs>
+          {/* Compare Tab */}
+          <TabsContent value="compare" className="space-y-6">
+            <PlayerComparison
+              players={players.map((p) => ({
+                ...p,
+                rating: p.ratingData,
+              }))}
+              isLoading={isLoadingPlayers}
+            />
+          </TabsContent>
+        </Tabs>
+      )}
     </div>
   );
 }

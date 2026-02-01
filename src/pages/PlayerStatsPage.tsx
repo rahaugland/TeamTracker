@@ -21,15 +21,18 @@ import type { TimePeriod, CustomDateRange } from '@/services/player-stats.servic
 import type { VolleyballPosition } from '@/types/database.types';
 import { getPlayer } from '@/services/players.service';
 import { useEffect } from 'react';
+import { useAuth } from '@/store';
 
 /**
  * FIFA-Style Player Stats Page
  * Comprehensive stats page with card, charts, and detailed breakdowns
+ * Players can only view their own stats; coaches can view any player's stats.
  */
 export function PlayerStatsPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { user } = useAuth();
 
   const [period, setPeriod] = useState<TimePeriod>('career');
   const [customRange, setCustomRange] = useState<CustomDateRange>();
@@ -37,11 +40,16 @@ export function PlayerStatsPage() {
   const [playerPosition, setPlayerPosition] = useState<VolleyballPosition>('outside_hitter');
   const [playerPhotoUrl, setPlayerPhotoUrl] = useState<string>();
 
-  // Load player basic info
+  // Load player basic info and enforce access control
   useEffect(() => {
     if (id) {
       getPlayer(id).then(player => {
         if (player) {
+          // Players can only view their own stats
+          if (user?.role === 'player' && player.user_id !== user?.id) {
+            navigate('/player-dashboard', { replace: true });
+            return;
+          }
           setPlayerName(player.name);
           setPlayerPosition(player.positions[0] || 'outside_hitter');
           setPlayerPhotoUrl(player.photo_url);
@@ -50,7 +58,7 @@ export function PlayerStatsPage() {
         console.error('Error loading player:', error);
       });
     }
-  }, [id]);
+  }, [id, user?.id, user?.role, navigate]);
 
   const {
     isLoading,

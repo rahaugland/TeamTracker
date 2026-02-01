@@ -76,6 +76,8 @@ export interface Player {
   updated_at: string;
 }
 
+export type TeamMembershipStatus = 'pending' | 'active' | 'rejected';
+
 export interface TeamMembership {
   id: string;
   player_id: string;
@@ -86,6 +88,7 @@ export interface TeamMembership {
   left_at?: string;
   departure_reason?: DepartureReason;
   is_active: boolean;
+  status?: TeamMembershipStatus;
   created_at: string;
   updated_at: string;
 }

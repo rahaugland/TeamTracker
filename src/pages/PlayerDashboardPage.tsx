@@ -341,14 +341,7 @@ export function PlayerDashboardPage() {
             />
           </div>
 
-          {/* Link to full stats */}
-          <Button
-            variant="outline"
-            className="w-full"
-            onClick={() => navigate(`/players/${player.id}/stats`)}
-          >
-            {t('player.stats.viewStats')}
-          </Button>
+          {/* Stats are shown on this dashboard - no link to detailed stats page for players */}
         </TabsContent>
 
         {/* Tab 3: Feedback */}

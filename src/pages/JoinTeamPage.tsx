@@ -80,8 +80,8 @@ export function JoinTeamPage() {
       addNotification({
         id: Date.now().toString(),
         type: 'success',
-        message: t('joinTeam.joinSuccess', { teamName: validatedTeam.name }),
-        duration: 5000,
+        message: t('joinTeam.joinPending', { teamName: validatedTeam.name }),
+        duration: 7000,
       });
 
       // Redirect to dashboard

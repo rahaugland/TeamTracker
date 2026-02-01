@@ -22,6 +22,7 @@ interface PlayerWithRating extends PlayerWithMemberships {
 interface SquadRosterProps {
   players: PlayerWithRating[];
   isLoading?: boolean;
+  hideRatings?: boolean;
 }
 
 type SortOption = 'rating' | 'name' | 'number';
@@ -29,11 +30,12 @@ type SortOption = 'rating' | 'name' | 'number';
 /**
  * SquadRoster component
  * Displays team roster with player ratings, sortable
+ * When hideRatings is true, only shows names, positions, and jersey numbers (player view)
  */
-export function SquadRoster({ players, isLoading = false }: SquadRosterProps) {
+export function SquadRoster({ players, isLoading = false, hideRatings = false }: SquadRosterProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [sortBy, setSortBy] = useState<SortOption>('rating');
+  const [sortBy, setSortBy] = useState<SortOption>(hideRatings ? 'name' : 'rating');
 
   const sortedPlayers = [...players].sort((a, b) => {
     switch (sortBy) {
@@ -65,6 +67,17 @@ export function SquadRoster({ players, isLoading = false }: SquadRosterProps) {
     );
   }
 
+  const sortOptions = hideRatings
+    ? [
+        { value: 'name', label: t('team.dashboard.sortByName') },
+        { value: 'number', label: t('team.dashboard.sortByNumber') },
+      ]
+    : [
+        { value: 'rating', label: t('team.dashboard.sortByRating') },
+        { value: 'name', label: t('team.dashboard.sortByName') },
+        { value: 'number', label: t('team.dashboard.sortByNumber') },
+      ];
+
   return (
     <Card>
       <CardHeader>
@@ -81,9 +94,11 @@ export function SquadRoster({ players, isLoading = false }: SquadRosterProps) {
               <SelectValue placeholder={t('team.dashboard.sortBy')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="rating">{t('team.dashboard.sortByRating')}</SelectItem>
-              <SelectItem value="name">{t('team.dashboard.sortByName')}</SelectItem>
-              <SelectItem value="number">{t('team.dashboard.sortByNumber')}</SelectItem>
+              {sortOptions.map((opt) => (
+                <SelectItem key={opt.value} value={opt.value}>
+                  {opt.label}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
@@ -98,8 +113,10 @@ export function SquadRoster({ players, isLoading = false }: SquadRosterProps) {
             {sortedPlayers.map((player) => (
               <div
                 key={player.id}
-                className="flex items-center justify-between p-3 border rounded-lg hover:bg-accent cursor-pointer transition-colors"
-                onClick={() => navigate(`/players/${player.id}`)}
+                className={`flex items-center justify-between p-3 border rounded-lg transition-colors ${
+                  hideRatings ? '' : 'hover:bg-accent cursor-pointer'
+                }`}
+                onClick={hideRatings ? undefined : () => navigate(`/players/${player.id}`)}
               >
                 <div className="flex items-center gap-3">
                   {/* Jersey Number */}
@@ -135,21 +152,23 @@ export function SquadRoster({ players, isLoading = false }: SquadRosterProps) {
                   </div>
                 </div>
 
-                {/* Rating */}
-                <div className="text-right">
-                  {player.rating ? (
-                    <>
-                      <div className="text-2xl font-bold">{player.rating}</div>
-                      <div className="text-xs text-muted-foreground">
-                        {t('team.dashboard.rating')}
+                {/* Rating - hidden for players */}
+                {!hideRatings && (
+                  <div className="text-right">
+                    {player.rating ? (
+                      <>
+                        <div className="text-2xl font-bold">{player.rating}</div>
+                        <div className="text-xs text-muted-foreground">
+                          {t('team.dashboard.rating')}
+                        </div>
+                      </>
+                    ) : (
+                      <div className="text-sm text-muted-foreground">
+                        {t('player.stats.noData')}
                       </div>
-                    </>
-                  ) : (
-                    <div className="text-sm text-muted-foreground">
-                      {t('player.stats.noData')}
-                    </div>
-                  )}
-                </div>
+                    )}
+                  </div>
+                )}
               </div>
             ))}
           </div>
