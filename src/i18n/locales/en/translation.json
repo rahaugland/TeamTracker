@@ -218,6 +218,14 @@
     "regenerateCode": "Regenerate Code",
     "regenerateCodeConfirm": "Are you sure you want to regenerate the invite code? The old code will no longer work.",
     "codeRegenerated": "New invite code generated successfully",
+    "pendingPlayers": {
+      "title": "Pending Join Requests",
+      "approve": "Approve",
+      "reject": "Reject",
+      "empty": "No pending requests",
+      "approved": "Player approved",
+      "rejected": "Request removed"
+    },
     "dashboard": {
       "tabs": {
         "overview": "Overview",
@@ -583,6 +591,7 @@
     "confirmJoin": "Join Team",
     "joining": "Joining team...",
     "joinSuccess": "Successfully joined {{teamName}}!",
+    "joinPending": "Your request to join {{teamName}} has been sent. The coach will review it.",
     "joinError": "Failed to join team. Please try again.",
     "alreadyMember": "You are already a member of this team",
     "instructions": "Ask your coach for the team invite code. Once you enter the code and join, you'll be able to view schedules and RSVP to events."

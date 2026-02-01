@@ -204,7 +204,7 @@ export async function getPlayersByTeam(teamId: string): Promise<PlayerWithMember
     const memberships = await db.team_memberships
       .where('team_id')
       .equals(teamId)
-      .and(m => m.is_active && !m._deleted)
+      .and(m => m.is_active && !m._deleted && m.status !== 'pending')
       .toArray();
 
     const playerIds = [...new Set(memberships.map(m => m.player_id))];
@@ -270,7 +270,8 @@ export async function getPlayersByTeam(teamId: string): Promise<PlayerWithMember
         *
       `)
       .eq('team_id', teamId)
-      .eq('is_active', true);
+      .eq('is_active', true)
+      .eq('status', 'active');
 
     if (supabaseError) {
       console.error('Error fetching team players:', supabaseError);
@@ -622,6 +623,7 @@ export async function addPlayerToTeam(
       jersey_number: input.jersey_number,
       joined_at: input.joined_at || new Date().toISOString().split('T')[0],
       is_active: true,
+      status: 'pending',
       created_at: now,
       updated_at: now,
     };
@@ -642,6 +644,7 @@ export async function addPlayerToTeam(
             jersey_number: input.jersey_number,
             joined_at: input.joined_at || new Date().toISOString().split('T')[0],
             is_active: true,
+            status: 'pending',
           })
           .select()
           .single();
@@ -651,13 +654,6 @@ export async function addPlayerToTeam(
         // Update local DB with real ID from Supabase
         await db.team_memberships.delete(tempId);
         await db.team_memberships.put(addSyncMetadata(data, true));
-
-        // Create pending RSVPs for all upcoming events in this team
-        const player = await db.players.get(input.player_id);
-        const respondedBy = player?.user_id || input.player_id;
-        createPendingRSVPsForPlayer(input.player_id, input.team_id, respondedBy).catch(err =>
-          console.warn('Failed to create pending RSVPs for new team member:', err)
-        );
 
         return data;
       } catch (error) {
@@ -804,6 +800,101 @@ export async function getTeamMembership(
   } catch (error) {
     console.error('Error fetching team membership:', error);
     throw error;
+  }
+}
+
+/**
+ * Get pending players for a team (awaiting coach approval)
+ */
+export async function getPendingPlayersByTeam(teamId: string): Promise<PlayerWithMemberships[]> {
+  const { data, error } = await supabase
+    .from('team_memberships')
+    .select(`
+      *,
+      player:players(*)
+    `)
+    .eq('team_id', teamId)
+    .eq('is_active', true)
+    .eq('status', 'pending');
+
+  if (error) {
+    console.error('Error fetching pending players:', error);
+    throw error;
+  }
+
+  return (data || []).map((item: any) => ({
+    ...item.player,
+    team_memberships: [{ ...item, player: undefined }],
+  }));
+}
+
+/**
+ * Approve a pending team membership
+ */
+export async function approveTeamMembership(membershipId: string): Promise<void> {
+  const { data, error } = await supabase
+    .from('team_memberships')
+    .update({ status: 'active' })
+    .eq('id', membershipId)
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error approving membership:', error);
+    throw error;
+  }
+
+  // Update local DB
+  if (data) {
+    await db.team_memberships.put(addSyncMetadata(data, true));
+  }
+
+  // Also create RSVPs client-side as a fallback
+  if (data) {
+    const player = await db.players.get(data.player_id);
+    const respondedBy = player?.user_id || data.player_id;
+    createPendingRSVPsForPlayer(data.player_id, data.team_id, respondedBy).catch(err =>
+      console.warn('Failed to create pending RSVPs for approved member:', err)
+    );
+  }
+}
+
+/**
+ * Reject a pending team membership (hard delete)
+ */
+export async function rejectTeamMembership(membershipId: string): Promise<void> {
+  // Get membership first to check player
+  const { data: membership } = await supabase
+    .from('team_memberships')
+    .select('*')
+    .eq('id', membershipId)
+    .single();
+
+  // Delete the membership
+  const { error } = await supabase
+    .from('team_memberships')
+    .delete()
+    .eq('id', membershipId);
+
+  if (error) {
+    console.error('Error rejecting membership:', error);
+    throw error;
+  }
+
+  // Remove from local DB
+  await db.team_memberships.delete(membershipId);
+
+  // If player has no other memberships, delete the player record too
+  if (membership) {
+    const { data: otherMemberships } = await supabase
+      .from('team_memberships')
+      .select('id')
+      .eq('player_id', membership.player_id);
+
+    if (!otherMemberships || otherMemberships.length === 0) {
+      await supabase.from('players').delete().eq('id', membership.player_id);
+      await db.players.delete(membership.player_id);
+    }
   }
 }
 

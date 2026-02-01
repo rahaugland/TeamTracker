@@ -42,12 +42,20 @@ export function PlayerDetailPage() {
   const [showReviewModal, setShowReviewModal] = useState(false);
 
   const isCoach = user?.role === 'head_coach' || user?.role === 'assistant_coach';
+  const isPlayer = user?.role === 'player';
 
   useEffect(() => {
     if (id) {
       loadPlayerData(id);
     }
   }, [id]);
+
+  // Players can only view their own profile - redirect if viewing another player
+  useEffect(() => {
+    if (isPlayer && player && player.user_id !== user?.id) {
+      navigate('/player-dashboard', { replace: true });
+    }
+  }, [isPlayer, player, user?.id, navigate]);
 
   const loadPlayerData = async (playerId: string) => {
     setIsLoading(true);
@@ -149,9 +157,11 @@ export function PlayerDetailPage() {
             </p>
           </div>
           <div className="flex gap-2">
-            <Button variant="outline" onClick={() => navigate(`/players/${id}/stats`)}>
-              View Stats
-            </Button>
+            {!isPlayer && (
+              <Button variant="outline" onClick={() => navigate(`/players/${id}/stats`)}>
+                View Stats
+              </Button>
+            )}
             {isCoach && (
               <>
                 <Button variant="outline" onClick={() => navigate(`/players/${id}/edit`)}>

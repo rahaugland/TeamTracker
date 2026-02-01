@@ -66,6 +66,9 @@ export interface Permissions {
   canEditSeason: boolean;
   canDeleteSeason: boolean;
   canViewSeason: boolean;
+
+  // Membership approval
+  canApproveMembers: boolean;
 }
 
 /**
@@ -146,6 +149,8 @@ function getHeadCoachPermissions(): Permissions {
     canEditSeason: true,
     canDeleteSeason: true,
     canViewSeason: true,
+
+    canApproveMembers: true,
   };
 }
 
@@ -205,6 +210,8 @@ function getAssistantCoachPermissions(): Permissions {
     canEditSeason: false,
     canDeleteSeason: false,
     canViewSeason: true,
+
+    canApproveMembers: true,
   };
 }
 
@@ -255,7 +262,7 @@ function getPlayerPermissions(): Permissions {
 
     // Stats and notes
     canRecordStats: false,
-    canViewStats: true, // Own stats only
+    canViewStats: false, // Players cannot view other players' stats; own stats shown on dashboard
     canAddCoachNotes: false,
     canViewCoachNotes: false,
 
@@ -264,6 +271,8 @@ function getPlayerPermissions(): Permissions {
     canEditSeason: false,
     canDeleteSeason: false,
     canViewSeason: true,
+
+    canApproveMembers: false,
   };
 }
 
@@ -323,6 +332,8 @@ function getParentPermissions(): Permissions {
     canEditSeason: false,
     canDeleteSeason: false,
     canViewSeason: true,
+
+    canApproveMembers: false,
   };
 }
 
@@ -382,6 +393,8 @@ function getGuestPermissions(): Permissions {
     canEditSeason: false,
     canDeleteSeason: false,
     canViewSeason: false,
+
+    canApproveMembers: false,
   };
 }
 

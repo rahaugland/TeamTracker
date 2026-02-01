@@ -193,6 +193,14 @@
     "regenerateCode": "Generer ny kode",
     "regenerateCodeConfirm": "Er du sikker på at du vil generere ny invitasjonskode? Den gamle koden vil ikke lenger fungere.",
     "codeRegenerated": "Ny invitasjonskode generert",
+    "pendingPlayers": {
+      "title": "Ventende medlemsforespørsler",
+      "approve": "Godkjenn",
+      "reject": "Avvis",
+      "empty": "Ingen ventende forespørsler",
+      "approved": "Spiller godkjent",
+      "rejected": "Forespørsel fjernet"
+    },
     "dashboard": {
       "tabs": {
         "overview": "Oversikt",
@@ -500,6 +508,7 @@
     "confirmJoin": "Bli med på laget",
     "joining": "Blir med på lag...",
     "joinSuccess": "Vellykket deltakelse på {{teamName}}!",
+    "joinPending": "Din forespørsel om å bli med på {{teamName}} er sendt. Treneren vil vurdere den.",
     "joinError": "Kunne ikke bli med på laget. Vennligst prøv igjen.",
     "alreadyMember": "Du er allerede medlem av dette laget",
     "instructions": "Spør treneren din om lagkoden. Når du har skrevet inn koden og blitt med, kan du se tidsplaner og melde deg på arrangementer."
