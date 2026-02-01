@@ -8,3 +8,7 @@ export { SelfAssessmentForm } from './SelfAssessmentForm';
 export { SelfAssessmentHistory } from './SelfAssessmentHistory';
 export { WriteReviewModal } from './WriteReviewModal';
 export { SkillRatingWidget } from './SkillRatingWidget';
+export { StreaksMilestones } from './StreaksMilestones';
+export { FeedbackSpotlight } from './FeedbackSpotlight';
+export { StatSnapshots } from './StatSnapshots';
+export { ProgressJourney } from './ProgressJourney';

@@ -1013,6 +1013,29 @@
       "disable": "Disable Notifications",
       "enabled": "Notifications enabled",
       "disabled": "Notifications disabled"
+    },
+    "progress": {
+      "currentStreak": "Current Streak",
+      "bestStreak": "Best: {{count}}",
+      "goalsAchieved": "Goals Achieved",
+      "activeGoals": "{{count}} active",
+      "selfReflections": "Self-Reflections",
+      "totalReflections": "Total reflections",
+      "feedbackReceived": "Feedback Received",
+      "totalFeedback": "Total feedback",
+      "spotlightEmpty": "No coach feedback yet — keep working hard and it will come!",
+      "killPct": "Kill %",
+      "servePct": "Serve %",
+      "passRating": "Pass Rating",
+      "attendancePct": "Attendance %",
+      "noGamesYet": "No games yet",
+      "journeyTitle": "Your Progress Journey",
+      "journeyGoalCreated": "Goal created",
+      "journeyGoalCompleted": "Goal completed",
+      "journeyFeedback": "Feedback from {{author}}",
+      "journeyAssessment": "Self-assessment",
+      "journeyEmpty": "Your journey starts here — set goals, reflect on events, and track your growth!",
+      "showMore": "Show More"
     }
   }
 }
