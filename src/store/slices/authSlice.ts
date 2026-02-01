@@ -166,8 +166,21 @@ export const createAuthSlice: StateCreator<AuthSlice> = (set, get) => ({
         .single();
 
       if (profileError && profileError.code !== 'PGRST116') {
-        // PGRST116 = no rows returned (profile doesn't exist yet)
         throw profileError;
+      }
+
+      // If profile doesn't exist, create it as a fallback
+      if (profileError?.code === 'PGRST116') {
+        const meta = session.user.user_metadata ?? {};
+        await supabase.from('profiles').upsert(
+          {
+            id: session.user.id,
+            email: session.user.email,
+            full_name: meta.full_name ?? meta.name ?? '',
+            avatar_url: meta.avatar_url ?? meta.picture ?? '',
+          },
+          { onConflict: 'id', ignoreDuplicates: true },
+        );
       }
 
       // Create user object

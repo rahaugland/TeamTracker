@@ -24,6 +24,18 @@ export function AuthCallbackPage() {
 
       if (event === 'SIGNED_IN' && session) {
         try {
+          // Ensure profile row exists (DB trigger is unreliable for OAuth)
+          const meta = session.user.user_metadata ?? {};
+          await supabase.from('profiles').upsert(
+            {
+              id: session.user.id,
+              email: session.user.email,
+              full_name: meta.full_name ?? meta.name ?? '',
+              avatar_url: meta.avatar_url ?? meta.picture ?? '',
+            },
+            { onConflict: 'id', ignoreDuplicates: true },
+          );
+
           // Sync session to our store
           await syncSession();
 
