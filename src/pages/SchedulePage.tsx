@@ -16,7 +16,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { EventForm } from '@/components/forms/EventForm';
 import { EmptyState } from '@/components/common/EmptyState';
 import { CalendarView } from '@/components/calendar/CalendarView';
-import { Calendar, List } from 'lucide-react';
+import { Calendar, List, History, Clock } from 'lucide-react';
 import {
   Select,
   SelectContent,
@@ -38,6 +38,7 @@ export function SchedulePage() {
   const [events, setEvents] = useState<Event[]>([]);
   const [filteredEvents, setFilteredEvents] = useState<Event[]>([]);
   const [selectedType, setSelectedType] = useState<EventType | 'all'>('all');
+  const [showPast, setShowPast] = useState(false);
   const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
   const [isLoading, setIsLoading] = useState(true);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
@@ -82,7 +83,7 @@ export function SchedulePage() {
 
   useEffect(() => {
     filterEvents();
-  }, [selectedType, events]);
+  }, [selectedType, events, showPast]);
 
   const loadEvents = async (teamId: string) => {
     setIsLoading(true);
@@ -98,11 +99,24 @@ export function SchedulePage() {
   };
 
   const filterEvents = () => {
-    if (selectedType === 'all') {
-      setFilteredEvents(events);
+    const now = new Date();
+    let filtered = events;
+
+    // Filter by time: upcoming vs past
+    if (!showPast) {
+      filtered = filtered.filter((event) => new Date(event.start_time) >= now);
     } else {
-      setFilteredEvents(events.filter((event) => event.type === selectedType));
+      filtered = filtered.filter((event) => new Date(event.start_time) < now);
+      // Show most recent past events first
+      filtered = [...filtered].reverse();
     }
+
+    // Filter by type
+    if (selectedType !== 'all') {
+      filtered = filtered.filter((event) => event.type === selectedType);
+    }
+
+    setFilteredEvents(filtered);
   };
 
   const handleCreateEvent = async (data: EventFormData) => {
@@ -212,6 +226,26 @@ export function SchedulePage() {
               )}
             </div>
             <div className="flex items-center gap-2">
+          <div className="flex items-center border rounded-md">
+            <Button
+              variant={!showPast ? 'default' : 'ghost'}
+              size="sm"
+              onClick={() => setShowPast(false)}
+              className="rounded-r-none"
+            >
+              <Clock className="h-4 w-4 mr-2" />
+              {t('schedule.upcoming')}
+            </Button>
+            <Button
+              variant={showPast ? 'default' : 'ghost'}
+              size="sm"
+              onClick={() => setShowPast(true)}
+              className="rounded-l-none"
+            >
+              <History className="h-4 w-4 mr-2" />
+              {t('schedule.past')}
+            </Button>
+          </div>
           <div className="flex items-center border rounded-md">
             <Button
               variant={viewMode === 'list' ? 'default' : 'ghost'}

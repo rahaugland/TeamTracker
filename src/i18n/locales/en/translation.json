@@ -388,7 +388,9 @@
   },
   "schedule": {
     "noActiveTeam": "No Active Team",
-    "noActiveTeamDescription": "Please select a team to view the schedule"
+    "noActiveTeamDescription": "Please select a team to view the schedule",
+    "upcoming": "Upcoming",
+    "past": "Past"
   },
   "calendar": {
     "listView": "List",
