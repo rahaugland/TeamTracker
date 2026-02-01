@@ -17,6 +17,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { ConfirmDialog } from '@/components/common/ConfirmDialog';
 import { SeasonManager } from '@/components/seasons/SeasonManager';
 import { SeasonAwardsDisplay } from '@/components/seasons/SeasonAwards';
+import { SeasonSummary } from '@/components/seasons/SeasonSummary';
 import { cn } from '@/lib/utils';
 
 export function TeamSeasonsPage() {
@@ -183,9 +184,12 @@ export function TeamSeasonsPage() {
                   )}
                 </div>
               </CardHeader>
-              {expandedSeason === season.id && season.is_finalized && seasonAwards[season.id] && (
-                <CardContent>
-                  <SeasonAwardsDisplay awards={seasonAwards[season.id]} playerNames={playerNames} />
+              {expandedSeason === season.id && (
+                <CardContent className="space-y-6">
+                  <SeasonSummary teamId={teamId!} startDate={season.start_date} endDate={season.end_date} />
+                  {season.is_finalized && seasonAwards[season.id] && (
+                    <SeasonAwardsDisplay awards={seasonAwards[season.id]} playerNames={playerNames} />
+                  )}
                 </CardContent>
               )}
             </Card>
