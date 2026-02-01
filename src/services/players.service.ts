@@ -2,6 +2,7 @@ import { supabase } from '@/lib/supabase';
 import { withErrorHandling } from '@/lib/api-error-handler';
 import { db, addSyncMetadata, softDelete, type OfflinePlayer, type OfflineTeamMembership } from '@/lib/offline-db';
 import { isOnline } from '@/services/sync.service';
+import { createPendingRSVPsForPlayer } from '@/services/rsvp.service';
 import type {
   Player,
   TeamMembership,
@@ -650,6 +651,13 @@ export async function addPlayerToTeam(
         // Update local DB with real ID from Supabase
         await db.team_memberships.delete(tempId);
         await db.team_memberships.put(addSyncMetadata(data, true));
+
+        // Create pending RSVPs for all upcoming events in this team
+        const player = await db.players.get(input.player_id);
+        const respondedBy = player?.user_id || input.player_id;
+        createPendingRSVPsForPlayer(input.player_id, input.team_id, respondedBy).catch(err =>
+          console.warn('Failed to create pending RSVPs for new team member:', err)
+        );
 
         return data;
       } catch (error) {
