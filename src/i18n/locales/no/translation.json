@@ -329,6 +329,12 @@
       "tier8": "8 - Nasjonal",
       "tier9": "9 - Verdensklasse"
     },
+    "playerFeedback": {
+      "title": "Spillertilbakemelding",
+      "placeholder": "f.eks. Bra serving i dag, jobb med mottak...",
+      "saved": "Tilbakemelding lagret",
+      "noPlayers": "Ingen spillere å gi tilbakemelding til"
+    },
     "recurring": {
       "enable": "Opprett gjentakende trening",
       "selectDays": "Velg ukedager",
@@ -856,7 +862,8 @@
       "home": "Hjem",
       "myStats": "Min Statistikk",
       "feedback": "Tilbakemelding",
-      "selfAssessment": "Egenvurdering"
+      "selfAssessment": "Egenvurdering",
+      "progress": "Fremgang"
     },
     "home": {
       "nextEvent": "Neste Hendelse",

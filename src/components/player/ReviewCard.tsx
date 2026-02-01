@@ -22,7 +22,7 @@ export function ReviewCard({ review }: ReviewCardProps) {
         <div className="flex items-center justify-between">
           <div className="flex-1">
             <CardTitle className="text-base">
-              {t('playerExperience.reviews.reviewBy', { author: review.author.full_name })}
+              {t('playerExperience.reviews.reviewBy', { author: review.author?.full_name || 'Coach' })}
             </CardTitle>
             <p className="text-xs text-muted-foreground mt-1">
               {format(new Date(review.created_at), 'MMMM d, yyyy')}
