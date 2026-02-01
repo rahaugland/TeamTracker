@@ -20,6 +20,24 @@ export interface UserWithTeams extends Profile {
       };
     };
   }>;
+  players?: Array<{
+    id: string;
+    team_memberships: Array<{
+      id: string;
+      team_id: string;
+      role: 'player' | 'captain';
+      is_active: boolean;
+      team: {
+        id: string;
+        name: string;
+        season: {
+          id: string;
+          name: string;
+        };
+      };
+    }>;
+  }>;
+  // Flattened from players->team_memberships for backward compatibility
   team_memberships?: Array<{
     id: string;
     team_id: string;
@@ -61,15 +79,18 @@ export async function getAllUsers(roleFilter?: UserRole): Promise<UserWithTeams[
           season:seasons(id, name)
         )
       ),
-      team_memberships(
+      players(
         id,
-        team_id,
-        role,
-        is_active,
-        team:teams(
+        team_memberships(
           id,
-          name,
-          season:seasons(id, name)
+          team_id,
+          role,
+          is_active,
+          team:teams(
+            id,
+            name,
+            season:seasons(id, name)
+          )
         )
       )
     `)
@@ -86,7 +107,11 @@ export async function getAllUsers(roleFilter?: UserRole): Promise<UserWithTeams[
     throw error;
   }
 
-  return data || [];
+  // Flatten players->team_memberships into top-level team_memberships
+  return (data || []).map((user) => ({
+    ...user,
+    team_memberships: user.players?.flatMap((p: { team_memberships: unknown[] }) => p.team_memberships) || [],
+  }));
 }
 
 /**
@@ -107,15 +132,18 @@ export async function getUserById(userId: string): Promise<UserWithTeams | null>
           season:seasons(id, name)
         )
       ),
-      team_memberships(
+      players(
         id,
-        team_id,
-        role,
-        is_active,
-        team:teams(
+        team_memberships(
           id,
-          name,
-          season:seasons(id, name)
+          team_id,
+          role,
+          is_active,
+          team:teams(
+            id,
+            name,
+            season:seasons(id, name)
+          )
         )
       )
     `)
@@ -127,7 +155,13 @@ export async function getUserById(userId: string): Promise<UserWithTeams | null>
     throw error;
   }
 
-  return data;
+  if (!data) return null;
+
+  // Flatten players->team_memberships into top-level team_memberships
+  return {
+    ...data,
+    team_memberships: data.players?.flatMap((p: { team_memberships: unknown[] }) => p.team_memberships) || [],
+  };
 }
 
 /**
