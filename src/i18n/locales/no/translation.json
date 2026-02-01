@@ -342,7 +342,9 @@
   },
   "schedule": {
     "noActiveTeam": "Ingen aktivt lag",
-    "noActiveTeamDescription": "Vennligst velg et lag for å se timeplanen"
+    "noActiveTeamDescription": "Vennligst velg et lag for å se timeplanen",
+    "upcoming": "Kommende",
+    "past": "Tidligere"
   },
   "calendar": {
     "listView": "Liste",

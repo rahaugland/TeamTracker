@@ -148,15 +148,17 @@ export function EventDetailPage() {
             onRSVPChange={handleRSVPChange}
           />
 
-          {/* Attendance Section */}
-          <DragDropAttendance
-            eventId={id!}
-            eventType={event.type}
-            teamPlayers={teamPlayers}
-            initialAttendance={attendance}
-            onSave={handleBatchAttendanceSave}
-            isCoach={isCoach}
-          />
+          {/* Attendance Section (coaches only) */}
+          {isCoach && (
+            <DragDropAttendance
+              eventId={id!}
+              eventType={event.type}
+              teamPlayers={teamPlayers}
+              initialAttendance={attendance}
+              onSave={handleBatchAttendanceSave}
+              isCoach={isCoach}
+            />
+          )}
         </>
       )}
 
