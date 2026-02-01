@@ -839,6 +839,23 @@
       "noMatches": "Ingen kamper spilt ennå",
       "win": "S",
       "loss": "T"
+    },
+    "activeSeason": {
+      "label": "Aktiv sesong",
+      "games": "{{count}} kamper",
+      "viewDetails": "Vis detaljer"
+    },
+    "seasonTimeline": {
+      "title": "Sesongtidslinje",
+      "record": "{{wins}}S – {{losses}}T ({{pct}}%)"
+    },
+    "seasonComparison": {
+      "title": "Sammenlign sesonger",
+      "selectSeason": "Velg sesong",
+      "seasonA": "Sesong A",
+      "seasonB": "Sesong B",
+      "empty": "Velg to sesonger for å sammenligne",
+      "delta": "Δ {{value}}"
     }
   },
   "goals": {
