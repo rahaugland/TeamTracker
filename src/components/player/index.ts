@@ -12,3 +12,4 @@ export { StreaksMilestones } from './StreaksMilestones';
 export { FeedbackSpotlight } from './FeedbackSpotlight';
 export { StatSnapshots } from './StatSnapshots';
 export { ProgressJourney } from './ProgressJourney';
+export { PlayerAwardsShowcase } from './PlayerAwardsShowcase';

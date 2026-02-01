@@ -829,6 +829,16 @@
       "most_improved": "Mest forbedret",
       "best_attendance": "Beste oppmøte",
       "most_practices": "Flest treninger"
+    },
+    "seasonSummary": {
+      "record": "Resultat",
+      "teamKillPct": "Lag Kill %",
+      "teamServePct": "Lag Serve %",
+      "avgAttendance": "Snitt Oppmøte",
+      "recentMatches": "Siste Kamper",
+      "noMatches": "Ingen kamper spilt ennå",
+      "win": "S",
+      "loss": "T"
     }
   },
   "goals": {
@@ -952,7 +962,11 @@
       "journeyFeedback": "Tilbakemelding fra {{author}}",
       "journeyAssessment": "Egenvurdering",
       "journeyEmpty": "Reisen din starter her — sett mål, reflekter over hendelser, og følg utviklingen din!",
-      "showMore": "Vis Mer"
+      "showMore": "Vis Mer",
+      "awardsTitle": "Priser og Anerkjennelse",
+      "awardsEmpty": "Ingen priser ennå — de dukker opp her etter hvert som du oppnår dem!",
+      "journeyGameAward": "{{award}} — mot {{opponent}}",
+      "journeySeasonAward": "{{award}} — {{season}}"
     }
   }
 }

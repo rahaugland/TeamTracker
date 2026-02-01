@@ -88,6 +88,105 @@ export async function getSeasonAwards(seasonId: string): Promise<SeasonAward[]> 
   return data || [];
 }
 
+export interface SeasonSummaryMatch {
+  eventId: string;
+  opponent: string | null;
+  setsWon: number;
+  setsLost: number;
+  won: boolean;
+}
+
+export interface SeasonSummaryData {
+  wins: number;
+  losses: number;
+  aggregatedStats: { killPct: number | null; servePct: number | null };
+  avgAttendanceRate: number;
+  recentMatches: SeasonSummaryMatch[];
+}
+
+/**
+ * Get a summary of season performance: W/L record, team stats, attendance, recent matches
+ */
+export async function getSeasonSummary(teamId: string, startDate: string, endDate: string): Promise<SeasonSummaryData> {
+  // Get game/tournament events in date range with scores
+  const { data: gameEvents } = await supabase
+    .from('events')
+    .select('id, opponent, sets_won, sets_lost, is_finalized, start_time')
+    .eq('team_id', teamId)
+    .in('type', ['game', 'tournament'])
+    .gte('start_time', startDate)
+    .lte('start_time', endDate + 'T23:59:59Z')
+    .order('start_time', { ascending: false });
+
+  const matches = (gameEvents || []).filter((e: any) => e.sets_won != null && e.sets_lost != null);
+  let wins = 0;
+  let losses = 0;
+  const recentMatches: SeasonSummaryMatch[] = [];
+
+  for (const m of matches) {
+    const won = m.sets_won > m.sets_lost;
+    if (won) wins++; else losses++;
+    recentMatches.push({
+      eventId: m.id,
+      opponent: m.opponent,
+      setsWon: m.sets_won,
+      setsLost: m.sets_lost,
+      won,
+    });
+  }
+
+  // Get finalized game stat entries for aggregated team stats
+  const finalizedIds = (gameEvents || []).filter((e: any) => e.is_finalized).map((e: any) => e.id);
+  let killPct: number | null = null;
+  let servePct: number | null = null;
+
+  if (finalizedIds.length > 0) {
+    const { data: stats } = await supabase
+      .from('stat_entries')
+      .select('kills, attack_errors, attack_attempts, aces, service_errors, serve_attempts')
+      .in('event_id', finalizedIds);
+
+    if (stats && stats.length > 0) {
+      let totalKills = 0, totalAtkErr = 0, totalAtkAtt = 0;
+      let totalAces = 0, totalSrvErr = 0, totalSrvAtt = 0;
+      for (const s of stats) {
+        totalKills += s.kills;
+        totalAtkErr += s.attack_errors;
+        totalAtkAtt += s.attack_attempts;
+        totalAces += s.aces;
+        totalSrvErr += s.service_errors;
+        totalSrvAtt += s.serve_attempts;
+      }
+      if (totalAtkAtt > 0) killPct = ((totalKills - totalAtkErr) / totalAtkAtt) * 100;
+      if (totalSrvAtt > 0) servePct = ((totalAces) / totalSrvAtt) * 100;
+    }
+  }
+
+  // Get attendance for all events in range
+  const { data: allEvents } = await supabase
+    .from('events')
+    .select('id')
+    .eq('team_id', teamId)
+    .gte('start_time', startDate)
+    .lte('start_time', endDate + 'T23:59:59Z');
+
+  let avgAttendanceRate = 0;
+  const allEventIds = (allEvents || []).map((e: any) => e.id);
+  if (allEventIds.length > 0) {
+    const { data: attendance } = await supabase
+      .from('attendance_records')
+      .select('status')
+      .in('event_id', allEventIds);
+
+    if (attendance && attendance.length > 0) {
+      const present = attendance.filter((a: any) => a.status === 'present' || a.status === 'late').length;
+      avgAttendanceRate = (present / attendance.length) * 100;
+    }
+  }
+
+  return { wins, losses, aggregatedStats: { killPct, servePct }, avgAttendanceRate, recentMatches: recentMatches.slice(0, 10) };
+}
+
 interface SeasonStatData {
   statEntries: (StatEntry & { event_start: string })[];
   attendanceByPlayer: Record<string, { total: number; attended: number; practices: number }>;
