@@ -930,6 +930,29 @@
       "disable": "Deaktiver Varsler",
       "enabled": "Varsler aktivert",
       "disabled": "Varsler deaktivert"
+    },
+    "progress": {
+      "currentStreak": "Nåværende Streak",
+      "bestStreak": "Beste: {{count}}",
+      "goalsAchieved": "Mål Oppnådd",
+      "activeGoals": "{{count}} aktive",
+      "selfReflections": "Egenvurderinger",
+      "totalReflections": "Totalt refleksjoner",
+      "feedbackReceived": "Tilbakemeldinger Mottatt",
+      "totalFeedback": "Totalt tilbakemeldinger",
+      "spotlightEmpty": "Ingen trenertilbakemelding ennå — fortsett å jobbe hardt, det kommer!",
+      "killPct": "Kill %",
+      "servePct": "Serve %",
+      "passRating": "Mottak",
+      "attendancePct": "Oppmøte %",
+      "noGamesYet": "Ingen kamper ennå",
+      "journeyTitle": "Din Fremgangsreise",
+      "journeyGoalCreated": "Mål opprettet",
+      "journeyGoalCompleted": "Mål fullført",
+      "journeyFeedback": "Tilbakemelding fra {{author}}",
+      "journeyAssessment": "Egenvurdering",
+      "journeyEmpty": "Reisen din starter her — sett mål, reflekter over hendelser, og følg utviklingen din!",
+      "showMore": "Vis Mer"
     }
   }
 }

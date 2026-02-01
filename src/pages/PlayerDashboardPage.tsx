@@ -17,11 +17,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PlayerScheduleView } from '@/components/player/PlayerScheduleView';
 import { PlayerAttendanceHistory } from '@/components/player/PlayerAttendanceHistory';
 import { AnnouncementsFeed } from '@/components/player/AnnouncementsFeed';
-import { FeedbackTimeline } from '@/components/player/FeedbackTimeline';
 import { SelfAssessmentForm } from '@/components/player/SelfAssessmentForm';
-import { SelfAssessmentHistory } from '@/components/player/SelfAssessmentHistory';
-import { GoalTracker } from '@/components/player-stats/GoalTracker';
+import { StreaksMilestones } from '@/components/player/StreaksMilestones';
+import { FeedbackSpotlight } from '@/components/player/FeedbackSpotlight';
+import { StatSnapshots } from '@/components/player/StatSnapshots';
+import { ProgressJourney } from '@/components/player/ProgressJourney';
 import { getPlayerGoals } from '@/services/player-goals.service';
+import { getPlayerStats, aggregateStats, getAttendanceStats } from '@/services/player-stats.service';
+import type { AggregatedStats, AttendanceStats } from '@/services/player-stats.service';
 import {
   Dialog,
   DialogContent,
@@ -58,6 +61,9 @@ export function PlayerDashboardPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
   const [goals, setGoals] = useState<PlayerGoal[]>([]);
+  const [attendanceStats, setAttendanceStats] = useState<AttendanceStats | null>(null);
+  const [currentMonthStats, setCurrentMonthStats] = useState<AggregatedStats | null>(null);
+  const [previousMonthStats, setPreviousMonthStats] = useState<AggregatedStats | null>(null);
 
   const activeMemberships = player?.team_memberships?.filter((tm) => tm.status === 'active' || !tm.status) || [];
   const teamIds = activeMemberships.map((tm) => tm.team_id);
@@ -118,6 +124,32 @@ export function PlayerDashboardPage() {
         } catch {
           // Goals may not exist yet
         }
+      }
+
+      // Load attendance stats
+      try {
+        const attStats = await getAttendanceStats(playerRecord.id);
+        setAttendanceStats(attStats);
+      } catch {
+        // Attendance stats may not exist yet
+      }
+
+      // Load current and previous month stats
+      try {
+        const now = new Date();
+        const currentMonthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+        const currentMonthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0).toISOString();
+        const prevMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1).toISOString();
+        const prevMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0).toISOString();
+
+        const [curEntries, prevEntries] = await Promise.all([
+          getPlayerStats(playerRecord.id, 'custom', { startDate: currentMonthStart, endDate: currentMonthEnd }),
+          getPlayerStats(playerRecord.id, 'custom', { startDate: prevMonthStart, endDate: prevMonthEnd }),
+        ]);
+        setCurrentMonthStats(aggregateStats(curEntries));
+        setPreviousMonthStats(aggregateStats(prevEntries));
+      } catch {
+        // Stats may not exist yet
       }
     } catch (error) {
       console.error('Error loading player dashboard:', error);
@@ -365,31 +397,33 @@ export function PlayerDashboardPage() {
 
         {/* Tab 3: Progress */}
         <TabsContent value="progress" className="space-y-6">
-          {/* Goals */}
-          <GoalTracker
+          <StreaksMilestones
             goals={goals}
-            isCoach={false}
-            onCreateGoal={async () => {}}
-            onToggleComplete={async () => {}}
-            onDeleteGoal={async () => {}}
+            feedback={feedback}
+            assessments={assessments}
+            attendanceStats={attendanceStats}
           />
 
-          {/* Coach Feedback */}
-          <div>
-            <h2 className="text-2xl font-bold mb-4">
-              {t('playerExperience.feedback.title')}
-            </h2>
-            <FeedbackTimeline feedback={feedback} />
-          </div>
+          <FeedbackSpotlight feedback={feedback} />
 
-          {/* Self-Reflections */}
+          <StatSnapshots
+            currentMonthStats={currentMonthStats}
+            previousMonthStats={previousMonthStats}
+            attendanceRate={attendanceRate}
+          />
+
+          <ProgressJourney
+            goals={goals}
+            feedback={feedback}
+            assessments={assessments}
+          />
+
           <SelfAssessmentForm
             events={recentEventsForAssessment}
             playerId={player.id}
             existingAssessments={assessments}
             onSubmit={submitAssessment}
           />
-          <SelfAssessmentHistory assessments={assessments} />
         </TabsContent>
       </Tabs>
 
