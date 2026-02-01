@@ -851,7 +851,12 @@ export async function approveTeamMembership(membershipId: string): Promise<void>
 
   // Also create RSVPs client-side as a fallback
   if (data) {
-    const player = await db.players.get(data.player_id);
+    // Fetch player from Supabase to get user_id (local DB may not have it)
+    const { data: player } = await supabase
+      .from('players')
+      .select('user_id')
+      .eq('id', data.player_id)
+      .single();
     const respondedBy = player?.user_id || data.player_id;
     createPendingRSVPsForPlayer(data.player_id, data.team_id, respondedBy).catch(err =>
       console.warn('Failed to create pending RSVPs for approved member:', err)
