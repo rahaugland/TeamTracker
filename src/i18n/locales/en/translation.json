@@ -922,6 +922,23 @@
       "noMatches": "No matches played yet",
       "win": "W",
       "loss": "L"
+    },
+    "activeSeason": {
+      "label": "Active Season",
+      "games": "{{count}} games",
+      "viewDetails": "View Details"
+    },
+    "seasonTimeline": {
+      "title": "Season Timeline",
+      "record": "{{wins}}W – {{losses}}L ({{pct}}%)"
+    },
+    "seasonComparison": {
+      "title": "Compare Seasons",
+      "selectSeason": "Select season",
+      "seasonA": "Season A",
+      "seasonB": "Season B",
+      "empty": "Select two seasons to compare",
+      "delta": "Δ {{value}}"
     }
   },
   "goals": {

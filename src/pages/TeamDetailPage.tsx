@@ -24,6 +24,8 @@ import { TeamRatingRadar } from '@/components/team/TeamRatingRadar';
 import { BestXIFormation } from '@/components/team/BestXIFormation';
 import { PlayerComparison } from '@/components/team/PlayerComparison';
 import { PendingPlayers } from '@/components/team/PendingPlayers';
+import { ActiveSeasonBar } from '@/components/seasons/ActiveSeasonBar';
+import { SeasonTimeline } from '@/components/seasons/SeasonTimeline';
 import { usePermissions } from '@/hooks/usePermissions';
 
 interface PlayerWithRating extends PlayerWithMemberships {
@@ -159,6 +161,9 @@ export function TeamDetailPage() {
         </div>
       )}
 
+      {/* Active Season Bar */}
+      {id && <ActiveSeasonBar teamId={id} />}
+
       {/* Pending Players (coaches only) */}
       {isCoach && pendingPlayers.length > 0 && (
         <div className="mb-6">
@@ -219,6 +224,7 @@ export function TeamDetailPage() {
 
           {/* Stats Tab */}
           <TabsContent value="stats" className="space-y-6">
+            <SeasonTimeline gameStats={gameStats} isLoading={isLoadingTeamStats} />
             <TeamPerformanceTrends gameStats={gameStats} isLoading={isLoadingTeamStats} />
             <TeamGameLog gameStats={gameStats} isLoading={isLoadingTeamStats} />
           </TabsContent>

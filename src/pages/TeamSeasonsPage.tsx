@@ -18,6 +18,7 @@ import { ConfirmDialog } from '@/components/common/ConfirmDialog';
 import { SeasonManager } from '@/components/seasons/SeasonManager';
 import { SeasonAwardsDisplay } from '@/components/seasons/SeasonAwards';
 import { SeasonSummary } from '@/components/seasons/SeasonSummary';
+import { SeasonComparison } from '@/components/seasons/SeasonComparison';
 import { cn } from '@/lib/utils';
 
 export function TeamSeasonsPage() {
@@ -56,6 +57,10 @@ export function TeamSeasonsPage() {
       ]);
       setSeasons(seasonsData);
       setPlayers(playersData);
+
+      // Auto-expand active (non-finalized) season
+      const active = seasonsData.find((s) => !s.is_finalized);
+      if (active) setExpandedSeason(active.id);
 
       // Load awards for finalized seasons
       const awardsMap: Record<string, SeasonAward[]> = {};
@@ -130,6 +135,12 @@ export function TeamSeasonsPage() {
           </Button>
         )}
       </div>
+
+      {seasons.length >= 2 && (
+        <div className="mb-6">
+          <SeasonComparison teamId={teamId!} seasons={seasons} />
+        </div>
+      )}
 
       {seasons.length === 0 ? (
         <Card>
