@@ -375,6 +375,12 @@
       "tier8": "8 - National",
       "tier9": "9 - World Class"
     },
+    "playerFeedback": {
+      "title": "Player Feedback",
+      "placeholder": "e.g. Great serving today, work on reception...",
+      "saved": "Feedback saved",
+      "noPlayers": "No players to give feedback to"
+    },
     "recurring": {
       "enable": "Create recurring practice",
       "selectDays": "Select days of the week",
@@ -939,7 +945,8 @@
       "home": "Home",
       "myStats": "My Stats",
       "feedback": "Feedback",
-      "selfAssessment": "Self-Assessment"
+      "selfAssessment": "Self-Assessment",
+      "progress": "Progress"
     },
     "home": {
       "nextEvent": "Next Event",

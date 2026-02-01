@@ -18,10 +18,10 @@ import { PlayerScheduleView } from '@/components/player/PlayerScheduleView';
 import { PlayerAttendanceHistory } from '@/components/player/PlayerAttendanceHistory';
 import { AnnouncementsFeed } from '@/components/player/AnnouncementsFeed';
 import { FeedbackTimeline } from '@/components/player/FeedbackTimeline';
-import { SkillRatingsChart } from '@/components/player/SkillRatingsChart';
-import { ReviewCard } from '@/components/player/ReviewCard';
 import { SelfAssessmentForm } from '@/components/player/SelfAssessmentForm';
 import { SelfAssessmentHistory } from '@/components/player/SelfAssessmentHistory';
+import { GoalTracker } from '@/components/player-stats/GoalTracker';
+import { getPlayerGoals } from '@/services/player-goals.service';
 import {
   Dialog,
   DialogContent,
@@ -37,7 +37,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Calendar, Users, TrendingUp, Home, BarChart3, MessageSquare, ClipboardCheck } from 'lucide-react';
+import { Calendar, Users, TrendingUp, Home, BarChart3, Target } from 'lucide-react';
+import type { PlayerGoal } from '@/types/database.types';
 import { format } from 'date-fns';
 import { JoinTeamCard } from '@/components/player/JoinTeamCard';
 import { PendingMemberships } from '@/components/player/PendingMemberships';
@@ -56,13 +57,14 @@ export function PlayerDashboardPage() {
   const [rsvpStatus, setRsvpStatus] = useState<RsvpStatus>('pending');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [goals, setGoals] = useState<PlayerGoal[]>([]);
 
   const activeMemberships = player?.team_memberships?.filter((tm) => tm.status === 'active' || !tm.status) || [];
   const teamIds = activeMemberships.map((tm) => tm.team_id);
   const hasActiveTeams = teamIds.length > 0;
 
   const { announcements, pinnedAnnouncements } = useAnnouncements(teamIds);
-  const { feedback, reviews, skillRatings, refetch: refetchFeedback } = usePlayerFeedback(player?.id);
+  const { feedback } = usePlayerFeedback(player?.id);
   const { assessments, submitAssessment } = useSelfAssessments(player?.id);
 
   useEffect(() => {
@@ -107,6 +109,16 @@ export function PlayerDashboardPage() {
 
       const rsvpData = await getPlayerRSVPs(playerRecord.id);
       setRsvps(rsvpData);
+
+      // Load goals for first active team
+      if (playerTeamIds.length > 0) {
+        try {
+          const goalsData = await getPlayerGoals(playerRecord.id, playerTeamIds[0]);
+          setGoals(goalsData);
+        } catch {
+          // Goals may not exist yet
+        }
+      }
     } catch (error) {
       console.error('Error loading player dashboard:', error);
     } finally {
@@ -202,7 +214,7 @@ export function PlayerDashboardPage() {
 
       {/* Tabbed Dashboard */}
       <Tabs defaultValue="home" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="home" className="flex items-center gap-2">
             <Home className="h-4 w-4" />
             <span className="hidden sm:inline">{t('playerExperience.tabs.home')}</span>
@@ -211,13 +223,9 @@ export function PlayerDashboardPage() {
             <BarChart3 className="h-4 w-4" />
             <span className="hidden sm:inline">{t('playerExperience.tabs.myStats')}</span>
           </TabsTrigger>
-          <TabsTrigger value="feedback" className="flex items-center gap-2">
-            <MessageSquare className="h-4 w-4" />
-            <span className="hidden sm:inline">{t('playerExperience.tabs.feedback')}</span>
-          </TabsTrigger>
-          <TabsTrigger value="self-assessment" className="flex items-center gap-2">
-            <ClipboardCheck className="h-4 w-4" />
-            <span className="hidden sm:inline">{t('playerExperience.tabs.selfAssessment')}</span>
+          <TabsTrigger value="progress" className="flex items-center gap-2">
+            <Target className="h-4 w-4" />
+            <span className="hidden sm:inline">{t('playerExperience.tabs.progress')}</span>
           </TabsTrigger>
         </TabsList>
 
@@ -355,45 +363,32 @@ export function PlayerDashboardPage() {
           {/* Stats are shown on this dashboard - no link to detailed stats page for players */}
         </TabsContent>
 
-        {/* Tab 3: Feedback */}
-        <TabsContent value="feedback" className="space-y-6">
-          {/* Skill Ratings */}
-          <SkillRatingsChart ratings={skillRatings} />
+        {/* Tab 3: Progress */}
+        <TabsContent value="progress" className="space-y-6">
+          {/* Goals */}
+          <GoalTracker
+            goals={goals}
+            isCoach={false}
+            onCreateGoal={async () => {}}
+            onToggleComplete={async () => {}}
+            onDeleteGoal={async () => {}}
+          />
 
-          {/* Reviews */}
-          {reviews.length > 0 && (
-            <div>
-              <h2 className="text-2xl font-bold mb-4">
-                {t('playerExperience.reviews.title')}
-              </h2>
-              <div className="space-y-4">
-                {reviews.map((review) => (
-                  <ReviewCard key={review.id} review={review} />
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Post-Event Feedback */}
+          {/* Coach Feedback */}
           <div>
             <h2 className="text-2xl font-bold mb-4">
               {t('playerExperience.feedback.title')}
             </h2>
             <FeedbackTimeline feedback={feedback} />
           </div>
-        </TabsContent>
 
-        {/* Tab 4: Self-Assessment */}
-        <TabsContent value="self-assessment" className="space-y-6">
-          {/* Assessment Form */}
+          {/* Self-Reflections */}
           <SelfAssessmentForm
             events={recentEventsForAssessment}
             playerId={player.id}
             existingAssessments={assessments}
             onSubmit={submitAssessment}
           />
-
-          {/* Assessment History */}
           <SelfAssessmentHistory assessments={assessments} />
         </TabsContent>
       </Tabs>

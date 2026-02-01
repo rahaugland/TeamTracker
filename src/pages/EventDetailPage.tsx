@@ -15,6 +15,7 @@ import { FinalizedParticipantsCard } from '@/components/event-detail/FinalizedPa
 import { MatchResultSection } from '@/components/event-detail/MatchResultSection';
 import { EventStatsSummary } from '@/components/event-detail/EventStatsSummary';
 import { EventPracticePlanCard } from '@/components/event-detail/EventPracticePlanCard';
+import { EventPlayerFeedback } from '@/components/event-detail/EventPlayerFeedback';
 import type { EventFormData } from '@/lib/validations/event';
 
 /**
@@ -160,6 +161,15 @@ export function EventDetailPage() {
             />
           )}
         </>
+      )}
+
+      {/* Player Feedback (coaches only) */}
+      {isCoach && (
+        <EventPlayerFeedback
+          eventId={id!}
+          teamPlayers={teamPlayers}
+          isCoach={isCoach}
+        />
       )}
 
       {/* Match Result Section (for games and tournaments) */}

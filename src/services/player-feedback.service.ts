@@ -94,6 +94,35 @@ export async function createFeedback(input: CreateFeedbackInput): Promise<Player
 }
 
 /**
+ * Get all feedback for a specific event
+ */
+export async function getEventFeedback(eventId: string): Promise<FeedbackWithAuthor[]> {
+  const { data, error } = await supabase
+    .from('player_feedback')
+    .select(`
+      *,
+      author:profiles!author_id(
+        id,
+        full_name
+      ),
+      event:events!event_id(
+        id,
+        title,
+        start_time
+      )
+    `)
+    .eq('event_id', eventId)
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error('Error fetching event feedback:', error);
+    throw error;
+  }
+
+  return data || [];
+}
+
+/**
  * Delete feedback
  */
 export async function deleteFeedback(id: string): Promise<void> {
