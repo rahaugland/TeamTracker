@@ -23,7 +23,9 @@ import { FeedbackSpotlight } from '@/components/player/FeedbackSpotlight';
 import { StatSnapshots } from '@/components/player/StatSnapshots';
 import { ProgressJourney } from '@/components/player/ProgressJourney';
 import { PlayerAwardsShowcase } from '@/components/player/PlayerAwardsShowcase';
-import { getPlayerGoals } from '@/services/player-goals.service';
+import { getPlayerGoals, createPlayerGoal, toggleGoalCompletion, deletePlayerGoal, refreshGoalProgress } from '@/services/player-goals.service';
+import { GoalTracker } from '@/components/player-stats/GoalTracker';
+import type { PlayerGoalFormData } from '@/lib/validations/playerGoal';
 import { getPlayerStats, aggregateStats, getAttendanceStats } from '@/services/player-stats.service';
 import type { AggregatedStats, AttendanceStats } from '@/services/player-stats.service';
 import {
@@ -117,9 +119,10 @@ export function PlayerDashboardPage() {
       const rsvpData = await getPlayerRSVPs(playerRecord.id);
       setRsvps(rsvpData);
 
-      // Load goals for first active team
+      // Load goals for first active team + refresh progress
       if (playerTeamIds.length > 0) {
         try {
+          await refreshGoalProgress(playerRecord.id, playerTeamIds[0]);
           const goalsData = await getPlayerGoals(playerRecord.id, playerTeamIds[0]);
           setGoals(goalsData);
         } catch {
@@ -184,6 +187,40 @@ export function PlayerDashboardPage() {
       console.error('Error submitting RSVP:', error);
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const activeTeamId = teamIds[0];
+
+  const handleCreateGoal = async (data: PlayerGoalFormData) => {
+    if (!player || !user || !activeTeamId) return;
+    await createPlayerGoal({
+      player_id: player.id,
+      team_id: activeTeamId,
+      title: data.title,
+      description: data.description,
+      metric_type: data.metric_type,
+      target_value: data.target_value,
+      deadline: data.deadline,
+      created_by: user.id,
+    });
+    const updated = await getPlayerGoals(player.id, activeTeamId);
+    setGoals(updated);
+  };
+
+  const handleToggleGoal = async (goalId: string, isCompleted: boolean) => {
+    await toggleGoalCompletion(goalId, isCompleted);
+    if (player && activeTeamId) {
+      const updated = await getPlayerGoals(player.id, activeTeamId);
+      setGoals(updated);
+    }
+  };
+
+  const handleDeleteGoal = async (goalId: string) => {
+    await deletePlayerGoal(goalId);
+    if (player && activeTeamId) {
+      const updated = await getPlayerGoals(player.id, activeTeamId);
+      setGoals(updated);
     }
   };
 
@@ -403,6 +440,14 @@ export function PlayerDashboardPage() {
             feedback={feedback}
             assessments={assessments}
             attendanceStats={attendanceStats}
+          />
+
+          <GoalTracker
+            goals={goals}
+            isCoach={true}
+            onCreateGoal={handleCreateGoal}
+            onToggleComplete={handleToggleGoal}
+            onDeleteGoal={handleDeleteGoal}
           />
 
           <PlayerAwardsShowcase playerId={player.id} />
