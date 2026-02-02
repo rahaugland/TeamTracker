@@ -3,7 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useSeasons, useTeams } from '@/store';
 import { getSeasons, getActiveSeason } from '@/services/seasons.service';
-import { getTeams, createTeam, deleteTeam } from '@/services/teams.service';
+import { getTeams, createTeam, deleteTeam, assignCoach } from '@/services/teams.service';
+import { useAuth } from '@/store';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -21,6 +22,7 @@ export function TeamsPage() {
   const navigate = useNavigate();
   const { seasons, activeSeason, setSeasons, setActiveSeason } = useSeasons();
   const { teams, setTeams, setActiveTeam } = useTeams();
+  const { user } = useAuth();
 
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -65,6 +67,15 @@ export function TeamsPage() {
         name: data.name,
         season_id: data.seasonId,
       });
+
+      // Auto-assign creating coach to the new team
+      if (user?.id && (user.role === 'head_coach' || user.role === 'assistant_coach')) {
+        try {
+          await assignCoach(newTeam.id, user.id, user.role);
+        } catch (e) {
+          console.error('Error auto-assigning coach:', e);
+        }
+      }
 
       setTeams([...teams, newTeam as any]);
       setShowCreateDialog(false);
