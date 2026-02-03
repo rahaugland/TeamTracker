@@ -51,7 +51,9 @@ export function PracticePlanBuilderPage() {
     try {
       const planData = await getPracticePlan(planId);
       setPlan(planData);
-      setPlanName(planData.name);
+      if (planData) {
+        setPlanName(planData.name);
+      }
     } catch (error) {
       console.error('Error loading practice plan:', error);
     } finally {
@@ -134,7 +136,7 @@ export function PracticePlanBuilderPage() {
 
     return plan.practice_blocks.filter(block => {
       if (sectionType === 'warmup') return block.type === 'warmup';
-      if (sectionType === 'game') return block.type === 'scrimmage' || block.type === 'game';
+      if (sectionType === 'game') return block.type === 'scrimmage';
       // Main section includes drills and custom blocks
       return block.type === 'drill' || block.type === 'custom';
     });

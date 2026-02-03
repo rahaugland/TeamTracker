@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useEffect, useState } from 'react';
 import { format } from 'date-fns';
 import { Calendar, Clock, MapPin, Check, ChevronRight } from 'lucide-react';
-import { getEvent } from '@/services/events.service';
+import { getEvent, type EventWithDetails } from '@/services/events.service';
 import { getPlayersByTeam } from '@/services/players.service';
 import { getEventRSVPs } from '@/services/rsvp.service';
 import { getMatchRoster, saveMatchRoster } from '@/services/match-roster.service';
@@ -15,7 +15,7 @@ import { PlayerAvatar } from '@/components/player';
 import { FormIndicator } from '@/components/match';
 import { cn } from '@/lib/utils';
 import { POSITION_NAMES } from '@/types/database.types';
-import type { Event, Player, Rsvp, VolleyballPosition } from '@/types/database.types';
+import type { Player, Rsvp, VolleyballPosition } from '@/types/database.types';
 
 interface PlayerWithRSVP extends Player {
   rsvpStatus?: Rsvp['status'];
@@ -31,7 +31,7 @@ export function MatchSelectionPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  const [event, setEvent] = useState<Event | null>(null);
+  const [event, setEvent] = useState<EventWithDetails | null>(null);
   const [players, setPlayers] = useState<PlayerWithRSVP[]>([]);
   const [selectedPlayerIds, setSelectedPlayerIds] = useState<Set<string>>(new Set());
   const [playerStats, setPlayerStats] = useState<Map<string, PlayerSelectionStats>>(new Map());

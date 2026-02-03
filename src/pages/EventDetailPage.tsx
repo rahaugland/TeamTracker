@@ -150,8 +150,8 @@ export function EventDetailPage() {
 
   // Map RSVP status for badge component
   const mapRSVPStatus = (status: RsvpStatus): 'coming' | 'not-coming' | 'pending' => {
-    if (status === 'yes') return 'coming';
-    if (status === 'no') return 'not-coming';
+    if (status === 'attending') return 'coming';
+    if (status === 'not_attending') return 'not-coming';
     return 'pending';
   };
 
@@ -265,7 +265,7 @@ export function EventDetailPage() {
           <div className="grid grid-cols-3 gap-3 md:gap-4 mb-6">
             <div className="bg-navy-80 rounded-md p-4 md:p-6 text-center">
               <p className="font-mono font-bold text-2xl md:text-4xl text-green-500 mb-1 md:mb-2">
-                {rsvpSummary.yes}
+                {rsvpSummary.attending}
               </p>
               <p className="font-display font-semibold text-[10px] md:text-[11px] uppercase tracking-wider text-gray-400">
                 Coming
@@ -273,7 +273,7 @@ export function EventDetailPage() {
             </div>
             <div className="bg-navy-80 rounded-md p-4 md:p-6 text-center">
               <p className="font-mono font-bold text-2xl md:text-4xl text-red-500 mb-1 md:mb-2">
-                {rsvpSummary.no}
+                {rsvpSummary.not_attending}
               </p>
               <p className="font-display font-semibold text-[10px] md:text-[11px] uppercase tracking-wider text-gray-400">
                 Not Coming
@@ -327,7 +327,7 @@ export function EventDetailPage() {
                             {player.name}
                           </p>
                           <p className="text-xs text-gray-400 truncate">
-                            {player.position || 'No position'}
+                            {player.positions?.[0] || 'No position'}
                           </p>
                         </div>
                         <RSVPStatusBadge status={mappedStatus} />
@@ -358,7 +358,7 @@ export function EventDetailPage() {
                     {practicePlan.name}
                   </p>
                   <p className="text-sm text-gray-400">
-                    {practicePlan.blocks?.reduce((acc, block) => acc + (block.drills?.length || 0), 0) || 0} drills • {practicePlan.total_duration} minutes total
+                    {practicePlan.practice_blocks?.length || 0} blocks • {practicePlan.practice_blocks?.reduce((acc: number, block: { duration_minutes: number }) => acc + block.duration_minutes, 0) || 0} minutes total
                   </p>
                 </div>
                 <span className="text-teal-500 text-xl">→</span>

@@ -7,6 +7,10 @@ export interface Team {
   id: string;
   name: string;
   season_id: string;
+  season?: {
+    id: string;
+    name: string;
+  };
   created_at: string;
   updated_at: string;
 }
