@@ -27,16 +27,16 @@ export function ServeTrendChart({ gameStats }: ServeTrendChartProps) {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (
-        <div className="bg-white border border-gray-200 rounded-lg shadow-lg p-3">
-          <p className="font-semibold text-sm">{data.opponent}</p>
+        <div className="bg-card border border-white/10 rounded-lg shadow-lg p-3">
+          <p className="font-semibold text-sm text-foreground">{data.opponent}</p>
           <p className="text-xs text-muted-foreground">
             {format(new Date(data.date), 'MMM d, yyyy')}
           </p>
-          <p className="text-sm mt-1">
-            <span className="font-medium text-green-600">Aces:</span> {data.aces}
+          <p className="text-sm mt-1 text-foreground">
+            <span className="font-medium text-emerald-400">Aces:</span> {data.aces}
           </p>
-          <p className="text-sm">
-            <span className="font-medium text-red-600">Errors:</span> {data.errors}
+          <p className="text-sm text-foreground">
+            <span className="font-medium text-club-primary">Errors:</span> {data.errors}
           </p>
         </div>
       );
@@ -67,21 +67,21 @@ export function ServeTrendChart({ gameStats }: ServeTrendChartProps) {
       <CardContent>
         <ResponsiveContainer width="100%" height={300}>
           <BarChart data={chartData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
             <XAxis
               dataKey="game"
-              tick={{ fontSize: 12 }}
-              stroke="#888"
+              tick={{ fontSize: 12, fill: '#8B95A5' }}
+              stroke="#8B95A5"
             />
             <YAxis
-              tick={{ fontSize: 12 }}
-              stroke="#888"
-              label={{ value: 'Count', angle: -90, position: 'insideLeft', style: { fontSize: 12 } }}
+              tick={{ fontSize: 12, fill: '#8B95A5' }}
+              stroke="#8B95A5"
+              label={{ value: 'Count', angle: -90, position: 'insideLeft', style: { fontSize: 12, fill: '#8B95A5' } }}
             />
             <Tooltip content={<CustomTooltip />} />
-            <Legend wrapperStyle={{ fontSize: 12 }} />
-            <Bar dataKey="aces" fill="#22c55e" name="Aces" />
-            <Bar dataKey="errors" fill="#ef4444" name="Errors" />
+            <Legend wrapperStyle={{ fontSize: 12, color: '#8B95A5' }} />
+            <Bar dataKey="aces" fill="#34D399" name="Aces" />
+            <Bar dataKey="errors" fill="#E63946" name="Errors" />
           </BarChart>
         </ResponsiveContainer>
       </CardContent>

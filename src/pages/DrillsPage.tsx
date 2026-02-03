@@ -173,7 +173,7 @@ export function DrillsPage() {
                       </CardDescription>
                     </div>
                     {progressionStatus[drill.id] && (
-                      <span className="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">
+                      <span className="px-2 py-1 text-xs font-medium bg-emerald-500/15 text-emerald-400 rounded-full">
                         {t('drill.advanceBadge')}
                       </span>
                     )}

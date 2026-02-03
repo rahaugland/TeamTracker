@@ -42,6 +42,7 @@ const ImportPage = lazy(() => import('@/pages/ImportPage').then(m => ({ default:
 const PlayerStatsPage = lazy(() => import('@/pages/PlayerStatsPage').then(m => ({ default: m.PlayerStatsPage })));
 const RecordStatsPage = lazy(() => import('@/pages/RecordStatsPage').then(m => ({ default: m.RecordStatsPage })));
 const TeamSeasonsPage = lazy(() => import('@/pages/TeamSeasonsPage').then(m => ({ default: m.TeamSeasonsPage })));
+const MatchSelectionPage = lazy(() => import('@/pages/MatchSelectionPage').then(m => ({ default: m.MatchSelectionPage })));
 
 function App() {
   const { syncSession, user } = useAuth();
@@ -213,6 +214,14 @@ function App() {
                 element={
                   <Suspense fallback={<PageLoadingSpinner />}>
                     <RecordStatsPage />
+                  </Suspense>
+                }
+              />
+              <Route
+                path="/events/:eventId/lineup"
+                element={
+                  <Suspense fallback={<PageLoadingSpinner />}>
+                    <MatchSelectionPage />
                   </Suspense>
                 }
               />

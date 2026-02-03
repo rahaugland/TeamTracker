@@ -96,35 +96,35 @@ function ErrorFallback({ error, errorInfo, reset }: ErrorFallbackProps) {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-      <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+      <div className="max-w-md w-full bg-card rounded-lg shadow-lg p-8 text-center border border-white/10">
         <div className="mb-6">
           {isOffline ? (
-            <div className="mx-auto w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center">
-              <WifiOff className="w-8 h-8 text-orange-600" />
+            <div className="mx-auto w-16 h-16 bg-club-secondary/15 rounded-full flex items-center justify-center">
+              <WifiOff className="w-8 h-8 text-club-secondary" />
             </div>
           ) : (
-            <div className="mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
-              <AlertTriangle className="w-8 h-8 text-red-600" />
+            <div className="mx-auto w-16 h-16 bg-club-primary/15 rounded-full flex items-center justify-center">
+              <AlertTriangle className="w-8 h-8 text-club-primary" />
             </div>
           )}
         </div>
 
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">
+        <h1 className="text-2xl font-bold text-foreground mb-2">
           {isOffline ? 'No Internet Connection' : 'Something Went Wrong'}
         </h1>
 
-        <p className="text-gray-600 mb-6">
+        <p className="text-muted-foreground mb-6">
           {isOffline
             ? 'Please check your internet connection and try again.'
             : 'An unexpected error occurred. We apologize for the inconvenience.'}
         </p>
 
         {import.meta.env.DEV && (
-          <div className="mb-6 p-4 bg-gray-100 rounded-lg text-left">
-            <p className="text-sm font-mono text-red-600 mb-2">{error.message}</p>
+          <div className="mb-6 p-4 bg-muted/30 rounded-lg text-left">
+            <p className="text-sm font-mono text-club-primary mb-2">{error.message}</p>
             {errorInfo?.componentStack && (
-              <details className="text-xs text-gray-600">
+              <details className="text-xs text-muted-foreground">
                 <summary className="cursor-pointer font-semibold mb-1">
                   Component Stack
                 </summary>

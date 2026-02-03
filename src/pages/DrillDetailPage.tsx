@@ -121,7 +121,7 @@ export function DrillDetailPage() {
                 Level {drill.progression_level}
               </span>
               {readyToAdvance && (
-                <span className="px-3 py-1 text-sm font-medium bg-green-100 text-green-800 rounded-full">
+                <span className="px-3 py-1 text-sm font-medium bg-emerald-500/15 text-emerald-400 rounded-full">
                   {t('drill.advanceBadge')}
                 </span>
               )}
@@ -345,8 +345,8 @@ export function DrillDetailPage() {
                                 key={i}
                                 className={`text-lg ${
                                   i < execution.coach_rating!
-                                    ? 'text-yellow-500'
-                                    : 'text-gray-300'
+                                    ? 'text-club-secondary'
+                                    : 'text-muted-foreground/30'
                                 }`}
                               >
                                 ★

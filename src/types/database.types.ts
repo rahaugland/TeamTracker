@@ -368,6 +368,14 @@ export interface SyncLogEntry {
   device_id?: string;
 }
 
+export interface MatchRoster {
+  id: string;
+  event_id: string;
+  player_id: string;
+  selected_by: string;
+  selected_at: string;
+}
+
 // Skill tags (system-defined)
 export const SKILL_TAGS = [
   'passing',

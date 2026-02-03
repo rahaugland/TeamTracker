@@ -53,14 +53,14 @@ export function TeamHeader({
   const getFormResultBadge = (result: 'W' | 'L' | 'D') => {
     if (result === 'W') {
       return (
-        <Badge className="bg-green-500 text-white hover:bg-green-600">
+        <Badge className="bg-emerald-500 text-white hover:bg-emerald-600">
           {t('team.dashboard.wins')}
         </Badge>
       );
     }
     if (result === 'L') {
       return (
-        <Badge className="bg-red-500 text-white hover:bg-red-600">
+        <Badge className="bg-club-primary text-white hover:bg-club-primary/90">
           {t('team.dashboard.losses')}
         </Badge>
       );
@@ -83,7 +83,7 @@ export function TeamHeader({
                 <span className="text-sm text-muted-foreground">{t('team.inviteCode')}:</span>
                 <code className="text-sm font-mono bg-muted px-2 py-0.5 rounded">{inviteCode}</code>
                 <Button variant="ghost" size="icon" className="h-6 w-6" onClick={handleCopyCode}>
-                  {copied ? <Check className="h-3.5 w-3.5 text-green-500" /> : <Copy className="h-3.5 w-3.5" />}
+                  {copied ? <Check className="h-3.5 w-3.5 text-emerald-400" /> : <Copy className="h-3.5 w-3.5" />}
                 </Button>
               </div>
             )}
@@ -99,7 +99,7 @@ export function TeamHeader({
                   {t('team.dashboard.overallRating')}
                 </div>
                 {teamRating.isProvisional && (
-                  <div className="text-xs text-orange-500 mt-1">
+                  <div className="text-xs text-club-secondary mt-1">
                     {t('team.dashboard.provisional')}
                   </div>
                 )}

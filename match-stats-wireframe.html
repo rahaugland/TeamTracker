@@ -1,0 +1,1622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VolleyQuest — Match Stats Recording Wireframe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800;900&family=Barlow:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --vq-navy: #0A1628;
+  --vq-navy-90: #0f1e35;
+  --vq-navy-80: #162843;
+  --vq-navy-70: #1e3452;
+  --vq-navy-60: #2a4268;
+  --vq-white: #FFFFFF;
+  --vq-off-white: #F0F2F5;
+  --vq-light-gray: #E1E5EB;
+  --vq-mid-gray: #8B95A5;
+  --vq-teal: #2EC4B6;
+  --vq-teal-dim: #1a7a70;
+  --club-primary: #E63946;
+  --club-primary-dim: #c42d39;
+  --club-primary-glow: rgba(230, 57, 70, 0.25);
+  --club-secondary: #FFB703;
+  --club-secondary-dim: #e0a003;
+  --color-success: #22C55E;
+  --color-warning: #F59E0B;
+  --color-error: #EF4444;
+  --color-info: #3B82F6;
+  --font-display: 'Barlow Condensed', sans-serif;
+  --font-body: 'Barlow', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-full: 999px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-body);
+  background: var(--vq-navy);
+  color: var(--vq-white);
+  line-height: 1.5;
+  padding: var(--space-lg);
+  min-height: 100vh;
+}
+
+.page-container {
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+/* Breadcrumb */
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-lg);
+  font-size: 13px;
+}
+
+.breadcrumb a {
+  color: var(--vq-mid-gray);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.breadcrumb a:hover { color: var(--vq-teal); }
+.breadcrumb span { color: var(--vq-mid-gray); }
+.breadcrumb .current { color: var(--vq-white); }
+
+/* Match Header */
+.match-header {
+  background: linear-gradient(135deg, var(--club-primary), var(--club-primary-dim));
+  border-radius: var(--radius-lg);
+  padding: var(--space-xl);
+  margin-bottom: var(--space-lg);
+  position: relative;
+  overflow: hidden;
+}
+
+.match-header::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -10%;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.1);
+  filter: blur(60px);
+}
+
+.match-type-badge {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  background: rgba(255,255,255,0.2);
+  padding: 6px 14px;
+  border-radius: var(--radius-full);
+  display: inline-block;
+  margin-bottom: var(--space-md);
+}
+
+.match-title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 32px;
+  text-transform: uppercase;
+  margin-bottom: var(--space-xs);
+}
+
+.match-meta {
+  font-size: 14px;
+  color: rgba(255,255,255,0.8);
+  margin-bottom: var(--space-md);
+}
+
+.match-score-section {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xl);
+  margin-top: var(--space-lg);
+  padding-top: var(--space-lg);
+  border-top: 1px solid rgba(255,255,255,0.15);
+}
+
+.score-team {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.team-badge-lg {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  background: rgba(255,255,255,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 16px;
+}
+
+.team-name-score {
+  display: flex;
+  flex-direction: column;
+}
+
+.team-label {
+  font-size: 11px;
+  color: rgba(255,255,255,0.6);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.team-name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 16px;
+  text-transform: uppercase;
+}
+
+.score-display {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.score-input {
+  width: 60px;
+  height: 60px;
+  background: rgba(255,255,255,0.15);
+  border: 2px solid rgba(255,255,255,0.3);
+  border-radius: var(--radius-md);
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 32px;
+  color: var(--vq-white);
+  text-align: center;
+}
+
+.score-input:focus {
+  outline: none;
+  border-color: var(--vq-white);
+  background: rgba(255,255,255,0.2);
+}
+
+.score-separator {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 24px;
+  color: rgba(255,255,255,0.5);
+}
+
+.set-scores {
+  display: flex;
+  gap: var(--space-sm);
+  margin-left: var(--space-lg);
+}
+
+.set-score-pill {
+  padding: 4px 12px;
+  background: rgba(255,255,255,0.1);
+  border-radius: var(--radius-full);
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+.set-score-pill.win { background: rgba(34, 197, 94, 0.3); }
+.set-score-pill.loss { background: rgba(239, 68, 68, 0.3); }
+
+/* View Mode Toggle */
+.view-toggle {
+  display: flex;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-lg);
+  background: var(--vq-navy-90);
+  padding: var(--space-xs);
+  border-radius: var(--radius-md);
+  width: fit-content;
+}
+
+.view-btn {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: var(--space-sm) var(--space-lg);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--vq-mid-gray);
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.view-btn:hover {
+  color: var(--vq-white);
+}
+
+.view-btn.active {
+  background: var(--club-primary);
+  color: var(--vq-white);
+}
+
+/* Player Selector */
+.player-selector {
+  display: flex;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-lg);
+  overflow-x: auto;
+  padding-bottom: var(--space-sm);
+}
+
+.player-chip {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  background: var(--vq-navy-90);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.player-chip:hover {
+  border-color: rgba(255,255,255,0.15);
+}
+
+.player-chip.active {
+  background: var(--club-primary);
+  border-color: var(--club-primary);
+}
+
+.player-chip-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-full);
+  background: var(--vq-navy-70);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 10px;
+  color: var(--vq-teal);
+}
+
+.player-chip.active .player-chip-avatar {
+  background: rgba(255,255,255,0.2);
+  color: var(--vq-white);
+}
+
+.player-chip-name {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.player-chip-number {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--vq-mid-gray);
+}
+
+.player-chip.active .player-chip-number {
+  color: rgba(255,255,255,0.7);
+}
+
+/* ==================== */
+/* CARD VIEW            */
+/* ==================== */
+
+.card-view-container {
+  display: none;
+}
+
+.card-view-container.active {
+  display: block;
+}
+
+/* Stat Categories Grid */
+.stat-categories {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-lg);
+  margin-bottom: var(--space-lg);
+}
+
+@media (max-width: 1200px) {
+  .stat-categories {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .stat-categories {
+    grid-template-columns: 1fr;
+  }
+}
+
+.stat-category {
+  background: var(--vq-navy-90);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.stat-category-header {
+  padding: var(--space-md) var(--space-lg);
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  position: relative;
+}
+
+.stat-category-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--category-color, var(--vq-teal));
+}
+
+.stat-category-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  background: var(--category-color, var(--vq-teal));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+
+.stat-category-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.stat-category-body {
+  padding: var(--space-lg);
+}
+
+/* Stat Input Group */
+.stat-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.stat-input-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+}
+
+.stat-label {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--vq-mid-gray);
+  flex: 1;
+}
+
+.stat-input-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.stat-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  background: var(--vq-navy-80);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: var(--vq-white);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stat-btn:hover {
+  background: var(--vq-navy-70);
+  border-color: rgba(255,255,255,0.2);
+}
+
+.stat-btn:active {
+  transform: scale(0.95);
+}
+
+.stat-btn.minus { color: var(--color-error); }
+.stat-btn.plus { color: var(--color-success); }
+
+.stat-value-display {
+  width: 48px;
+  height: 32px;
+  background: var(--vq-navy-80);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--vq-white);
+  text-align: center;
+  line-height: 30px;
+}
+
+/* Calculated Stat */
+.stat-calculated {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-md);
+  background: rgba(255,255,255,0.03);
+  border-radius: var(--radius-sm);
+  margin-top: var(--space-md);
+}
+
+.stat-calculated-label {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--vq-mid-gray);
+}
+
+.stat-calculated-value {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 20px;
+}
+
+.stat-calculated-value.good { color: var(--color-success); }
+.stat-calculated-value.average { color: var(--color-warning); }
+.stat-calculated-value.poor { color: var(--color-error); }
+
+/* ==================== */
+/* SPREADSHEET VIEW     */
+/* ==================== */
+
+.spreadsheet-container {
+  display: none;
+}
+
+.spreadsheet-container.active {
+  display: block;
+}
+
+.spreadsheet-wrapper {
+  background: var(--vq-navy-90);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.spreadsheet-scroll {
+  overflow-x: auto;
+}
+
+.spreadsheet {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.spreadsheet thead {
+  background: rgba(255,255,255,0.02);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.spreadsheet th {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--vq-mid-gray);
+  padding: var(--space-md) var(--space-sm);
+  text-align: center;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  white-space: nowrap;
+  min-width: 60px;
+}
+
+.spreadsheet th.player-col {
+  min-width: 150px;
+  text-align: left;
+  position: sticky;
+  left: 0;
+  background: var(--vq-navy-90);
+  z-index: 11;
+}
+
+.spreadsheet th.category-header {
+  background: var(--category-color, var(--vq-navy-80));
+  color: var(--vq-white);
+  font-size: 11px;
+  padding: var(--space-sm) var(--space-md);
+}
+
+.spreadsheet td {
+  padding: var(--space-xs);
+  text-align: center;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+}
+
+.spreadsheet td.player-col {
+  text-align: left;
+  padding: var(--space-sm) var(--space-md);
+  position: sticky;
+  left: 0;
+  background: var(--vq-navy-90);
+  z-index: 5;
+}
+
+.spreadsheet tbody tr:hover td {
+  background: rgba(255,255,255,0.02);
+}
+
+.spreadsheet tbody tr:hover td.player-col {
+  background: var(--vq-navy-80);
+}
+
+.spreadsheet-input {
+  width: 50px;
+  height: 32px;
+  background: var(--vq-navy-80);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--vq-white);
+  text-align: center;
+}
+
+.spreadsheet-input:focus {
+  outline: none;
+  border-color: var(--vq-teal);
+  background: var(--vq-navy-70);
+}
+
+.spreadsheet-input.highlight {
+  border-color: var(--color-success);
+  background: rgba(34, 197, 94, 0.1);
+}
+
+.spreadsheet-calc {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 12px;
+  color: var(--vq-teal);
+}
+
+.spreadsheet tfoot {
+  background: rgba(255,255,255,0.03);
+  font-weight: 600;
+}
+
+.spreadsheet tfoot td {
+  padding: var(--space-md) var(--space-sm);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  border-top: 2px solid rgba(255,255,255,0.1);
+}
+
+.spreadsheet tfoot td.player-col {
+  font-family: var(--font-display);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Player Row Info */
+.player-row-info {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.player-row-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-full);
+  background: var(--vq-navy-70);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 10px;
+  color: var(--vq-teal);
+  flex-shrink: 0;
+}
+
+.player-row-name {
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.player-row-number {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--vq-mid-gray);
+}
+
+/* Rotation Select */
+.rotation-select {
+  width: 50px;
+  height: 32px;
+  background: var(--vq-navy-80);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--vq-white);
+  text-align: center;
+  cursor: pointer;
+}
+
+/* Action Bar */
+.action-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-lg);
+  background: var(--vq-navy-90);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--radius-md);
+  margin-top: var(--space-lg);
+  position: sticky;
+  bottom: var(--space-lg);
+}
+
+.action-bar-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.save-status {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: 13px;
+  color: var(--vq-mid-gray);
+}
+
+.save-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+  background: var(--color-success);
+}
+
+.save-status-dot.saving {
+  background: var(--color-warning);
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.btn {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  border: none;
+  cursor: pointer;
+  padding: 12px 24px;
+  border-radius: var(--radius-sm);
+  transition: all 0.2s;
+}
+
+.btn-primary {
+  background: var(--club-primary);
+  color: var(--vq-white);
+  box-shadow: 0 2px 12px rgba(230, 57, 70, 0.3);
+}
+
+.btn-primary:hover {
+  background: var(--club-primary-dim);
+  transform: translateY(-1px);
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--vq-white);
+  border: 1px solid rgba(255,255,255,0.2);
+}
+
+.btn-outline:hover {
+  border-color: var(--vq-white);
+  background: rgba(255,255,255,0.05);
+}
+
+.btn-success {
+  background: var(--color-success);
+  color: var(--vq-navy);
+}
+
+.btn-success:hover {
+  background: #1eb854;
+}
+
+/* Quick Stats Summary */
+.quick-stats-bar {
+  display: flex;
+  gap: var(--space-lg);
+  padding: var(--space-md) var(--space-lg);
+  background: var(--vq-navy-90);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-lg);
+  overflow-x: auto;
+}
+
+.quick-stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 80px;
+}
+
+.quick-stat-value {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 24px;
+}
+
+.quick-stat-label {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--vq-mid-gray);
+}
+
+/* Player Card View - Individual Player Stats */
+.player-stats-card {
+  background: var(--vq-navy-90);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-lg);
+}
+
+.player-stats-header {
+  padding: var(--space-lg);
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.player-stats-info {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.player-avatar-lg {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  background: var(--vq-navy-70);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--vq-teal);
+}
+
+.player-name-lg {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 18px;
+  text-transform: uppercase;
+}
+
+.player-position {
+  font-size: 12px;
+  color: var(--vq-mid-gray);
+}
+
+.player-stats-actions {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.nav-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  background: var(--vq-navy-80);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: var(--vq-white);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  transition: all 0.2s;
+}
+
+.nav-btn:hover {
+  background: var(--vq-navy-70);
+  border-color: rgba(255,255,255,0.2);
+}
+
+.nav-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+</style>
+</head>
+<body>
+
+<div class="page-container">
+  <!-- Breadcrumb -->
+  <nav class="breadcrumb">
+    <a href="#">Dashboard</a>
+    <span>/</span>
+    <a href="#">Schedule</a>
+    <span>/</span>
+    <a href="#">vs Bergen VBK</a>
+    <span>/</span>
+    <span class="current">Record Stats</span>
+  </nav>
+
+  <!-- Match Header -->
+  <div class="match-header">
+    <span class="match-type-badge">League Match</span>
+    <h1 class="match-title">Record Match Stats</h1>
+    <p class="match-meta">Saturday, February 1, 2026 • 19:00 • Ekeberg Hallen</p>
+
+    <div class="match-score-section">
+      <div class="score-team">
+        <div class="team-badge-lg">OV</div>
+        <div class="team-name-score">
+          <span class="team-label">Home</span>
+          <span class="team-name">Oslo Volley U19</span>
+        </div>
+      </div>
+
+      <div class="score-display">
+        <input type="text" class="score-input" value="3">
+        <span class="score-separator">:</span>
+        <input type="text" class="score-input" value="1">
+      </div>
+
+      <div class="score-team">
+        <div class="team-badge-lg">BV</div>
+        <div class="team-name-score">
+          <span class="team-label">Away</span>
+          <span class="team-name">Bergen VBK</span>
+        </div>
+      </div>
+
+      <div class="set-scores">
+        <span class="set-score-pill win">25-21</span>
+        <span class="set-score-pill win">25-19</span>
+        <span class="set-score-pill loss">22-25</span>
+        <span class="set-score-pill win">25-18</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Stats Summary -->
+  <div class="quick-stats-bar">
+    <div class="quick-stat-item">
+      <span class="quick-stat-value" style="color: var(--color-success)">58</span>
+      <span class="quick-stat-label">Team Kills</span>
+    </div>
+    <div class="quick-stat-item">
+      <span class="quick-stat-value" style="color: var(--vq-teal)">45%</span>
+      <span class="quick-stat-label">Kill %</span>
+    </div>
+    <div class="quick-stat-item">
+      <span class="quick-stat-value">12</span>
+      <span class="quick-stat-label">Aces</span>
+    </div>
+    <div class="quick-stat-item">
+      <span class="quick-stat-value">8</span>
+      <span class="quick-stat-label">Blocks</span>
+    </div>
+    <div class="quick-stat-item">
+      <span class="quick-stat-value">42</span>
+      <span class="quick-stat-label">Digs</span>
+    </div>
+    <div class="quick-stat-item">
+      <span class="quick-stat-value" style="color: var(--club-secondary)">2.1</span>
+      <span class="quick-stat-label">Pass Rating</span>
+    </div>
+    <div class="quick-stat-item">
+      <span class="quick-stat-value" style="color: var(--color-error)">14</span>
+      <span class="quick-stat-label">Errors</span>
+    </div>
+  </div>
+
+  <!-- View Toggle -->
+  <div class="view-toggle">
+    <button class="view-btn active" onclick="showView('card')">Player Cards</button>
+    <button class="view-btn" onclick="showView('spreadsheet')">Spreadsheet</button>
+  </div>
+
+  <!-- ==================== -->
+  <!-- CARD VIEW            -->
+  <!-- ==================== -->
+  <div class="card-view-container active" id="card-view">
+    <!-- Player Selector -->
+    <div class="player-selector">
+      <div class="player-chip active">
+        <div class="player-chip-avatar">EH</div>
+        <span class="player-chip-name">Erik Hansen</span>
+        <span class="player-chip-number">#12</span>
+      </div>
+      <div class="player-chip">
+        <div class="player-chip-avatar">SN</div>
+        <span class="player-chip-name">Sofia Nilsen</span>
+        <span class="player-chip-number">#7</span>
+      </div>
+      <div class="player-chip">
+        <div class="player-chip-avatar">KL</div>
+        <span class="player-chip-name">Kristian Larsen</span>
+        <span class="player-chip-number">#4</span>
+      </div>
+      <div class="player-chip">
+        <div class="player-chip-avatar">IJ</div>
+        <span class="player-chip-name">Ingrid Johansen</span>
+        <span class="player-chip-number">#9</span>
+      </div>
+      <div class="player-chip">
+        <div class="player-chip-avatar">OB</div>
+        <span class="player-chip-name">Ole Berg</span>
+        <span class="player-chip-number">#1</span>
+      </div>
+      <div class="player-chip">
+        <div class="player-chip-avatar">LK</div>
+        <span class="player-chip-name">Lisa Knutsen</span>
+        <span class="player-chip-number">#11</span>
+      </div>
+    </div>
+
+    <!-- Individual Player Card -->
+    <div class="player-stats-card">
+      <div class="player-stats-header">
+        <div class="player-stats-info">
+          <div class="player-avatar-lg">EH</div>
+          <div>
+            <div class="player-name-lg">Erik Hansen</div>
+            <div class="player-position">Outside Hitter • #12</div>
+          </div>
+        </div>
+        <div class="player-stats-actions">
+          <button class="nav-btn" disabled>←</button>
+          <button class="nav-btn">→</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stat Categories -->
+    <div class="stat-categories">
+      <!-- Attack -->
+      <div class="stat-category" style="--category-color: var(--color-success)">
+        <div class="stat-category-header">
+          <div class="stat-category-icon">⚔️</div>
+          <span class="stat-category-title">Attack</span>
+        </div>
+        <div class="stat-category-body">
+          <div class="stat-input-group">
+            <div class="stat-input-row">
+              <span class="stat-label">Kills (K)</span>
+              <div class="stat-input-controls">
+                <button class="stat-btn minus">−</button>
+                <div class="stat-value-display">18</div>
+                <button class="stat-btn plus">+</button>
+              </div>
+            </div>
+            <div class="stat-input-row">
+              <span class="stat-label">Attack Errors (E)</span>
+              <div class="stat-input-controls">
+                <button class="stat-btn minus">−</button>
+                <div class="stat-value-display">4</div>
+                <button class="stat-btn plus">+</button>
+              </div>
+            </div>
+            <div class="stat-input-row">
+              <span class="stat-label">Attack Attempts (TA)</span>
+              <div class="stat-input-controls">
+                <button class="stat-btn minus">−</button>
+                <div class="stat-value-display">38</div>
+                <button class="stat-btn plus">+</button>
+              </div>
+            </div>
+          </div>
+          <div class="stat-calculated">
+            <span class="stat-calculated-label">Kill Percentage</span>
+            <span class="stat-calculated-value good">36.8%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Serve -->
+      <div class="stat-category" style="--category-color: var(--club-primary)">
+        <div class="stat-category-header">
+          <div class="stat-category-icon">🎯</div>
+          <span class="stat-category-title">Serve</span>
+        </div>
+        <div class="stat-category-body">
+          <div class="stat-input-group">
+            <div class="stat-input-row">
+              <span class="stat-label">Aces</span>
+              <div class="stat-input-controls">
+                <button class="stat-btn minus">−</button>
+                <div class="stat-value-display">4</div>
+                <button class="stat-btn plus">+</button>
+              </div>
+            </div>
+            <div class="stat-input-row">
+              <span class="stat-label">Service Errors (SE)</span>
+              <div class="stat-input-controls">
+                <button class="stat-btn minus">−</button>
+                <div class="stat-value-display">2</div>
+                <button class="stat-btn plus">+</button>
+              </div>
+            </div>
+            <div class="stat-input-row">
+              <span class="stat-label">Serve Attempts (SA)</span>
+              <div class="stat-input-controls">
+                <button class="stat-btn minus">−</button>
+                <div class="stat-value-display">18</div>
+                <button class="stat-btn plus">+</button>
+              </div>
+            </div>
+          </div>
+          <div class="stat-calculated">
+            <span class="stat-calculated-label">Ace Percentage</span>
+            <span class="stat-calculated-value good">22.2%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Block -->
+      <div class="stat-category" style="--category-color: var(--color-info)">
+        <div class="stat-category-header">
+          <div class="stat-category-icon">🛡️</div>
+          <span class="stat-category-title">Block</span>
+        </div>
+        <div class="stat-category-body">
+          <div class="stat-input-group">
+            <div class="stat-input-row">
+              <span class="stat-label">Block Solos (BS)</span>
+              <div class="stat-input-controls">
+                <button class="stat-btn minus">−</button>
+                <div class="stat-value-display">2</div>
+                <button class="stat-btn plus">+</button>
+              </div>
+            </div>
+            <div class="stat-input-row">
+              <span class="stat-label">Block Assists (BA)</span>
+              <div class="stat-input-controls">
+                <button class="stat-btn minus">−</button>
+                <div class="stat-value-display">3</div>
+                <button class="stat-btn plus">+</button>
+              </div>
+            </div>
+            <div class="stat-input-row">
+              <span class="stat-label">Block Touches (BT)</span>
+              <div class="stat-input-controls">
+                <button class="stat-btn minus">−</button>
+                <div class="stat-value-display">8</div>
+                <button class="stat-btn plus">+</button>
+              </div>
+            </div>
+          </div>
+          <div class="stat-calculated">
+            <span class="stat-calculated-label">Total Blocks</span>
+            <span class="stat-calculated-value">5</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Defense / Digs -->
+      <div class="stat-category" style="--category-color: #9333EA">
+        <div class="stat-category-header">
+          <div class="stat-category-icon">🏐</div>
+          <span class="stat-category-title">Defense</span>
+        </div>
+        <div class="stat-category-body">
+          <div class="stat-input-group">
+            <div class="stat-input-row">
+              <span class="stat-label">Digs</span>
+              <div class="stat-input-controls">
+                <button class="stat-btn minus">−</button>
+                <div class="stat-value-display">8</div>
+                <button class="stat-btn plus">+</button>
+              </div>
+            </div>
+            <div class="stat-input-row">
+              <span class="stat-label">Ball Handling Errors</span>
+              <div class="stat-input-controls">
+                <button class="stat-btn minus">−</button>
+                <div class="stat-value-display">1</div>
+                <button class="stat-btn plus">+</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Passing / Receive -->
+      <div class="stat-category" style="--category-color: var(--vq-teal)">
+        <div class="stat-category-header">
+          <div class="stat-category-icon">🤲</div>
+          <span class="stat-category-title">Passing / Receive</span>
+        </div>
+        <div class="stat-category-body">
+          <div class="stat-input-group">
+            <div class="stat-input-row">
+              <span class="stat-label">Pass Attempts (PA)</span>
+              <div class="stat-input-controls">
+                <button class="stat-btn minus">−</button>
+                <div class="stat-value-display">12</div>
+                <button class="stat-btn plus">+</button>
+              </div>
+            </div>
+            <div class="stat-input-row">
+              <span class="stat-label">Pass Sum (0-3 each)</span>
+              <div class="stat-input-controls">
+                <button class="stat-btn minus">−</button>
+                <div class="stat-value-display">26</div>
+                <button class="stat-btn plus">+</button>
+              </div>
+            </div>
+          </div>
+          <div class="stat-calculated">
+            <span class="stat-calculated-label">Pass Rating</span>
+            <span class="stat-calculated-value good">2.17</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Setting -->
+      <div class="stat-category" style="--category-color: var(--club-secondary)">
+        <div class="stat-category-header">
+          <div class="stat-category-icon">👆</div>
+          <span class="stat-category-title">Setting</span>
+        </div>
+        <div class="stat-category-body">
+          <div class="stat-input-group">
+            <div class="stat-input-row">
+              <span class="stat-label">Set Attempts (SA)</span>
+              <div class="stat-input-controls">
+                <button class="stat-btn minus">−</button>
+                <div class="stat-value-display">0</div>
+                <button class="stat-btn plus">+</button>
+              </div>
+            </div>
+            <div class="stat-input-row">
+              <span class="stat-label">Set Sum (0-3 each)</span>
+              <div class="stat-input-controls">
+                <button class="stat-btn minus">−</button>
+                <div class="stat-value-display">0</div>
+                <button class="stat-btn plus">+</button>
+              </div>
+            </div>
+            <div class="stat-input-row">
+              <span class="stat-label">Setting Errors</span>
+              <div class="stat-input-controls">
+                <button class="stat-btn minus">−</button>
+                <div class="stat-value-display">0</div>
+                <button class="stat-btn plus">+</button>
+              </div>
+            </div>
+          </div>
+          <div class="stat-calculated">
+            <span class="stat-calculated-label">Set Rating</span>
+            <span class="stat-calculated-value" style="color: var(--vq-mid-gray)">—</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Playing Time -->
+    <div class="stat-category" style="--category-color: var(--vq-mid-gray); max-width: 400px;">
+      <div class="stat-category-header">
+        <div class="stat-category-icon">⏱️</div>
+        <span class="stat-category-title">Playing Time</span>
+      </div>
+      <div class="stat-category-body">
+        <div class="stat-input-group">
+          <div class="stat-input-row">
+            <span class="stat-label">Starting Rotation</span>
+            <select class="rotation-select" style="width: 60px;">
+              <option value="">—</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4" selected>4</option>
+              <option value="5">5</option>
+              <option value="6">6</option>
+            </select>
+          </div>
+          <div class="stat-input-row">
+            <span class="stat-label">Sets Played</span>
+            <div class="stat-input-controls">
+              <button class="stat-btn minus">−</button>
+              <div class="stat-value-display">4</div>
+              <button class="stat-btn plus">+</button>
+            </div>
+          </div>
+          <div class="stat-input-row">
+            <span class="stat-label">Rotations Played</span>
+            <div class="stat-input-controls">
+              <button class="stat-btn minus">−</button>
+              <div class="stat-value-display">22</div>
+              <button class="stat-btn plus">+</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== -->
+  <!-- SPREADSHEET VIEW     -->
+  <!-- ==================== -->
+  <div class="spreadsheet-container" id="spreadsheet-view">
+    <div class="spreadsheet-wrapper">
+      <div class="spreadsheet-scroll">
+        <table class="spreadsheet">
+          <thead>
+            <tr>
+              <th class="player-col" rowspan="2">Player</th>
+              <th colspan="4" class="category-header" style="--category-color: rgba(34, 197, 94, 0.8)">Attack</th>
+              <th colspan="3" class="category-header" style="--category-color: rgba(230, 57, 70, 0.8)">Serve</th>
+              <th colspan="3" class="category-header" style="--category-color: rgba(59, 130, 246, 0.8)">Block</th>
+              <th colspan="2" class="category-header" style="--category-color: rgba(147, 51, 234, 0.8)">Defense</th>
+              <th colspan="3" class="category-header" style="--category-color: rgba(46, 196, 182, 0.8)">Passing</th>
+              <th colspan="4" class="category-header" style="--category-color: rgba(255, 183, 3, 0.8)">Setting</th>
+              <th colspan="3" class="category-header" style="--category-color: rgba(139, 149, 165, 0.6)">Time</th>
+            </tr>
+            <tr>
+              <!-- Attack -->
+              <th>K</th>
+              <th>E</th>
+              <th>TA</th>
+              <th>K%</th>
+              <!-- Serve -->
+              <th>A</th>
+              <th>SE</th>
+              <th>SA</th>
+              <!-- Block -->
+              <th>BS</th>
+              <th>BA</th>
+              <th>BT</th>
+              <!-- Defense -->
+              <th>D</th>
+              <th>BHE</th>
+              <!-- Passing -->
+              <th>PA</th>
+              <th>PS</th>
+              <th>PR</th>
+              <!-- Setting -->
+              <th>SA</th>
+              <th>SS</th>
+              <th>SE</th>
+              <th>SR</th>
+              <!-- Time -->
+              <th>R</th>
+              <th>SP</th>
+              <th>RP</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="player-col">
+                <div class="player-row-info">
+                  <div class="player-row-avatar">EH</div>
+                  <span class="player-row-name">Erik Hansen</span>
+                  <span class="player-row-number">#12</span>
+                </div>
+              </td>
+              <td><input type="number" class="spreadsheet-input highlight" value="18"></td>
+              <td><input type="number" class="spreadsheet-input" value="4"></td>
+              <td><input type="number" class="spreadsheet-input" value="38"></td>
+              <td class="spreadsheet-calc">36.8%</td>
+              <td><input type="number" class="spreadsheet-input" value="4"></td>
+              <td><input type="number" class="spreadsheet-input" value="2"></td>
+              <td><input type="number" class="spreadsheet-input" value="18"></td>
+              <td><input type="number" class="spreadsheet-input" value="2"></td>
+              <td><input type="number" class="spreadsheet-input" value="3"></td>
+              <td><input type="number" class="spreadsheet-input" value="8"></td>
+              <td><input type="number" class="spreadsheet-input" value="8"></td>
+              <td><input type="number" class="spreadsheet-input" value="1"></td>
+              <td><input type="number" class="spreadsheet-input" value="12"></td>
+              <td><input type="number" class="spreadsheet-input" value="26"></td>
+              <td class="spreadsheet-calc">2.17</td>
+              <td><input type="number" class="spreadsheet-input" value="0"></td>
+              <td><input type="number" class="spreadsheet-input" value="0"></td>
+              <td><input type="number" class="spreadsheet-input" value="0"></td>
+              <td class="spreadsheet-calc">—</td>
+              <td><select class="rotation-select"><option>4</option></select></td>
+              <td><input type="number" class="spreadsheet-input" value="4"></td>
+              <td><input type="number" class="spreadsheet-input" value="22"></td>
+            </tr>
+            <tr>
+              <td class="player-col">
+                <div class="player-row-info">
+                  <div class="player-row-avatar">SN</div>
+                  <span class="player-row-name">Sofia Nilsen</span>
+                  <span class="player-row-number">#7</span>
+                </div>
+              </td>
+              <td><input type="number" class="spreadsheet-input" value="2"></td>
+              <td><input type="number" class="spreadsheet-input" value="1"></td>
+              <td><input type="number" class="spreadsheet-input" value="8"></td>
+              <td class="spreadsheet-calc">12.5%</td>
+              <td><input type="number" class="spreadsheet-input" value="3"></td>
+              <td><input type="number" class="spreadsheet-input" value="1"></td>
+              <td><input type="number" class="spreadsheet-input" value="16"></td>
+              <td><input type="number" class="spreadsheet-input" value="0"></td>
+              <td><input type="number" class="spreadsheet-input" value="2"></td>
+              <td><input type="number" class="spreadsheet-input" value="4"></td>
+              <td><input type="number" class="spreadsheet-input" value="3"></td>
+              <td><input type="number" class="spreadsheet-input" value="2"></td>
+              <td><input type="number" class="spreadsheet-input" value="0"></td>
+              <td><input type="number" class="spreadsheet-input" value="0"></td>
+              <td class="spreadsheet-calc">—</td>
+              <td><input type="number" class="spreadsheet-input highlight" value="48"></td>
+              <td><input type="number" class="spreadsheet-input" value="124"></td>
+              <td><input type="number" class="spreadsheet-input" value="3"></td>
+              <td class="spreadsheet-calc">2.58</td>
+              <td><select class="rotation-select"><option>1</option></select></td>
+              <td><input type="number" class="spreadsheet-input" value="4"></td>
+              <td><input type="number" class="spreadsheet-input" value="24"></td>
+            </tr>
+            <tr>
+              <td class="player-col">
+                <div class="player-row-info">
+                  <div class="player-row-avatar">KL</div>
+                  <span class="player-row-name">Kristian Larsen</span>
+                  <span class="player-row-number">#4</span>
+                </div>
+              </td>
+              <td><input type="number" class="spreadsheet-input highlight" value="14"></td>
+              <td><input type="number" class="spreadsheet-input" value="3"></td>
+              <td><input type="number" class="spreadsheet-input" value="32"></td>
+              <td class="spreadsheet-calc">34.4%</td>
+              <td><input type="number" class="spreadsheet-input" value="2"></td>
+              <td><input type="number" class="spreadsheet-input" value="3"></td>
+              <td><input type="number" class="spreadsheet-input" value="14"></td>
+              <td><input type="number" class="spreadsheet-input" value="4"></td>
+              <td><input type="number" class="spreadsheet-input" value="5"></td>
+              <td><input type="number" class="spreadsheet-input" value="12"></td>
+              <td><input type="number" class="spreadsheet-input" value="2"></td>
+              <td><input type="number" class="spreadsheet-input" value="0"></td>
+              <td><input type="number" class="spreadsheet-input" value="0"></td>
+              <td><input type="number" class="spreadsheet-input" value="0"></td>
+              <td class="spreadsheet-calc">—</td>
+              <td><input type="number" class="spreadsheet-input" value="0"></td>
+              <td><input type="number" class="spreadsheet-input" value="0"></td>
+              <td><input type="number" class="spreadsheet-input" value="0"></td>
+              <td class="spreadsheet-calc">—</td>
+              <td><select class="rotation-select"><option>3</option></select></td>
+              <td><input type="number" class="spreadsheet-input" value="4"></td>
+              <td><input type="number" class="spreadsheet-input" value="24"></td>
+            </tr>
+            <tr>
+              <td class="player-col">
+                <div class="player-row-info">
+                  <div class="player-row-avatar">IJ</div>
+                  <span class="player-row-name">Ingrid Johansen</span>
+                  <span class="player-row-number">#9</span>
+                </div>
+              </td>
+              <td><input type="number" class="spreadsheet-input highlight" value="16"></td>
+              <td><input type="number" class="spreadsheet-input" value="5"></td>
+              <td><input type="number" class="spreadsheet-input" value="36"></td>
+              <td class="spreadsheet-calc">30.6%</td>
+              <td><input type="number" class="spreadsheet-input" value="1"></td>
+              <td><input type="number" class="spreadsheet-input" value="2"></td>
+              <td><input type="number" class="spreadsheet-input" value="12"></td>
+              <td><input type="number" class="spreadsheet-input" value="1"></td>
+              <td><input type="number" class="spreadsheet-input" value="2"></td>
+              <td><input type="number" class="spreadsheet-input" value="6"></td>
+              <td><input type="number" class="spreadsheet-input" value="5"></td>
+              <td><input type="number" class="spreadsheet-input" value="1"></td>
+              <td><input type="number" class="spreadsheet-input" value="8"></td>
+              <td><input type="number" class="spreadsheet-input" value="18"></td>
+              <td class="spreadsheet-calc">2.25</td>
+              <td><input type="number" class="spreadsheet-input" value="0"></td>
+              <td><input type="number" class="spreadsheet-input" value="0"></td>
+              <td><input type="number" class="spreadsheet-input" value="0"></td>
+              <td class="spreadsheet-calc">—</td>
+              <td><select class="rotation-select"><option>2</option></select></td>
+              <td><input type="number" class="spreadsheet-input" value="4"></td>
+              <td><input type="number" class="spreadsheet-input" value="22"></td>
+            </tr>
+            <tr>
+              <td class="player-col">
+                <div class="player-row-info">
+                  <div class="player-row-avatar">OB</div>
+                  <span class="player-row-name">Ole Berg</span>
+                  <span class="player-row-number">#1</span>
+                </div>
+              </td>
+              <td><input type="number" class="spreadsheet-input" value="0"></td>
+              <td><input type="number" class="spreadsheet-input" value="0"></td>
+              <td><input type="number" class="spreadsheet-input" value="0"></td>
+              <td class="spreadsheet-calc">—</td>
+              <td><input type="number" class="spreadsheet-input" value="0"></td>
+              <td><input type="number" class="spreadsheet-input" value="0"></td>
+              <td><input type="number" class="spreadsheet-input" value="0"></td>
+              <td><input type="number" class="spreadsheet-input" value="0"></td>
+              <td><input type="number" class="spreadsheet-input" value="0"></td>
+              <td><input type="number" class="spreadsheet-input" value="0"></td>
+              <td><input type="number" class="spreadsheet-input highlight" value="18"></td>
+              <td><input type="number" class="spreadsheet-input" value="0"></td>
+              <td><input type="number" class="spreadsheet-input highlight" value="24"></td>
+              <td><input type="number" class="spreadsheet-input" value="52"></td>
+              <td class="spreadsheet-calc">2.17</td>
+              <td><input type="number" class="spreadsheet-input" value="0"></td>
+              <td><input type="number" class="spreadsheet-input" value="0"></td>
+              <td><input type="number" class="spreadsheet-input" value="0"></td>
+              <td class="spreadsheet-calc">—</td>
+              <td><select class="rotation-select"><option>5</option></select></td>
+              <td><input type="number" class="spreadsheet-input" value="4"></td>
+              <td><input type="number" class="spreadsheet-input" value="24"></td>
+            </tr>
+            <tr>
+              <td class="player-col">
+                <div class="player-row-info">
+                  <div class="player-row-avatar">LK</div>
+                  <span class="player-row-name">Lisa Knutsen</span>
+                  <span class="player-row-number">#11</span>
+                </div>
+              </td>
+              <td><input type="number" class="spreadsheet-input" value="8"></td>
+              <td><input type="number" class="spreadsheet-input" value="2"></td>
+              <td><input type="number" class="spreadsheet-input" value="18"></td>
+              <td class="spreadsheet-calc">33.3%</td>
+              <td><input type="number" class="spreadsheet-input" value="2"></td>
+              <td><input type="number" class="spreadsheet-input" value="1"></td>
+              <td><input type="number" class="spreadsheet-input" value="10"></td>
+              <td><input type="number" class="spreadsheet-input" value="1"></td>
+              <td><input type="number" class="spreadsheet-input" value="3"></td>
+              <td><input type="number" class="spreadsheet-input" value="5"></td>
+              <td><input type="number" class="spreadsheet-input" value="6"></td>
+              <td><input type="number" class="spreadsheet-input" value="1"></td>
+              <td><input type="number" class="spreadsheet-input" value="10"></td>
+              <td><input type="number" class="spreadsheet-input" value="22"></td>
+              <td class="spreadsheet-calc">2.20</td>
+              <td><input type="number" class="spreadsheet-input" value="0"></td>
+              <td><input type="number" class="spreadsheet-input" value="0"></td>
+              <td><input type="number" class="spreadsheet-input" value="0"></td>
+              <td class="spreadsheet-calc">—</td>
+              <td><select class="rotation-select"><option>6</option></select></td>
+              <td><input type="number" class="spreadsheet-input" value="4"></td>
+              <td><input type="number" class="spreadsheet-input" value="20"></td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td class="player-col">Team Totals</td>
+              <td>58</td>
+              <td>15</td>
+              <td>132</td>
+              <td class="spreadsheet-calc">32.6%</td>
+              <td>12</td>
+              <td>9</td>
+              <td>70</td>
+              <td>8</td>
+              <td>15</td>
+              <td>35</td>
+              <td>42</td>
+              <td>5</td>
+              <td>54</td>
+              <td>118</td>
+              <td class="spreadsheet-calc">2.19</td>
+              <td>48</td>
+              <td>124</td>
+              <td>3</td>
+              <td class="spreadsheet-calc">2.58</td>
+              <td></td>
+              <td>24</td>
+              <td>136</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Action Bar -->
+  <div class="action-bar">
+    <div class="action-bar-left">
+      <div class="save-status">
+        <span class="save-status-dot"></span>
+        <span>All changes saved</span>
+      </div>
+    </div>
+    <div style="display: flex; gap: var(--space-md);">
+      <button class="btn btn-outline">Cancel</button>
+      <button class="btn btn-primary">Save All Stats</button>
+      <button class="btn btn-success">Finalize Match</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function showView(view) {
+  // Toggle buttons
+  document.querySelectorAll('.view-btn').forEach(btn => btn.classList.remove('active'));
+  event.target.classList.add('active');
+
+  // Toggle views
+  document.getElementById('card-view').classList.remove('active');
+  document.getElementById('spreadsheet-view').classList.remove('active');
+
+  if (view === 'card') {
+    document.getElementById('card-view').classList.add('active');
+  } else {
+    document.getElementById('spreadsheet-view').classList.add('active');
+  }
+}
+
+// Player chip selection
+document.querySelectorAll('.player-chip').forEach(chip => {
+  chip.addEventListener('click', function() {
+    document.querySelectorAll('.player-chip').forEach(c => c.classList.remove('active'));
+    this.classList.add('active');
+  });
+});
+</script>
+
+</body>
+</html>

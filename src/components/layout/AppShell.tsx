@@ -1,7 +1,7 @@
 import { ReactNode } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useAuth, useUI } from '@/store';
+import { useAuth, useUI, useTeams } from '@/store';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,9 +11,9 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
-import { useSyncStatus, useLastSyncFormatted } from '@/hooks/useOffline';
+import { useSyncStatus } from '@/hooks/useOffline';
 import { performSync } from '@/services/sync.service';
-import { WifiOff, CloudOff, RefreshCw, CheckCircle2, AlertCircle } from 'lucide-react';
+import { WifiOff, RefreshCw, CheckCircle2, ChevronDown } from 'lucide-react';
 
 interface AppShellProps {
   children: ReactNode;
@@ -28,19 +28,19 @@ export function AppShell({ children }: AppShellProps) {
   const location = useLocation();
   const { user, signOut } = useAuth();
   const { sidebarOpen, setSidebarOpen, language, setLanguage } = useUI();
-  const { synced, syncing, error, offline, pendingCount } = useSyncStatus();
-  const lastSyncFormatted = useLastSyncFormatted();
+  const { synced, syncing, offline } = useSyncStatus();
+  const { teams, getActiveTeam } = useTeams();
 
   const isPlayer = user?.role === 'player';
   const isParent = user?.role === 'parent';
+  const isCoach = user?.role === 'coach' || user?.role === 'head_coach';
+  const activeTeam = getActiveTeam();
 
   const handleSync = async () => {
     if (user?.id && !syncing && !offline) {
       await performSync(user.id);
     }
   };
-
-  const isHeadCoach = user?.role === 'head_coach';
 
   // Role-based navigation
   const getNavigation = () => {
@@ -61,17 +61,14 @@ export function AppShell({ children }: AppShellProps) {
       ];
     }
 
-    // Coach navigation
+    // Coach navigation - matching wireframe structure
     return [
       { name: t('navigation.dashboard'), href: '/coach-dashboard', icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6' },
-      { name: t('season.plural'), href: '/seasons', icon: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z' },
-      { name: t('navigation.teams'), href: '/teams', icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z' },
-      { name: t('navigation.players'), href: '/players', icon: 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z' },
       { name: t('navigation.schedule'), href: '/schedule', icon: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z' },
-      { name: t('navigation.drills'), href: '/drills', icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01' },
-      { name: t('navigation.practices'), href: '/practice-plans', icon: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z' },
-      { name: t('navigation.import'), href: '/import', icon: 'M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12' },
-      ...(isHeadCoach ? [{ name: t('navigation.users'), href: '/users', icon: 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z' }] : []),
+      { name: t('navigation.players'), href: '/players', icon: 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z' },
+      { name: 'Practice Plans', href: '/practice-plans', icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4' },
+      { name: t('navigation.drills'), href: '/drills', icon: 'M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10' },
+      { name: t('navigation.reports'), href: '/reports', icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z' },
     ];
   };
 
@@ -90,9 +87,9 @@ export function AppShell({ children }: AppShellProps) {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-navy">
       {/* Mobile header */}
-      <div className="lg:hidden flex items-center justify-between p-4 border-b gradient-hero">
+      <div className="lg:hidden flex items-center justify-between p-4 border-b border-white/[0.06] bg-navy-90">
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
           className="p-2 rounded-md hover:bg-white/10 text-white transition-colors"
@@ -112,7 +109,7 @@ export function AppShell({ children }: AppShellProps) {
             />
           </svg>
         </button>
-        <h1 className="text-lg font-bold text-white">{t('app.name')}</h1>
+        <h1 className="text-lg font-display font-bold uppercase tracking-wider text-white">VolleyQuest</h1>
         <div className="w-8 flex items-center justify-end">
           {offline && (
             <WifiOff className="w-5 h-5 text-white/80" />
@@ -124,22 +121,28 @@ export function AppShell({ children }: AppShellProps) {
       </div>
 
       <div className="flex">
-        {/* Sidebar */}
+        {/* Sidebar - 220px fixed width */}
         <aside
           className={cn(
-            'fixed lg:sticky top-0 left-0 z-40 h-screen w-64 border-r border-sidebar-border gradient-sidebar transition-transform lg:translate-x-0',
+            'fixed lg:sticky top-0 left-0 z-40 h-screen w-[220px] border-r border-white/[0.06] bg-navy-90 transition-transform lg:translate-x-0',
             sidebarOpen ? 'translate-x-0' : '-translate-x-full'
           )}
         >
           <div className="flex flex-col h-full">
-            {/* Logo */}
-            <div className="p-6 border-b border-sidebar-border">
-              <h1 className="text-2xl font-bold text-white">{t('app.name')}</h1>
-              <p className="text-xs text-sidebar-foreground/70 mt-1">{t('app.tagline')}</p>
+            {/* Logo section - matching wireframe */}
+            <div className="px-6 py-6 border-b border-white/[0.06]">
+              <div className="flex items-center gap-2">
+                <div className="w-9 h-9 rounded-md bg-gradient-to-br from-vq-teal to-vq-teal/70 flex items-center justify-center font-display font-black text-white text-base">
+                  VQ
+                </div>
+                <div className="font-display font-extrabold text-lg uppercase tracking-wide text-white">
+                  VolleyQuest
+                </div>
+              </div>
             </div>
 
-            {/* Navigation */}
-            <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
+            {/* Navigation - matching wireframe styling */}
+            <nav className="flex-1 p-4 overflow-y-auto">
               {navigation.map((item) => {
                 const isActive = location.pathname.startsWith(item.href);
                 return (
@@ -148,13 +151,13 @@ export function AppShell({ children }: AppShellProps) {
                     to={item.href}
                     onClick={() => setSidebarOpen(false)}
                     className={cn(
-                      'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all',
+                      'flex items-center gap-2 px-4 py-3 rounded-md text-sm font-display font-semibold uppercase tracking-wide transition-all mb-1',
                       isActive
-                        ? 'bg-sidebar-primary text-sidebar-primary-foreground shadow-lg shadow-sidebar-primary/20'
-                        : 'text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-foreground'
+                        ? 'bg-club-primary text-white shadow-lg shadow-club-primary/30'
+                        : 'text-muted-foreground hover:bg-white/[0.04] hover:text-white'
                     )}
                   >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className={cn("w-[18px] h-[18px]", isActive ? "opacity-100" : "opacity-70")} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={item.icon} />
                     </svg>
                     {item.name}
@@ -163,72 +166,109 @@ export function AppShell({ children }: AppShellProps) {
               })}
             </nav>
 
-            {/* Sync status */}
-            <div className="p-4 border-t border-sidebar-border">
+          </div>
+        </aside>
+
+        {/* Mobile overlay */}
+        {sidebarOpen && (
+          <div
+            className="fixed inset-0 z-30 bg-black/50 lg:hidden"
+            onClick={() => setSidebarOpen(false)}
+          />
+        )}
+
+        {/* Main wrapper for topbar and content */}
+        <div className="flex-1 min-w-0 flex flex-col">
+          {/* Topbar - 60px height, hidden on mobile */}
+          <header className="hidden lg:flex fixed top-0 left-[220px] right-0 h-[60px] bg-navy-90 border-b border-white/[0.06] items-center justify-between px-6 z-30">
+            {/* Left: Team selector */}
+            {isCoach && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="flex items-center gap-2 bg-navy-80 px-4 py-2 rounded-md border border-white/10 hover:border-club-primary transition-colors">
+                    <div className="w-7 h-7 rounded-md bg-club-primary flex items-center justify-center font-display font-extrabold text-xs text-white">
+                      {activeTeam?.name?.substring(0, 2).toUpperCase() || 'T'}
+                    </div>
+                    <div className="flex flex-col items-start">
+                      <div className="font-display font-bold text-sm uppercase tracking-wide text-white leading-tight">
+                        {activeTeam?.name || t('team.selectTeam')}
+                      </div>
+                      {activeTeam?.season?.name && (
+                        <div className="text-xs text-white/60">
+                          {activeTeam.season.name}
+                        </div>
+                      )}
+                    </div>
+                    <ChevronDown className="w-4 h-4 text-white/60 ml-2" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="w-64">
+                  <DropdownMenuLabel>{t('team.selectTeam')}</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  {teams.map((team) => (
+                    <DropdownMenuItem key={team.id} asChild>
+                      <Link to={`/teams/${team.id}`}>
+                        <div className="flex items-center gap-2">
+                          <div className="w-6 h-6 rounded bg-club-primary/20 flex items-center justify-center font-display font-bold text-xs text-club-primary">
+                            {team.name?.substring(0, 2).toUpperCase()}
+                          </div>
+                          <div>
+                            <div className="font-medium">{team.name}</div>
+                            {team.season?.name && <div className="text-xs text-muted-foreground">{team.season.name}</div>}
+                          </div>
+                        </div>
+                      </Link>
+                    </DropdownMenuItem>
+                  ))}
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link to="/teams">{t('team.viewAll')}</Link>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+
+            {/* Right: Sync button and user menu */}
+            <div className="flex items-center gap-4">
+              {/* Sync button */}
               <button
                 onClick={handleSync}
                 disabled={syncing || offline}
                 className={cn(
-                  'w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all',
+                  'flex items-center gap-2 px-3 py-2 rounded-md text-xs font-display font-semibold uppercase tracking-wide transition-all',
                   offline
-                    ? 'bg-sidebar-accent/50 text-sidebar-foreground/50 cursor-not-allowed'
-                    : error
-                    ? 'status-error hover:shadow-lg'
+                    ? 'bg-white/[0.03] text-white/50 cursor-not-allowed border border-white/5'
                     : syncing
-                    ? 'status-info'
-                    : synced
-                    ? 'status-success hover:shadow-lg'
-                    : 'status-warning hover:shadow-lg'
+                    ? 'bg-vq-teal/10 text-vq-teal border border-vq-teal/20'
+                    : 'bg-vq-teal/10 text-vq-teal border border-vq-teal/20 hover:bg-vq-teal/20'
                 )}
               >
                 {offline ? (
                   <WifiOff className="w-4 h-4" />
-                ) : error ? (
-                  <AlertCircle className="w-4 h-4" />
                 ) : syncing ? (
                   <RefreshCw className="w-4 h-4 animate-spin" />
                 ) : synced ? (
                   <CheckCircle2 className="w-4 h-4" />
                 ) : (
-                  <CloudOff className="w-4 h-4" />
+                  <RefreshCw className="w-4 h-4" />
                 )}
-                <div className="flex-1 text-left min-w-0">
-                  <p className="font-medium truncate">
-                    {offline
-                      ? t('offline.status.offline')
-                      : error
-                      ? t('offline.status.error')
-                      : syncing
-                      ? t('offline.status.syncing')
-                      : synced
-                      ? t('offline.status.synced')
-                      : t('offline.syncNow')}
-                  </p>
-                  {!offline && !syncing && lastSyncFormatted && (
-                    <p className="text-xs opacity-75 truncate">
-                      {lastSyncFormatted}
-                    </p>
-                  )}
-                  {pendingCount > 0 && (
-                    <p className="text-xs opacity-75 truncate">
-                      {t('offline.pendingChanges', { count: pendingCount })}
-                    </p>
-                  )}
-                </div>
+                <span className="hidden xl:inline">
+                  {offline
+                    ? t('offline.status.offline')
+                    : syncing
+                    ? t('offline.status.syncing')
+                    : synced
+                    ? t('offline.status.synced')
+                    : t('offline.syncNow')}
+                </span>
               </button>
-            </div>
 
-            {/* User menu */}
-            <div className="p-4 border-t border-sidebar-border">
+              {/* User menu */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-sidebar-accent transition-all text-left">
-                    <div className="w-9 h-9 rounded-full gradient-primary flex items-center justify-center text-white font-semibold shadow-lg">
+                  <button className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+                    <div className="w-9 h-9 rounded-full bg-navy-70 flex items-center justify-center font-display font-bold text-sm text-vq-teal">
                       {user?.name?.[0]?.toUpperCase() || 'U'}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate text-sidebar-foreground">{user?.name}</p>
-                      <p className="text-xs text-sidebar-foreground/60 truncate">{user?.email}</p>
                     </div>
                   </button>
                 </DropdownMenuTrigger>
@@ -247,21 +287,13 @@ export function AppShell({ children }: AppShellProps) {
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
-          </div>
-        </aside>
+          </header>
 
-        {/* Mobile overlay */}
-        {sidebarOpen && (
-          <div
-            className="fixed inset-0 z-30 bg-black/50 lg:hidden"
-            onClick={() => setSidebarOpen(false)}
-          />
-        )}
-
-        {/* Main content */}
-        <main className="flex-1 min-w-0">
-          {children}
-        </main>
+          {/* Main content area */}
+          <main className="flex-1 lg:mt-[60px] p-6">
+            {children}
+          </main>
+        </div>
       </div>
     </div>
   );

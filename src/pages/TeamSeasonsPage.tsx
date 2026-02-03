@@ -155,7 +155,7 @@ export function TeamSeasonsPage() {
               key={season.id}
               className={cn(
                 'border-l-4',
-                season.is_finalized ? 'border-l-green-500' : 'border-l-primary'
+                season.is_finalized ? 'border-l-emerald-500' : 'border-l-primary'
               )}
             >
               <CardHeader
@@ -167,7 +167,7 @@ export function TeamSeasonsPage() {
                     <CardTitle className="flex items-center gap-2">
                       {season.name}
                       {season.is_finalized && (
-                        <span className="text-xs font-bold px-2 py-1 rounded-full bg-green-100 text-green-800">
+                        <span className="text-xs font-bold px-2 py-1 rounded-full bg-emerald-500/15 text-emerald-400">
                           {t('awards.finalized')}
                         </span>
                       )}

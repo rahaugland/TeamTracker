@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useEffect, useState, useMemo, useCallback } from 'react';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { ChevronRight } from 'lucide-react';
 import { useAuth } from '@/store';
 import { getEvent } from '@/services/events.service';
 import { getEventAttendance } from '@/services/attendance.service';
@@ -10,73 +11,56 @@ import {
   createStatEntry,
   updateStatEntry,
 } from '@/services/player-stats.service';
+import { updateEvent } from '@/services/events.service';
 import type { EventWithDetails } from '@/services/events.service';
 import type { AttendanceRecordWithPlayer } from '@/services/attendance.service';
 import type { PlayerWithMemberships } from '@/services/players.service';
 import type { StatEntry } from '@/types/database.types';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
+import { ConfirmDialog } from '@/components/common/ConfirmDialog';
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableFooter,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+  MatchStatsHeader,
+  QuickStatsSummary,
+  ViewToggle,
+  PlayerSelector,
+  PlayerStatsCard,
+  ActionBar,
+  type PlayerStatRow,
+  type ViewMode,
+  type TeamTotals,
+  type SetScore,
+} from '@/components/match-stats';
+import { SpreadsheetView } from './RecordStatsPage.Spreadsheet';
 
 /**
  * RecordStatsPage component
- * Spreadsheet-style stat recording interface for games and tournaments
+ * Enhanced stat recording interface with player cards and spreadsheet views
  */
-
-interface PlayerStatRow {
-  playerId: string;
-  playerName: string;
-  statEntryId?: string;
-  kills: number;
-  attackErrors: number;
-  attackAttempts: number;
-  aces: number;
-  serviceErrors: number;
-  serveAttempts: number;
-  digs: number;
-  blockSolos: number;
-  blockAssists: number;
-  ballHandlingErrors: number;
-  passAttempts: number;
-  passSum: number;
-  blockTouches: number;
-  setAttempts: number;
-  setSum: number;
-  settingErrors: number;
-  setsPlayed: number;
-  rotationsPlayed: number;
-  rotation: number | null;
-}
-
 export function RecordStatsPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { user } = useAuth();
+
+  // Data state
   const [event, setEvent] = useState<EventWithDetails | null>(null);
   const [attendance, setAttendance] = useState<AttendanceRecordWithPlayer[]>([]);
   const [teamPlayers, setTeamPlayers] = useState<PlayerWithMemberships[]>([]);
   const [statEntries, setStatEntries] = useState<StatEntry[]>([]);
   const [playerStats, setPlayerStats] = useState<PlayerStatRow[]>([]);
+
+  // UI state
+  const [viewMode, setViewMode] = useState<ViewMode>('card');
+  const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-  const [savingPlayerId, setSavingPlayerId] = useState<string | null>(null);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [showFinalizeConfirm, setShowFinalizeConfirm] = useState(false);
+
+  // Match score state
+  const [setsWon, setSetsWon] = useState(0);
+  const [setsLost, setSetsLost] = useState(0);
+  const [setScores, setSetScores] = useState<SetScore[]>([]);
 
   const isCoach = user?.role === 'head_coach' || user?.role === 'assistant_coach';
 
@@ -97,6 +81,14 @@ export function RecordStatsPage() {
       if (eventData) {
         setEvent(eventData);
         setAttendance(attendanceData);
+        setSetsWon(eventData.sets_won || 0);
+        setSetsLost(eventData.sets_lost || 0);
+        // Convert set_scores from number[][] to SetScore[]
+        const scores: SetScore[] = (eventData.set_scores || []).map((s: number[]) => ({
+          home: s[0] || 0,
+          away: s[1] || 0,
+        }));
+        setSetScores(scores);
 
         const players = await getPlayersByTeam(eventData.team_id);
         setTeamPlayers(players);
@@ -104,7 +96,13 @@ export function RecordStatsPage() {
         const stats = await getStatEntriesForEvent(eventId);
         setStatEntries(stats);
 
-        initializePlayerStats(players, attendanceData, stats);
+        const rows = initializePlayerStats(players, attendanceData, stats);
+        setPlayerStats(rows);
+
+        // Select first player by default
+        if (rows.length > 0) {
+          setSelectedPlayerId(rows[0].playerId);
+        }
       }
     } catch (err) {
       console.error('Error loading event data:', err);
@@ -117,7 +115,7 @@ export function RecordStatsPage() {
     players: PlayerWithMemberships[],
     attendanceRecords: AttendanceRecordWithPlayer[],
     stats: StatEntry[]
-  ) => {
+  ): PlayerStatRow[] => {
     const attendedPlayerIds = attendanceRecords
       .filter((record) => record.status === 'present' || record.status === 'late')
       .map((record) => record.player_id);
@@ -126,7 +124,7 @@ export function RecordStatsPage() {
       attendedPlayerIds.includes(player.id)
     );
 
-    const rows: PlayerStatRow[] = attendedPlayers.map((player) => {
+    return attendedPlayers.map((player) => {
       const existingEntry = stats.find((entry) => entry.player_id === player.id);
 
       return {
@@ -154,79 +152,53 @@ export function RecordStatsPage() {
         rotation: existingEntry?.rotation ?? null,
       };
     });
-
-    setPlayerStats(rows);
   };
 
-  const handleStatChange = (playerId: string, field: keyof PlayerStatRow, value: string) => {
-    const numValue = parseInt(value, 10) || 0;
+  const handleStatChange = useCallback(
+    (playerId: string, field: keyof PlayerStatRow, value: number) => {
+      setPlayerStats((prev) =>
+        prev.map((row) =>
+          row.playerId === playerId ? { ...row, [field]: Math.max(0, value) } : row
+        )
+      );
+      setHasUnsavedChanges(true);
+    },
+    []
+  );
+
+  const handleRotationChange = useCallback((playerId: string, rotation: number | null) => {
     setPlayerStats((prev) =>
       prev.map((row) =>
-        row.playerId === playerId ? { ...row, [field]: Math.max(0, numValue) } : row
+        row.playerId === playerId ? { ...row, rotation } : row
       )
     );
-  };
+    setHasUnsavedChanges(true);
+  }, []);
 
-  const handleSaveRow = async (playerId: string) => {
-    if (!id || !user?.id) return;
+  const handleScoreChange = useCallback((newSetsWon: number, newSetsLost: number) => {
+    setSetsWon(newSetsWon);
+    setSetsLost(newSetsLost);
+    setHasUnsavedChanges(true);
+  }, []);
 
-    setSavingPlayerId(playerId);
-    try {
-      const row = playerStats.find((r) => r.playerId === playerId);
-      if (!row) return;
-
-      const statData = {
-        kills: row.kills,
-        attack_errors: row.attackErrors,
-        attack_attempts: row.attackAttempts,
-        aces: row.aces,
-        service_errors: row.serviceErrors,
-        serve_attempts: row.serveAttempts,
-        digs: row.digs,
-        block_solos: row.blockSolos,
-        block_assists: row.blockAssists,
-        ball_handling_errors: row.ballHandlingErrors,
-        pass_attempts: row.passAttempts,
-        pass_sum: row.passSum,
-        block_touches: row.blockTouches,
-        set_attempts: row.setAttempts,
-        set_sum: row.setSum,
-        setting_errors: row.settingErrors,
-        sets_played: row.setsPlayed,
-        rotations_played: row.rotationsPlayed,
-        rotation: (row.rotation as 1 | 2 | 3 | 4 | 5 | 6 | undefined) ?? undefined,
-      };
-
-      if (row.statEntryId) {
-        await updateStatEntry(row.statEntryId, statData);
-      } else {
-        const created = await createStatEntry({
-          player_id: playerId,
-          event_id: id,
-          ...statData,
-          recorded_by: user.id,
-        });
-        setPlayerStats((prev) =>
-          prev.map((r) =>
-            r.playerId === playerId ? { ...r, statEntryId: created.id } : r
-          )
-        );
-      }
-
-      const stats = await getStatEntriesForEvent(id);
-      setStatEntries(stats);
-    } catch (err) {
-      console.error('Error saving player stats:', err);
-    } finally {
-      setSavingPlayerId(null);
-    }
-  };
+  const handleSetScoresChange = useCallback((newSetScores: SetScore[]) => {
+    setSetScores(newSetScores);
+    setHasUnsavedChanges(true);
+  }, []);
 
   const handleSaveAll = async () => {
     if (!id || !user?.id) return;
 
     setIsSaving(true);
     try {
+      // Save match score and set scores
+      await updateEvent(id, {
+        sets_won: setsWon,
+        sets_lost: setsLost,
+        set_scores: setScores.map(s => [s.home, s.away]),
+      });
+
+      // Save all player stats
       for (const row of playerStats) {
         const statData = {
           kills: row.kills,
@@ -269,6 +241,7 @@ export function RecordStatsPage() {
 
       const stats = await getStatEntriesForEvent(id);
       setStatEntries(stats);
+      setHasUnsavedChanges(false);
     } catch (err) {
       console.error('Error saving all stats:', err);
     } finally {
@@ -276,13 +249,34 @@ export function RecordStatsPage() {
     }
   };
 
-  const calculateKillPercentage = (row: PlayerStatRow): string => {
-    if (row.attackAttempts === 0) return '-';
-    const killPct = ((row.kills - row.attackErrors) / row.attackAttempts) * 100;
-    return killPct.toFixed(1) + '%';
+  const handleFinalize = async () => {
+    if (!id) return;
+
+    try {
+      await handleSaveAll();
+      await updateEvent(id, { is_finalized: true });
+      navigate(`/events/${id}`);
+    } catch (err) {
+      console.error('Error finalizing match:', err);
+    }
   };
 
-  const calculateTeamTotals = () => {
+  const handleCancel = () => {
+    navigate(`/events/${id}`);
+  };
+
+  const handleNavigatePlayer = (direction: 'prev' | 'next') => {
+    const currentIndex = playerStats.findIndex((p) => p.playerId === selectedPlayerId);
+    if (currentIndex === -1) return;
+
+    const newIndex = direction === 'prev' ? currentIndex - 1 : currentIndex + 1;
+    if (newIndex >= 0 && newIndex < playerStats.length) {
+      setSelectedPlayerId(playerStats[newIndex].playerId);
+    }
+  };
+
+  // Calculate team totals
+  const teamTotals: TeamTotals = useMemo(() => {
     return playerStats.reduce(
       (totals, row) => ({
         kills: totals.kills + row.kills,
@@ -295,14 +289,12 @@ export function RecordStatsPage() {
         blockSolos: totals.blockSolos + row.blockSolos,
         blockAssists: totals.blockAssists + row.blockAssists,
         blockTouches: totals.blockTouches + row.blockTouches,
-        setAttempts: totals.setAttempts + row.setAttempts,
-        setSum: totals.setSum + row.setSum,
-        settingErrors: totals.settingErrors + row.settingErrors,
         ballHandlingErrors: totals.ballHandlingErrors + row.ballHandlingErrors,
         passAttempts: totals.passAttempts + row.passAttempts,
         passSum: totals.passSum + row.passSum,
-        setsPlayed: totals.setsPlayed + row.setsPlayed,
-        rotationsPlayed: totals.rotationsPlayed + row.rotationsPlayed,
+        setAttempts: totals.setAttempts + row.setAttempts,
+        setSum: totals.setSum + row.setSum,
+        settingErrors: totals.settingErrors + row.settingErrors,
       }),
       {
         kills: 0,
@@ -315,29 +307,20 @@ export function RecordStatsPage() {
         blockSolos: 0,
         blockAssists: 0,
         blockTouches: 0,
-        setAttempts: 0,
-        setSum: 0,
-        settingErrors: 0,
         ballHandlingErrors: 0,
         passAttempts: 0,
         passSum: 0,
-        setsPlayed: 0,
-        rotationsPlayed: 0,
+        setAttempts: 0,
+        setSum: 0,
+        settingErrors: 0,
       }
     );
-  };
+  }, [playerStats]);
 
-  const formatDateTime = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleString(undefined, {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  };
+  // Get selected player data
+  const selectedPlayer = playerStats.find((p) => p.playerId === selectedPlayerId);
+  const selectedPlayerInfo = teamPlayers.find((p) => p.id === selectedPlayerId);
+  const selectedPlayerIndex = playerStats.findIndex((p) => p.playerId === selectedPlayerId);
 
   if (isLoading) {
     return (
@@ -374,427 +357,141 @@ export function RecordStatsPage() {
     );
   }
 
-  const totals = calculateTeamTotals();
+  const teamInitials = event.team?.name?.substring(0, 2).toUpperCase() || 'HM';
+  const opponentInitials = event.opponent?.substring(0, 2).toUpperCase() || 'OP';
 
   return (
-    <div className="container max-w-7xl mx-auto py-8 px-4">
-      <Button variant="outline" onClick={() => navigate(`/events/${id}`)} className="mb-4">
-        {t('common.buttons.back')}
-      </Button>
+    <div className="min-h-screen bg-navy-90 pb-24">
+      <div className="container max-w-7xl mx-auto py-6 px-4 space-y-6">
+        {/* Breadcrumb */}
+        <nav className="flex items-center gap-2 text-sm">
+          <Link
+            to="/coach-dashboard"
+            className="text-gray-400 hover:text-vq-teal transition-colors"
+          >
+            Dashboard
+          </Link>
+          <ChevronRight className="w-4 h-4 text-gray-600" />
+          <Link
+            to="/schedule"
+            className="text-gray-400 hover:text-vq-teal transition-colors"
+          >
+            Schedule
+          </Link>
+          <ChevronRight className="w-4 h-4 text-gray-600" />
+          <Link
+            to={`/events/${id}`}
+            className="text-gray-400 hover:text-vq-teal transition-colors"
+          >
+            vs {event.opponent || 'Opponent'}
+          </Link>
+          <ChevronRight className="w-4 h-4 text-gray-600" />
+          <span className="text-white">Record Stats</span>
+        </nav>
 
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold mb-2">{t('stats.recordStats')}</h1>
-        <p className="text-muted-foreground">
-          {event.title} - {formatDateTime(event.start_time)}
-        </p>
-        {event.opponent && (
-          <p className="text-muted-foreground">vs {event.opponent}</p>
+        {/* Match Header */}
+        <MatchStatsHeader
+          teamName={event.team?.name || 'Home Team'}
+          teamInitials={teamInitials}
+          opponent={event.opponent || 'Opponent'}
+          opponentInitials={opponentInitials}
+          eventType={event.type}
+          startTime={event.start_time}
+          location={event.location}
+          setsWon={setsWon}
+          setsLost={setsLost}
+          setScores={setScores}
+          onScoreChange={handleScoreChange}
+          onSetScoresChange={handleSetScoresChange}
+        />
+
+        {/* Quick Stats Summary */}
+        <QuickStatsSummary totals={teamTotals} />
+
+        {/* View Toggle */}
+        <ViewToggle mode={viewMode} onModeChange={setViewMode} />
+
+        {/* Card View */}
+        {viewMode === 'card' && (
+          <>
+            {/* Player Selector */}
+            <PlayerSelector
+              players={playerStats}
+              selectedPlayerId={selectedPlayerId}
+              onSelectPlayer={setSelectedPlayerId}
+            />
+
+            {/* Player Stats Card */}
+            {selectedPlayer && (
+              <PlayerStatsCard
+                player={selectedPlayer}
+                playerInfo={
+                  selectedPlayerInfo
+                    ? {
+                        id: selectedPlayerInfo.id,
+                        name: selectedPlayerInfo.name,
+                        position: selectedPlayerInfo.positions?.[0],
+                      }
+                    : undefined
+                }
+                onStatChange={(field, value) =>
+                  handleStatChange(selectedPlayer.playerId, field, value)
+                }
+                onRotationChange={(rotation) =>
+                  handleRotationChange(selectedPlayer.playerId, rotation)
+                }
+                onNavigate={handleNavigatePlayer}
+                canNavigatePrev={selectedPlayerIndex > 0}
+                canNavigateNext={selectedPlayerIndex < playerStats.length - 1}
+              />
+            )}
+
+            {playerStats.length === 0 && (
+              <div className="text-center py-12">
+                <p className="text-gray-500">
+                  No players attended this event. Mark attendance first.
+                </p>
+                <Button
+                  variant="outline"
+                  className="mt-4"
+                  onClick={() => navigate(`/events/${id}`)}
+                >
+                  Go to Event
+                </Button>
+              </div>
+            )}
+          </>
         )}
+
+        {/* Spreadsheet View */}
+        {viewMode === 'spreadsheet' && (
+          <SpreadsheetView
+            playerStats={playerStats}
+            teamTotals={teamTotals}
+            onStatChange={handleStatChange}
+            onRotationChange={handleRotationChange}
+          />
+        )}
+
+        {/* Action Bar */}
+        <ActionBar
+          isSaving={isSaving}
+          hasUnsavedChanges={hasUnsavedChanges}
+          onCancel={handleCancel}
+          onSaveAll={handleSaveAll}
+          onFinalize={() => setShowFinalizeConfirm(true)}
+          canFinalize={playerStats.length > 0}
+        />
       </div>
 
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle>{t('stats.recordStats')}</CardTitle>
-              <CardDescription>
-                {playerStats.length === 0
-                  ? t('attendance.noPlayers')
-                  : `${playerStats.length} ${t('player.plural').toLowerCase()}`}
-              </CardDescription>
-            </div>
-            <Button onClick={handleSaveAll} disabled={isSaving || playerStats.length === 0}>
-              {isSaving ? t('common.messages.saving') : t('stats.saveAll')}
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent>
-          {playerStats.length === 0 ? (
-            <p className="text-center text-muted-foreground py-8">
-              {t('attendance.noPlayers')}
-            </p>
-          ) : (
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="min-w-[150px] sticky left-0 z-20 bg-primary/5">
-                      {t('player.singular')}
-                    </TableHead>
-                    <TableHead className="text-center min-w-[80px]">
-                      {t('stats.fields.kills')} (K)
-                    </TableHead>
-                    <TableHead className="text-center min-w-[80px]">
-                      {t('stats.fields.attackErrors')} (E)
-                    </TableHead>
-                    <TableHead className="text-center min-w-[80px]">
-                      {t('stats.fields.attackAttempts')} (TA)
-                    </TableHead>
-                    <TableHead className="text-center min-w-[80px]">K%</TableHead>
-                    <TableHead className="text-center min-w-[80px]">
-                      {t('stats.fields.aces')}
-                    </TableHead>
-                    <TableHead className="text-center min-w-[80px]">
-                      {t('stats.fields.serviceErrors')} (SE)
-                    </TableHead>
-                    <TableHead className="text-center min-w-[80px]">
-                      {t('stats.fields.serveAttempts')} (SA)
-                    </TableHead>
-                    <TableHead className="text-center min-w-[80px]">
-                      {t('stats.fields.digs')}
-                    </TableHead>
-                    <TableHead className="text-center min-w-[80px]">
-                      {t('stats.fields.blockSolos')} (BS)
-                    </TableHead>
-                    <TableHead className="text-center min-w-[80px]">
-                      {t('stats.fields.blockAssists')} (BA)
-                    </TableHead>
-                    <TableHead className="text-center min-w-[80px]">
-                      {t('stats.fields.blockTouches')} (BT)
-                    </TableHead>
-                    <TableHead className="text-center min-w-[80px]">
-                      {t('stats.fields.ballHandlingErrors')} (BHE)
-                    </TableHead>
-                    <TableHead className="text-center min-w-[80px]">
-                      {t('stats.fields.passAttempts')} (PA)
-                    </TableHead>
-                    <TableHead className="text-center min-w-[80px]">
-                      {t('stats.fields.passSum')} (PS)
-                    </TableHead>
-                    <TableHead className="text-center min-w-[80px]">
-                      {t('stats.fields.setAttempts')} (SA)
-                    </TableHead>
-                    <TableHead className="text-center min-w-[80px]">
-                      {t('stats.fields.setSum')} (SS)
-                    </TableHead>
-                    <TableHead className="text-center min-w-[80px]">
-                      {t('stats.fields.settingErrors')} (SE)
-                    </TableHead>
-                    <TableHead className="text-center min-w-[80px]">
-                      {t('stats.fields.rotation')} (R)
-                    </TableHead>
-                    <TableHead className="text-center min-w-[80px]">
-                      {t('stats.fields.setsPlayed')} (SP)
-                    </TableHead>
-                    <TableHead className="text-center min-w-[80px]">
-                      {t('stats.fields.rotationsPlayed')} (RP)
-                    </TableHead>
-                    <TableHead className="min-w-[100px]">
-                      {t('common.labels.actions')}
-                    </TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {playerStats.map((row) => (
-                    <TableRow key={row.playerId}>
-                      <TableCell className="font-medium sticky left-0 z-10 bg-white">
-                        {row.playerName}
-                      </TableCell>
-                      <TableCell>
-                        <Input
-                          type="number"
-                          min="0"
-                          value={row.kills}
-                          onChange={(e) =>
-                            handleStatChange(row.playerId, 'kills', e.target.value)
-                          }
-                          className="w-20 text-center"
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <Input
-                          type="number"
-                          min="0"
-                          value={row.attackErrors}
-                          onChange={(e) =>
-                            handleStatChange(row.playerId, 'attackErrors', e.target.value)
-                          }
-                          className="w-20 text-center"
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <Input
-                          type="number"
-                          min="0"
-                          value={row.attackAttempts}
-                          onChange={(e) =>
-                            handleStatChange(row.playerId, 'attackAttempts', e.target.value)
-                          }
-                          className="w-20 text-center"
-                        />
-                      </TableCell>
-                      <TableCell className="text-center text-sm text-muted-foreground">
-                        {calculateKillPercentage(row)}
-                      </TableCell>
-                      <TableCell>
-                        <Input
-                          type="number"
-                          min="0"
-                          value={row.aces}
-                          onChange={(e) =>
-                            handleStatChange(row.playerId, 'aces', e.target.value)
-                          }
-                          className="w-20 text-center"
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <Input
-                          type="number"
-                          min="0"
-                          value={row.serviceErrors}
-                          onChange={(e) =>
-                            handleStatChange(row.playerId, 'serviceErrors', e.target.value)
-                          }
-                          className="w-20 text-center"
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <Input
-                          type="number"
-                          min="0"
-                          value={row.serveAttempts}
-                          onChange={(e) =>
-                            handleStatChange(row.playerId, 'serveAttempts', e.target.value)
-                          }
-                          className="w-20 text-center"
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <Input
-                          type="number"
-                          min="0"
-                          value={row.digs}
-                          onChange={(e) =>
-                            handleStatChange(row.playerId, 'digs', e.target.value)
-                          }
-                          className="w-20 text-center"
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <Input
-                          type="number"
-                          min="0"
-                          value={row.blockSolos}
-                          onChange={(e) =>
-                            handleStatChange(row.playerId, 'blockSolos', e.target.value)
-                          }
-                          className="w-20 text-center"
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <Input
-                          type="number"
-                          min="0"
-                          value={row.blockAssists}
-                          onChange={(e) =>
-                            handleStatChange(row.playerId, 'blockAssists', e.target.value)
-                          }
-                          className="w-20 text-center"
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <Input
-                          type="number"
-                          min="0"
-                          value={row.blockTouches}
-                          onChange={(e) =>
-                            handleStatChange(row.playerId, 'blockTouches', e.target.value)
-                          }
-                          className="w-20 text-center"
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <Input
-                          type="number"
-                          min="0"
-                          value={row.ballHandlingErrors}
-                          onChange={(e) =>
-                            handleStatChange(
-                              row.playerId,
-                              'ballHandlingErrors',
-                              e.target.value
-                            )
-                          }
-                          className="w-20 text-center"
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <Input
-                          type="number"
-                          min="0"
-                          value={row.passAttempts}
-                          onChange={(e) =>
-                            handleStatChange(row.playerId, 'passAttempts', e.target.value)
-                          }
-                          className="w-20 text-center"
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <Input
-                          type="number"
-                          min="0"
-                          value={row.passSum}
-                          onChange={(e) =>
-                            handleStatChange(row.playerId, 'passSum', e.target.value)
-                          }
-                          className="w-20 text-center"
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <Input
-                          type="number"
-                          min="0"
-                          value={row.setAttempts}
-                          onChange={(e) =>
-                            handleStatChange(row.playerId, 'setAttempts', e.target.value)
-                          }
-                          className="w-20 text-center"
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <Input
-                          type="number"
-                          min="0"
-                          value={row.setSum}
-                          onChange={(e) =>
-                            handleStatChange(row.playerId, 'setSum', e.target.value)
-                          }
-                          className="w-20 text-center"
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <Input
-                          type="number"
-                          min="0"
-                          value={row.settingErrors}
-                          onChange={(e) =>
-                            handleStatChange(row.playerId, 'settingErrors', e.target.value)
-                          }
-                          className="w-20 text-center"
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <Select
-                          value={row.rotation?.toString() ?? 'none'}
-                          onValueChange={(val) => {
-                            const numVal = val === 'none' ? null : parseInt(val);
-                            setPlayerStats((prev) =>
-                              prev.map((r) =>
-                                r.playerId === row.playerId ? { ...r, rotation: numVal } : r
-                              )
-                            );
-                          }}
-                        >
-                          <SelectTrigger className="w-20">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="none">-</SelectItem>
-                            <SelectItem value="1">1</SelectItem>
-                            <SelectItem value="2">2</SelectItem>
-                            <SelectItem value="3">3</SelectItem>
-                            <SelectItem value="4">4</SelectItem>
-                            <SelectItem value="5">5</SelectItem>
-                            <SelectItem value="6">6</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </TableCell>
-                      <TableCell>
-                        <Input
-                          type="number"
-                          min="0"
-                          value={row.setsPlayed}
-                          onChange={(e) =>
-                            handleStatChange(row.playerId, 'setsPlayed', e.target.value)
-                          }
-                          className="w-20 text-center"
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <Input
-                          type="number"
-                          min="0"
-                          value={row.rotationsPlayed}
-                          onChange={(e) =>
-                            handleStatChange(row.playerId, 'rotationsPlayed', e.target.value)
-                          }
-                          className="w-20 text-center"
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleSaveRow(row.playerId)}
-                          disabled={savingPlayerId === row.playerId}
-                        >
-                          {savingPlayerId === row.playerId
-                            ? t('common.messages.saving')
-                            : t('common.buttons.save')}
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-                <TableFooter>
-                  <TableRow>
-                    <TableCell className="font-bold sticky left-0 z-10 bg-muted/50">
-                      {t('stats.teamTotals')}
-                    </TableCell>
-                    <TableCell className="text-center font-bold">{totals.kills}</TableCell>
-                    <TableCell className="text-center font-bold">
-                      {totals.attackErrors}
-                    </TableCell>
-                    <TableCell className="text-center font-bold">
-                      {totals.attackAttempts}
-                    </TableCell>
-                    <TableCell className="text-center font-bold text-sm">
-                      {totals.attackAttempts > 0
-                        ? (
-                            ((totals.kills - totals.attackErrors) /
-                              totals.attackAttempts) *
-                            100
-                          ).toFixed(1) + '%'
-                        : '-'}
-                    </TableCell>
-                    <TableCell className="text-center font-bold">{totals.aces}</TableCell>
-                    <TableCell className="text-center font-bold">
-                      {totals.serviceErrors}
-                    </TableCell>
-                    <TableCell className="text-center font-bold">
-                      {totals.serveAttempts}
-                    </TableCell>
-                    <TableCell className="text-center font-bold">{totals.digs}</TableCell>
-                    <TableCell className="text-center font-bold">
-                      {totals.blockSolos}
-                    </TableCell>
-                    <TableCell className="text-center font-bold">
-                      {totals.blockAssists}
-                    </TableCell>
-                    <TableCell className="text-center font-bold">
-                      {totals.blockTouches}
-                    </TableCell>
-                    <TableCell className="text-center font-bold">
-                      {totals.ballHandlingErrors}
-                    </TableCell>
-                    <TableCell className="text-center font-bold">
-                      {totals.passAttempts}
-                    </TableCell>
-                    <TableCell className="text-center font-bold">{totals.passSum}</TableCell>
-                    <TableCell className="text-center font-bold">{totals.setAttempts}</TableCell>
-                    <TableCell className="text-center font-bold">{totals.setSum}</TableCell>
-                    <TableCell className="text-center font-bold">{totals.settingErrors}</TableCell>
-                    <TableCell></TableCell>
-                    <TableCell className="text-center font-bold">{totals.setsPlayed}</TableCell>
-                    <TableCell className="text-center font-bold">{totals.rotationsPlayed}</TableCell>
-                    <TableCell></TableCell>
-                  </TableRow>
-                </TableFooter>
-              </Table>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+      {/* Finalize Confirmation */}
+      <ConfirmDialog
+        open={showFinalizeConfirm}
+        onOpenChange={setShowFinalizeConfirm}
+        title="Finalize Match"
+        description="This will lock all stats and calculate awards. This action cannot be undone. Are you sure?"
+        onConfirm={handleFinalize}
+      />
     </div>
   );
 }

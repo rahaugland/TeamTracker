@@ -9,21 +9,25 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
 import type { TimePeriod, CustomDateRange } from '@/services/player-stats.service';
 
 interface TimePeriodSelectorProps {
   period: TimePeriod;
   customRange?: CustomDateRange;
   onPeriodChange: (period: TimePeriod, customRange?: CustomDateRange) => void;
+  variant?: 'select' | 'buttons';
 }
 
 /**
- * Selector for time period filter (game/season/career/custom)
+ * Selector for time period filter (game/season/career/custom/last5)
+ * Supports two variants: select dropdown or button pills
  */
 export function TimePeriodSelector({
   period,
   customRange,
   onPeriodChange,
+  variant = 'select',
 }: TimePeriodSelectorProps) {
   const [localStartDate, setLocalStartDate] = useState(customRange?.startDate || '');
   const [localEndDate, setLocalEndDate] = useState(customRange?.endDate || '');
@@ -50,6 +54,38 @@ export function TimePeriodSelector({
     }
   };
 
+  // Button variant for inline period selection
+  if (variant === 'buttons') {
+    return (
+      <div className="flex flex-wrap gap-2 mb-6">
+        <PeriodButton
+          label="Last 5 Games"
+          value="last5"
+          currentPeriod={period}
+          onSelect={handlePeriodChange}
+        />
+        <PeriodButton
+          label="This Season"
+          value="season"
+          currentPeriod={period}
+          onSelect={handlePeriodChange}
+        />
+        <PeriodButton
+          label="Career"
+          value="career"
+          currentPeriod={period}
+          onSelect={handlePeriodChange}
+        />
+        <PeriodButton
+          label="Custom Range"
+          value="custom"
+          currentPeriod={period}
+          onSelect={handlePeriodChange}
+        />
+      </div>
+    );
+  }
+
   return (
     <Card>
       <CardContent className="pt-6">
@@ -61,6 +97,7 @@ export function TimePeriodSelector({
                 <SelectValue placeholder="Select period" />
               </SelectTrigger>
               <SelectContent>
+                <SelectItem value="last5">Last 5 Games</SelectItem>
                 <SelectItem value="game">Last Game</SelectItem>
                 <SelectItem value="season">Current Season</SelectItem>
                 <SelectItem value="career">Career</SelectItem>
@@ -96,5 +133,32 @@ export function TimePeriodSelector({
         </div>
       </CardContent>
     </Card>
+  );
+}
+
+// Helper component for period button
+interface PeriodButtonProps {
+  label: string;
+  value: TimePeriod;
+  currentPeriod: TimePeriod;
+  onSelect: (value: string) => void;
+}
+
+function PeriodButton({ label, value, currentPeriod, onSelect }: PeriodButtonProps) {
+  const isActive = currentPeriod === value;
+
+  return (
+    <button
+      onClick={() => onSelect(value)}
+      className={cn(
+        'font-display font-semibold text-[11px] uppercase tracking-wider',
+        'px-4 py-2 rounded-full border transition-all',
+        isActive
+          ? 'bg-club-primary text-white border-club-primary'
+          : 'bg-navy-80 text-gray-400 border-transparent hover:text-white hover:border-white/10'
+      )}
+    >
+      {label}
+    </button>
   );
 }

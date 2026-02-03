@@ -24,28 +24,28 @@ export function PlayerScheduleView({ events, rsvpStatus = {}, onRSVP }: PlayerSc
   const getEventTypeColor = (type: string) => {
     switch (type) {
       case 'practice':
-        return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300';
+        return 'bg-vq-teal/15 text-vq-teal';
       case 'game':
-        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
+        return 'bg-emerald-500/15 text-emerald-400';
       case 'tournament':
-        return 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300';
+        return 'bg-purple-500/15 text-purple-400';
       case 'meeting':
-        return 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-300';
+        return 'bg-club-secondary/15 text-club-secondary';
       default:
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300';
+        return 'bg-muted text-muted-foreground';
     }
   };
 
   const getRSVPStatusColor = (status: string) => {
     switch (status) {
       case 'attending':
-        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
+        return 'bg-emerald-500/15 text-emerald-400';
       case 'not_attending':
-        return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300';
+        return 'bg-club-primary/15 text-club-primary';
       case 'maybe':
-        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300';
+        return 'bg-club-secondary/15 text-club-secondary';
       default:
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300';
+        return 'bg-muted text-muted-foreground';
     }
   };
 

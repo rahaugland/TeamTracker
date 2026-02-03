@@ -39,24 +39,24 @@ export function ReviewCard({ review }: ReviewCardProps) {
       {isExpanded && (
         <CardContent className="space-y-4 pt-0">
           {review.strengths && (
-            <div className="bg-green-50 dark:bg-green-950/20 p-4 rounded-lg">
-              <h4 className="font-semibold text-sm mb-2 text-green-900 dark:text-green-100">
+            <div className="bg-emerald-500/10 p-4 rounded-lg">
+              <h4 className="font-semibold text-sm mb-2 text-emerald-300">
                 {t('playerExperience.reviews.strengths')}
               </h4>
               <p className="text-sm whitespace-pre-wrap">{review.strengths}</p>
             </div>
           )}
           {review.areas_to_improve && (
-            <div className="bg-amber-50 dark:bg-amber-950/20 p-4 rounded-lg">
-              <h4 className="font-semibold text-sm mb-2 text-amber-900 dark:text-amber-100">
+            <div className="bg-club-secondary/10 p-4 rounded-lg">
+              <h4 className="font-semibold text-sm mb-2 text-club-secondary">
                 {t('playerExperience.reviews.areasToImprove')}
               </h4>
               <p className="text-sm whitespace-pre-wrap">{review.areas_to_improve}</p>
             </div>
           )}
           {review.goals_text && (
-            <div className="bg-blue-50 dark:bg-blue-950/20 p-4 rounded-lg">
-              <h4 className="font-semibold text-sm mb-2 text-blue-900 dark:text-blue-100">
+            <div className="bg-vq-teal/10 p-4 rounded-lg">
+              <h4 className="font-semibold text-sm mb-2 text-vq-teal">
                 {t('playerExperience.reviews.goals')}
               </h4>
               <p className="text-sm whitespace-pre-wrap">{review.goals_text}</p>

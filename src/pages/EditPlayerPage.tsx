@@ -1,16 +1,14 @@
 import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { getPlayer, updatePlayer } from '@/services/players.service';
 import { PlayerForm } from '@/components/forms/PlayerForm';
 import type { PlayerFormDataNew } from '@/lib/validations/playerNew';
 import type { Player } from '@/types/database.types';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 
 /**
  * EditPlayerPage component
- * Handles editing of existing players
+ * Handles editing of existing players - VolleyQuest style
  */
 export function EditPlayerPage() {
   const { id } = useParams<{ id: string }>();
@@ -71,7 +69,7 @@ export function EditPlayerPage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-screen">
+      <div className="flex items-center justify-center h-64">
         <p className="text-muted-foreground">{t('common.messages.loading')}</p>
       </div>
     );
@@ -79,29 +77,48 @@ export function EditPlayerPage() {
 
   if (!player) {
     return (
-      <div className="flex items-center justify-center h-screen">
+      <div className="flex items-center justify-center h-64">
         <p className="text-muted-foreground">Player not found</p>
       </div>
     );
   }
 
   return (
-    <div className="container max-w-2xl mx-auto py-8 px-4">
-      <Button variant="outline" onClick={handleCancel} className="mb-4">
-        {t('common.buttons.back')}
-      </Button>
+    <div className="max-w-2xl mx-auto">
+      {/* Breadcrumb */}
+      <nav className="flex items-center gap-2 mb-6 text-sm">
+        <Link to="/coach-dashboard" className="text-gray-400 hover:text-vq-teal transition-colors">
+          Dashboard
+        </Link>
+        <span className="text-gray-500">/</span>
+        <Link to="/players" className="text-gray-400 hover:text-vq-teal transition-colors">
+          Players
+        </Link>
+        <span className="text-gray-500">/</span>
+        <Link to={`/players/${id}`} className="text-gray-400 hover:text-vq-teal transition-colors">
+          {player.name}
+        </Link>
+        <span className="text-gray-500">/</span>
+        <span className="text-white">Edit</span>
+      </nav>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>{t('player.editPlayer')}</CardTitle>
-          <CardDescription>
-            {t('player.editPlayerDescription')}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
+      {/* Page Header */}
+      <div className="mb-6">
+        <h1 className="font-display font-extrabold text-[32px] uppercase tracking-tight text-white mb-1">
+          {t('player.editPlayer')}
+        </h1>
+        <p className="text-sm text-gray-400">
+          {t('player.editPlayerDescription')}
+        </p>
+      </div>
+
+      {/* Form Card */}
+      <div className="bg-navy-90 border border-white/[0.06] rounded-lg overflow-hidden">
+        <div className="h-1 bg-gradient-to-r from-club-primary to-club-secondary" />
+        <div className="p-6">
           {error && (
-            <div className="mb-4 p-3 bg-destructive/10 text-destructive rounded-md">
-              {error}
+            <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-lg">
+              <p className="text-sm text-red-400">{error}</p>
             </div>
           )}
           <PlayerForm
@@ -116,8 +133,8 @@ export function EditPlayerPage() {
             onSubmit={handleSubmit}
             onCancel={handleCancel}
           />
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }

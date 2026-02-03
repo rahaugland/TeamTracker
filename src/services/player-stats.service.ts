@@ -132,7 +132,7 @@ export interface TrainingVolumePoint {
   [skillTag: string]: number | string;
 }
 
-export type TimePeriod = 'game' | 'season' | 'career' | 'custom';
+export type TimePeriod = 'game' | 'season' | 'career' | 'custom' | 'last5';
 
 export interface CustomDateRange {
   startDate: string;
@@ -189,7 +189,7 @@ export async function getPlayerStats(
   teamId?: string,
   seasonId?: string
 ): Promise<StatEntryWithEvent[]> {
-  let query = supabase
+  const query = supabase
     .from('stat_entries')
     .select(`
       *,
@@ -207,17 +207,6 @@ export async function getPlayerStats(
     .eq('player_id', playerId)
     .order('recorded_at', { ascending: false });
 
-  // Apply filters based on period
-  if (period === 'custom' && customRange) {
-    query = query
-      .gte('event.start_time', customRange.startDate)
-      .lte('event.start_time', customRange.endDate);
-  }
-
-  if (teamId) {
-    query = query.eq('event.team_id', teamId);
-  }
-
   const { data, error } = await query;
 
   if (error) {
@@ -225,7 +214,28 @@ export async function getPlayerStats(
     throw error;
   }
 
-  return (data || []) as StatEntryWithEvent[];
+  let results = (data || []) as StatEntryWithEvent[];
+
+  // Filter by team post-query (nested filters don't work reliably)
+  if (teamId) {
+    results = results.filter(r => r.event?.team_id === teamId);
+  }
+
+  // Apply filters based on period
+  if (period === 'custom' && customRange) {
+    results = results.filter(r => {
+      const eventDate = r.event?.start_time;
+      if (!eventDate) return false;
+      return eventDate >= customRange.startDate && eventDate <= customRange.endDate;
+    });
+  }
+
+  // For 'last5', limit to 5 results
+  if (period === 'last5') {
+    results = results.slice(0, 5);
+  }
+
+  return results;
 }
 
 /**
@@ -556,11 +566,7 @@ export async function getAttendanceStats(
       )
     `)
     .eq('player_id', playerId)
-    .order('event.start_time', { ascending: true });
-
-  if (teamId) {
-    query = query.eq('event.team_id', teamId);
-  }
+    .order('created_at', { ascending: true });
 
   const { data, error } = await query;
 
@@ -569,7 +575,11 @@ export async function getAttendanceStats(
     throw error;
   }
 
-  const records = data || [];
+  // Filter by team post-query (nested filters don't work reliably)
+  let records = (data || []) as Array<AttendanceRecord & { event: { id: string; start_time: string; team_id: string } }>;
+  if (teamId) {
+    records = records.filter(r => r.event?.team_id === teamId);
+  }
   const totalEvents = records.length;
 
   if (totalEvents === 0) {
@@ -636,7 +646,7 @@ export async function getEventTypeBreakdown(
   playerId: string,
   teamId?: string
 ): Promise<EventTypeBreakdown> {
-  let query = supabase
+  const { data, error } = await supabase
     .from('attendance_records')
     .select(`
       *,
@@ -648,24 +658,22 @@ export async function getEventTypeBreakdown(
     .eq('player_id', playerId)
     .in('status', ['present', 'late']);
 
-  if (teamId) {
-    query = query.eq('event.team_id', teamId);
-  }
-
-  const { data, error } = await query;
-
   if (error) {
     console.error('Error fetching event breakdown:', error);
     throw error;
   }
 
-  const records = data || [];
+  // Filter by team post-query
+  let records = (data || []) as Array<{ event: { type: string; team_id: string } }>;
+  if (teamId) {
+    records = records.filter(r => r.event?.team_id === teamId);
+  }
 
   return {
-    practice: records.filter((r: any) => r.event.type === 'practice').length,
-    game: records.filter((r: any) => r.event.type === 'game').length,
-    tournament: records.filter((r: any) => r.event.type === 'tournament').length,
-    other: records.filter((r: any) => !['practice', 'game', 'tournament'].includes(r.event.type)).length,
+    practice: records.filter(r => r.event?.type === 'practice').length,
+    game: records.filter(r => r.event?.type === 'game').length,
+    tournament: records.filter(r => r.event?.type === 'tournament').length,
+    other: records.filter(r => r.event?.type && !['practice', 'game', 'tournament'].includes(r.event.type)).length,
   };
 }
 
@@ -676,7 +684,7 @@ export async function getMissedEventsTimeline(
   playerId: string,
   teamId?: string
 ): Promise<MissedEvent[]> {
-  let query = supabase
+  const { data, error } = await supabase
     .from('attendance_records')
     .select(`
       status,
@@ -686,23 +694,27 @@ export async function getMissedEventsTimeline(
       )
     `)
     .eq('player_id', playerId)
-    .order('event.start_time', { ascending: true });
-
-  if (teamId) {
-    query = query.eq('event.team_id', teamId);
-  }
-
-  const { data, error } = await query;
+    .order('created_at', { ascending: true });
 
   if (error) {
     console.error('Error fetching missed events:', error);
     throw error;
   }
 
-  return (data || []).map((record: any) => ({
-    date: record.event.start_time.split('T')[0],
-    status: record.status,
-  }));
+  // Filter by team post-query
+  // Supabase returns event as object, not array
+  type MissedEventRecord = { status: AttendanceStatus; event: { start_time: string; team_id: string } | null };
+  let records = (data || []) as MissedEventRecord[];
+  if (teamId) {
+    records = records.filter(r => r.event?.team_id === teamId);
+  }
+
+  return records
+    .filter(r => r.event?.start_time)
+    .map(record => ({
+      date: record.event!.start_time.split('T')[0],
+      status: record.status,
+    }));
 }
 
 /**
@@ -712,7 +724,7 @@ export async function getDrillParticipation(
   playerId: string,
   teamId?: string
 ): Promise<DrillParticipation[]> {
-  const { data, error } = await supabase
+  let query = supabase
     .from('drill_executions')
     .select(`
       *,
@@ -724,8 +736,14 @@ export async function getDrillParticipation(
         team_id
       )
     `)
-    .eq('team_id', teamId || '')
     .order('executed_at', { ascending: true });
+
+  // Only filter by team if teamId is provided
+  if (teamId) {
+    query = query.eq('team_id', teamId);
+  }
+
+  const { data, error } = await query;
 
   if (error) {
     console.error('Error fetching drill participation:', error);
@@ -762,63 +780,87 @@ export async function getDrillParticipation(
 
 /**
  * Get skill progression over time
+ * Derives skill levels from game stats using the same calculation as the FIFA card
+ * Uses 1-99 scale matching the SkillRatingsPanel and FIFA card
+ * Applies opponent tier scaling to match FIFA card values
  */
 export async function getSkillProgression(
   playerId: string,
   teamId?: string
 ): Promise<SkillProgressionPoint[]> {
-  const { data, error } = await supabase
-    .from('drill_executions')
-    .select(`
-      executed_at,
-      drill:drills(
-        skill_tags,
-        progression_level
-      ),
-      event:events(
-        team_id
-      )
-    `)
-    .eq('team_id', teamId || '')
-    .order('executed_at', { ascending: true });
+  // Get player's game stats over time
+  const stats = await getPlayerStats(playerId, 'career', undefined, teamId);
 
-  if (error) {
-    console.error('Error fetching skill progression:', error);
-    throw error;
+  if (stats.length === 0) {
+    return [];
   }
 
-  const executions = data || [];
+  // Group stats by month
+  const monthlyStats: Record<string, StatEntryWithEvent[]> = {};
 
-  // Group by month and skill tag
-  const monthlySkills: Record<string, Record<string, number[]>> = {};
-
-  executions.forEach((exec: any) => {
-    const month = exec.executed_at.substring(0, 7); // YYYY-MM
-    const skillTags = exec.drill?.skill_tags || [];
-    const level = exec.drill?.progression_level || 1;
-
-    if (!monthlySkills[month]) {
-      monthlySkills[month] = {};
+  stats.forEach(stat => {
+    const month = stat.event.start_time.substring(0, 7); // YYYY-MM
+    if (!monthlyStats[month]) {
+      monthlyStats[month] = [];
     }
-
-    skillTags.forEach((tag: string) => {
-      if (!monthlySkills[month][tag]) {
-        monthlySkills[month][tag] = [];
-      }
-      monthlySkills[month][tag].push(level);
-    });
+    monthlyStats[month].push(stat);
   });
 
   const points: SkillProgressionPoint[] = [];
 
-  Object.entries(monthlySkills).forEach(([month, skills]) => {
-    Object.entries(skills).forEach(([skillTag, levels]) => {
-      points.push({
-        date: month,
-        skillTag,
-        avgLevel: levels.reduce((a, b) => a + b, 0) / levels.length,
-      });
+  // For each month, calculate skill ratings using the same formulas as calculateSubRatings
+  // and mapPlayerRatingToSkills to match the FIFA card
+  Object.entries(monthlyStats).forEach(([month, monthStats]) => {
+    const agg = aggregateStats(monthStats);
+    const rawSubRatings = calculateSubRatings(agg);
+
+    // Calculate opponent tier scale for this month's games (same as calculatePlayerRating)
+    let tierWeightSum = 0;
+    let tierWeightedMax = 0;
+    monthStats.forEach(game => {
+      const opponentTier = game.event.opponent_tier || 5;
+      const opponentMax = TIER_MAX_RATING[opponentTier] || 55;
+      const recencyWeight = getRecencyWeight(game.event.start_time);
+      tierWeightSum += recencyWeight;
+      tierWeightedMax += opponentMax * recencyWeight;
     });
+
+    // Apply tier scaling to match FIFA card values
+    const avgOpponentMax = tierWeightSum > 0 ? tierWeightedMax / tierWeightSum : 55;
+    const tierScale = avgOpponentMax / 99;
+
+    // Scale the raw ratings
+    const scaledRatings = {
+      attack: Math.max(1, Math.min(99, Math.round(rawSubRatings.attack * tierScale))),
+      serve: Math.max(1, Math.min(99, Math.round(rawSubRatings.serve * tierScale))),
+      reception: Math.max(1, Math.min(99, Math.round(rawSubRatings.reception * tierScale))),
+      consistency: Math.max(1, Math.min(99, Math.round(rawSubRatings.consistency * tierScale))),
+    };
+
+    // Use same skill names and derivations as mapPlayerRatingToSkills in FifaPlayerCard.example.tsx
+    // Serve = scaledRatings.serve
+    points.push({ date: month, skillTag: 'serve', avgLevel: scaledRatings.serve });
+
+    // Receive = scaledRatings.reception
+    points.push({ date: month, skillTag: 'receive', avgLevel: scaledRatings.reception });
+
+    // Set = consistency * 0.8
+    points.push({ date: month, skillTag: 'set', avgLevel: Math.round(scaledRatings.consistency * 0.8) });
+
+    // Block = (attack + consistency) / 2
+    points.push({ date: month, skillTag: 'block', avgLevel: Math.round((scaledRatings.attack + scaledRatings.consistency) / 2) });
+
+    // Attack = scaledRatings.attack
+    points.push({ date: month, skillTag: 'attack', avgLevel: scaledRatings.attack });
+
+    // Dig = (reception + consistency) / 2
+    points.push({ date: month, skillTag: 'dig', avgLevel: Math.round((scaledRatings.reception + scaledRatings.consistency) / 2) });
+
+    // Mental = scaledRatings.consistency
+    points.push({ date: month, skillTag: 'mental', avgLevel: scaledRatings.consistency });
+
+    // Physique = (attack + serve) / 2
+    points.push({ date: month, skillTag: 'physique', avgLevel: Math.round((scaledRatings.attack + scaledRatings.serve) / 2) });
   });
 
   return points.sort((a, b) => a.date.localeCompare(b.date));
@@ -831,7 +873,7 @@ export async function getTrainingVolume(
   playerId: string,
   teamId?: string
 ): Promise<TrainingVolumePoint[]> {
-  const { data, error } = await supabase
+  let query = supabase
     .from('drill_executions')
     .select(`
       executed_at,
@@ -843,8 +885,14 @@ export async function getTrainingVolume(
         team_id
       )
     `)
-    .eq('team_id', teamId || '')
     .order('executed_at', { ascending: true });
+
+  // Only filter by team if teamId is provided
+  if (teamId) {
+    query = query.eq('team_id', teamId);
+  }
+
+  const { data, error } = await query;
 
   if (error) {
     console.error('Error fetching training volume:', error);
@@ -987,27 +1035,40 @@ export async function getPlayerForm(
   playerId: string,
   teamId?: string
 ): Promise<PlayerForm> {
-  let query = supabase
-    .from('attendance_records')
-    .select(`
-      status,
-      event:events!inner(
-        id,
-        type,
-        start_time,
-        team_id
-      )
-    `)
-    .eq('player_id', playerId)
-    .eq('event.type', 'practice')
-    .order('event.start_time', { ascending: false })
-    .limit(10);
+  // First, get practice events
+  let eventsQuery = supabase
+    .from('events')
+    .select('id, start_time, team_id')
+    .eq('type', 'practice')
+    .order('start_time', { ascending: false });
 
   if (teamId) {
-    query = query.eq('event.team_id', teamId);
+    eventsQuery = eventsQuery.eq('team_id', teamId);
   }
 
-  const { data, error } = await query;
+  const { data: events, error: eventsError } = await eventsQuery;
+
+  if (eventsError) {
+    console.error('Error fetching practice events:', eventsError);
+    throw eventsError;
+  }
+
+  const practiceEventIds = (events || []).slice(0, 10).map(e => e.id);
+
+  if (practiceEventIds.length === 0) {
+    return {
+      practicesAttended: 0,
+      practicesTotal: 0,
+      formRating: 1,
+    };
+  }
+
+  // Get attendance for these practice events
+  const { data, error } = await supabase
+    .from('attendance_records')
+    .select('status, event_id')
+    .eq('player_id', playerId)
+    .in('event_id', practiceEventIds);
 
   if (error) {
     console.error('Error fetching player form:', error);
@@ -1015,13 +1076,12 @@ export async function getPlayerForm(
   }
 
   const records = data || [];
-  const practicesTotal = Math.min(records.length, 10);
+  const practicesTotal = practiceEventIds.length;
   const practicesAttended = records.filter(
-    (r: any) => r.status === 'present' || r.status === 'late'
+    (r: { status: string }) => r.status === 'present' || r.status === 'late'
   ).length;
 
   // Map attendance to 1-99: 8/10 = 99, scale linearly, minimum 1
-  const maxAttendance = Math.min(practicesTotal, 8);
   const formRating = practicesTotal === 0
     ? 1
     : Math.max(1, Math.min(99, Math.round((Math.min(practicesAttended, 8) / 8) * 99)));
@@ -1074,6 +1134,156 @@ export function getRotationStats(statEntries: StatEntryWithEvent[]): RotationSta
       isBelowAverage,
     });
   }
+
+  return results;
+}
+
+/**
+ * Stats for player selection in match roster
+ */
+export interface PlayerSelectionStats {
+  attendancePercent: number;
+  keyStat: { label: string; value: number };
+  form: 'good' | 'average' | 'poor';
+}
+
+/**
+ * Get player selection stats for roster display
+ * Returns attendance percentage, key stat based on position, and form indicator
+ */
+export async function getPlayerSelectionStats(
+  playerId: string,
+  teamId: string,
+  position?: VolleyballPosition
+): Promise<PlayerSelectionStats> {
+  // Get attendance stats
+  const attendanceStats = await getAttendanceStats(playerId, teamId);
+  const attendancePercent = Math.round(attendanceStats.attendanceRate * 100);
+
+  // Get last 3 games for form calculation
+  const recentStats = await getPlayerStats(playerId, 'career', undefined, teamId);
+  const last3Games = recentStats.slice(0, 3);
+  const aggregated = aggregateStats(last3Games);
+
+  // Determine key stat based on position
+  let keyStat: { label: string; value: number };
+  let form: 'good' | 'average' | 'poor' = 'average';
+
+  // Calculate form based on position
+  switch (position) {
+    case 'outside_hitter':
+    case 'opposite':
+      // Key stat: kills
+      keyStat = { label: 'kills', value: aggregated.totalKills };
+      // Form: based on kill efficiency
+      if (last3Games.length === 0) {
+        form = 'average';
+      } else if (aggregated.killPercentage > 0.25) {
+        form = 'good';
+      } else if (aggregated.killPercentage >= 0.15) {
+        form = 'average';
+      } else {
+        form = 'poor';
+      }
+      break;
+
+    case 'middle_blocker':
+      // Key stat: blocks
+      keyStat = { label: 'blocks', value: aggregated.totalBlockSolos + aggregated.totalBlockAssists };
+      // Form: based on kill efficiency (MBs also attack)
+      if (last3Games.length === 0) {
+        form = 'average';
+      } else if (aggregated.killPercentage > 0.25) {
+        form = 'good';
+      } else if (aggregated.killPercentage >= 0.15) {
+        form = 'average';
+      } else {
+        form = 'poor';
+      }
+      break;
+
+    case 'setter':
+      // Key stat: assists (using set_sum as proxy for assists)
+      keyStat = { label: 'assists', value: aggregated.totalSetSum };
+      // Form: based on assist-to-error ratio
+      const assistErrors = aggregated.totalSettingErrors || 1;
+      const assistRatio = aggregated.totalSetSum / assistErrors;
+      if (last3Games.length === 0) {
+        form = 'average';
+      } else if (assistRatio > 10) {
+        form = 'good';
+      } else if (assistRatio >= 5) {
+        form = 'average';
+      } else {
+        form = 'poor';
+      }
+      break;
+
+    case 'libero':
+    case 'defensive_specialist':
+      // Key stat: digs
+      keyStat = { label: 'digs', value: aggregated.totalDigs };
+      // Form: based on dig average per game
+      if (last3Games.length === 0) {
+        form = 'average';
+      } else if (aggregated.digsPerGame > 10) {
+        form = 'good';
+      } else if (aggregated.digsPerGame >= 5) {
+        form = 'average';
+      } else {
+        form = 'poor';
+      }
+      break;
+
+    case 'all_around':
+    default:
+      // Key stat: kills for all-around players
+      keyStat = { label: 'kills', value: aggregated.totalKills };
+      // Form: based on attendance if no specific position
+      if (attendancePercent >= 80) {
+        form = 'good';
+      } else if (attendancePercent >= 50) {
+        form = 'average';
+      } else {
+        form = 'poor';
+      }
+      break;
+  }
+
+  return {
+    attendancePercent,
+    keyStat,
+    form,
+  };
+}
+
+/**
+ * Get selection stats for multiple players at once (batch operation)
+ * More efficient than calling getPlayerSelectionStats individually
+ */
+export async function getBatchPlayerSelectionStats(
+  players: Array<{ id: string; position?: VolleyballPosition }>,
+  teamId: string
+): Promise<Map<string, PlayerSelectionStats>> {
+  const results = new Map<string, PlayerSelectionStats>();
+
+  // Process in parallel for better performance
+  await Promise.all(
+    players.map(async (player) => {
+      try {
+        const stats = await getPlayerSelectionStats(player.id, teamId, player.position);
+        results.set(player.id, stats);
+      } catch (error) {
+        console.error(`Error fetching selection stats for player ${player.id}:`, error);
+        // Provide default stats on error
+        results.set(player.id, {
+          attendancePercent: 0,
+          keyStat: { label: 'kills', value: 0 },
+          form: 'average',
+        });
+      }
+    })
+  );
 
   return results;
 }

@@ -1,0 +1,2263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VolleyQuest — Player Detail Page Wireframes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800;900&family=Barlow:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --vq-navy: #0A1628;
+  --vq-navy-90: #0f1e35;
+  --vq-navy-80: #162843;
+  --vq-navy-70: #1e3452;
+  --vq-navy-60: #2a4268;
+  --vq-white: #FFFFFF;
+  --vq-off-white: #F0F2F5;
+  --vq-light-gray: #E1E5EB;
+  --vq-mid-gray: #8B95A5;
+  --vq-teal: #2EC4B6;
+  --vq-teal-dim: #1a7a70;
+  --club-primary: #E63946;
+  --club-primary-dim: #c42d39;
+  --club-primary-glow: rgba(230, 57, 70, 0.25);
+  --club-secondary: #FFB703;
+  --club-secondary-dim: #e0a003;
+  --color-success: #22C55E;
+  --color-warning: #F59E0B;
+  --color-error: #EF4444;
+  --color-info: #3B82F6;
+  --font-display: 'Barlow Condensed', sans-serif;
+  --font-body: 'Barlow', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-full: 999px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-body);
+  background: var(--vq-navy);
+  color: var(--vq-white);
+  line-height: 1.5;
+  padding: var(--space-2xl);
+  min-height: 100vh;
+}
+
+/* Page Container */
+.page-container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* Breadcrumb */
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-lg);
+  font-size: 13px;
+}
+
+.breadcrumb a {
+  color: var(--vq-mid-gray);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.breadcrumb a:hover { color: var(--vq-teal); }
+.breadcrumb span { color: var(--vq-mid-gray); }
+.breadcrumb .current { color: var(--vq-white); }
+
+/* Player Hero Section */
+.player-hero {
+  display: flex;
+  gap: var(--space-2xl);
+  margin-bottom: var(--space-xl);
+}
+
+/* FIFA-style Card - Enhanced with skill ratings */
+.fifa-card {
+  width: 280px;
+  min-height: 420px;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(170deg, #2a1f0a 0%, #1a1508 40%, #2a1a05 100%);
+  border: 1px solid rgba(255, 183, 3, 0.35);
+  box-shadow:
+    0 8px 32px rgba(255, 183, 3, 0.15),
+    inset 0 1px 0 rgba(255, 183, 3, 0.1);
+  position: relative;
+  overflow: hidden;
+  padding: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+
+.fifa-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -30%;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(255, 183, 3, 0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.card-top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--space-sm);
+}
+
+.card-rating-block {
+  display: flex;
+  flex-direction: column;
+}
+
+.card-tier {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 9px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--club-secondary);
+  margin-bottom: 2px;
+}
+
+.card-rating {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 52px;
+  line-height: 1;
+  background: linear-gradient(135deg, var(--club-secondary), #FFD166);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.card-position {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 13px;
+  color: rgba(255, 183, 3, 0.6);
+  letter-spacing: 2px;
+}
+
+/* Overall Trend Badge */
+.card-trend-badge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 11px;
+}
+
+.card-trend-badge.up {
+  background: rgba(34, 197, 94, 0.2);
+  color: var(--color-success);
+}
+
+.card-trend-badge.down {
+  background: rgba(239, 68, 68, 0.2);
+  color: var(--color-error);
+}
+
+.card-trend-badge.stable {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--vq-mid-gray);
+}
+
+.trend-arrow {
+  font-size: 14px;
+  line-height: 1;
+}
+
+.card-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: var(--radius-lg);
+  background: rgba(255, 183, 3, 0.1);
+  border: 2px solid rgba(255, 183, 3, 0.3);
+  margin: var(--space-md) auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 28px;
+  color: var(--club-secondary);
+}
+
+.card-name {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 16px;
+  text-transform: uppercase;
+  text-align: center;
+  letter-spacing: 1px;
+}
+
+.card-club {
+  font-size: 10px;
+  color: var(--vq-mid-gray);
+  text-align: center;
+  margin-top: 2px;
+  margin-bottom: var(--space-md);
+}
+
+/* FIFA Skill Attributes Grid */
+.card-skills {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin-top: auto;
+  padding-top: var(--space-md);
+  border-top: 1px solid rgba(255, 183, 3, 0.15);
+}
+
+.card-skill {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 8px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: var(--radius-sm);
+}
+
+.card-skill-value {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--club-secondary);
+  min-width: 28px;
+}
+
+.card-skill-label {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 9px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.card-skill-trend {
+  font-size: 10px;
+  margin-left: 2px;
+}
+
+.card-skill-trend.up { color: var(--color-success); }
+.card-skill-trend.down { color: var(--color-error); }
+
+/* Player Info Panel */
+.player-info-panel {
+  flex: 1;
+}
+
+.player-name-lg {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 48px;
+  text-transform: uppercase;
+  line-height: 1;
+  margin-bottom: var(--space-sm);
+}
+
+.player-meta-row {
+  display: flex;
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+  color: var(--vq-mid-gray);
+  font-size: 14px;
+  align-items: center;
+}
+
+.player-meta-row span { display: flex; align-items: center; gap: var(--space-xs); }
+
+/* Skill Ratings Panel - Full Width Display */
+.skill-ratings-panel {
+  background: var(--vq-navy-90);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--radius-md);
+  padding: var(--space-lg);
+  margin-bottom: var(--space-lg);
+}
+
+.skill-ratings-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-lg);
+}
+
+.skill-ratings-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.skill-ratings-period {
+  font-size: 12px;
+  color: var(--vq-mid-gray);
+}
+
+.skill-ratings-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-md);
+}
+
+.skill-rating-item {
+  background: var(--vq-navy-80);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  position: relative;
+  overflow: hidden;
+}
+
+.skill-rating-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--skill-color, var(--vq-teal));
+}
+
+.skill-rating-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--space-sm);
+}
+
+.skill-rating-value {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 32px;
+  line-height: 1;
+  color: var(--vq-white);
+}
+
+.skill-rating-change {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 12px;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+}
+
+.skill-rating-change.up {
+  background: rgba(34, 197, 94, 0.15);
+  color: var(--color-success);
+}
+
+.skill-rating-change.down {
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--color-error);
+}
+
+.skill-rating-change.stable {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--vq-mid-gray);
+}
+
+.skill-rating-label {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--vq-mid-gray);
+  margin-bottom: var(--space-sm);
+}
+
+.skill-rating-bar {
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.skill-rating-fill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  background: var(--skill-color, var(--vq-teal));
+  transition: width 0.5s ease;
+}
+
+/* Radar Chart Container */
+.radar-chart-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-lg);
+}
+
+.radar-chart {
+  width: 280px;
+  height: 280px;
+  position: relative;
+}
+
+/* Action Buttons */
+.action-buttons {
+  display: flex;
+  gap: var(--space-md);
+}
+
+.btn {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  border: none;
+  cursor: pointer;
+  padding: 10px 20px;
+  border-radius: var(--radius-sm);
+  transition: all 0.2s;
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--vq-white);
+  border: 1px solid rgba(255,255,255,0.2);
+}
+
+.btn-outline:hover {
+  border-color: var(--vq-white);
+  background: rgba(255,255,255,0.05);
+}
+
+.btn-teal {
+  background: transparent;
+  color: var(--vq-teal);
+  border: 1px solid rgba(46, 196, 182, 0.3);
+}
+
+.btn-teal:hover {
+  background: rgba(46, 196, 182, 0.1);
+  border-color: var(--vq-teal);
+}
+
+.btn-primary {
+  background: var(--club-primary);
+  color: var(--vq-white);
+  box-shadow: 0 2px 12px rgba(230, 57, 70, 0.3);
+}
+
+.btn-primary:hover {
+  background: var(--club-primary-dim);
+  transform: translateY(-1px);
+}
+
+/* Tabs */
+.tabs {
+  display: flex;
+  gap: var(--space-xs);
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  margin-bottom: var(--space-lg);
+}
+
+.tab {
+  padding: var(--space-md) var(--space-lg);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--vq-mid-gray);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: all 0.2s;
+  background: none;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+}
+
+.tab:hover { color: var(--vq-white); }
+
+.tab.active {
+  color: var(--vq-white);
+  border-bottom-color: var(--club-primary);
+}
+
+.tab-badge {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  background: rgba(255,255,255,0.1);
+  padding: 2px 6px;
+  border-radius: var(--radius-full);
+  margin-left: var(--space-xs);
+}
+
+/* Tab Content */
+.tab-content {
+  display: none;
+  animation: fadeIn 0.3s ease;
+}
+
+.tab-content.active { display: block; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Cards */
+.card {
+  background: var(--vq-navy-90);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.card-header {
+  padding: var(--space-md) var(--space-lg);
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.card-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.card-body { padding: var(--space-lg); }
+
+/* Two Column Grid */
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-lg);
+}
+
+.three-col {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-lg);
+}
+
+/* ==================== */
+/* TAB 1: OVERVIEW      */
+/* ==================== */
+
+/* Awards Highlight */
+.awards-row {
+  display: flex;
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+  padding: var(--space-lg);
+  background: linear-gradient(135deg, rgba(255, 183, 3, 0.08) 0%, rgba(255, 183, 3, 0.02) 100%);
+  border: 1px solid rgba(255, 183, 3, 0.15);
+  border-radius: var(--radius-md);
+}
+
+.award-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  background: rgba(255, 183, 3, 0.1);
+  border-radius: var(--radius-sm);
+}
+
+.award-icon {
+  font-size: 20px;
+}
+
+.award-text {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--club-secondary);
+}
+
+/* Contact Info */
+.info-grid {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.info-label {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--vq-mid-gray);
+}
+
+.info-value {
+  font-size: 14px;
+  color: var(--vq-white);
+}
+
+/* Position Tags */
+.position-tags {
+  display: flex;
+  gap: var(--space-sm);
+  flex-wrap: wrap;
+}
+
+.position-tag {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  background: rgba(46, 196, 182, 0.1);
+  color: var(--vq-teal);
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+}
+
+/* Team History */
+.team-history-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+
+.team-history-item:last-child { border-bottom: none; }
+
+.team-badge {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  background: rgba(230, 57, 70, 0.1);
+  border: 1px solid rgba(230, 57, 70, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 14px;
+  color: var(--club-primary);
+}
+
+.team-info { flex: 1; }
+
+.team-name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 14px;
+  text-transform: uppercase;
+}
+
+.team-meta {
+  font-size: 12px;
+  color: var(--vq-mid-gray);
+  display: flex;
+  gap: var(--space-sm);
+  align-items: center;
+}
+
+.captain-badge {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 9px;
+  text-transform: uppercase;
+  color: var(--club-secondary);
+  background: rgba(255, 183, 3, 0.15);
+  padding: 2px 6px;
+  border-radius: var(--radius-full);
+}
+
+.team-dates {
+  text-align: right;
+  font-size: 12px;
+  color: var(--vq-mid-gray);
+}
+
+/* ==================== */
+/* TAB 2: STATS HISTORY */
+/* ==================== */
+
+/* Period Selector */
+.period-selector {
+  display: flex;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-lg);
+}
+
+.period-btn {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-full);
+  background: var(--vq-navy-80);
+  color: var(--vq-mid-gray);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.period-btn:hover {
+  color: var(--vq-white);
+  border-color: rgba(255,255,255,0.1);
+}
+
+.period-btn.active {
+  background: var(--club-primary);
+  color: var(--vq-white);
+}
+
+/* Skill Progression Chart */
+.skill-progression-section {
+  margin-bottom: var(--space-lg);
+}
+
+.skill-progression-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-md);
+}
+
+.skill-progression-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.skill-selector {
+  display: flex;
+  gap: var(--space-xs);
+}
+
+.skill-selector-btn {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 6px 12px;
+  border-radius: var(--radius-full);
+  background: var(--vq-navy-80);
+  color: var(--vq-mid-gray);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.skill-selector-btn:hover {
+  color: var(--vq-white);
+}
+
+.skill-selector-btn.active {
+  background: var(--vq-teal);
+  color: var(--vq-navy);
+}
+
+/* Skill Timeline Chart */
+.skill-timeline-chart {
+  background: var(--vq-navy-90);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--radius-md);
+  padding: var(--space-lg);
+  margin-bottom: var(--space-lg);
+}
+
+.chart-area {
+  background: var(--vq-navy-80);
+  border-radius: var(--radius-md);
+  height: 220px;
+  position: relative;
+  overflow: hidden;
+}
+
+.chart-area::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 49px,
+      rgba(255,255,255,0.03) 49px,
+      rgba(255,255,255,0.03) 50px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 39px,
+      rgba(255,255,255,0.03) 39px,
+      rgba(255,255,255,0.03) 40px
+    );
+}
+
+.chart-y-axis {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 40px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: var(--space-md) var(--space-sm);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--vq-mid-gray);
+}
+
+.chart-x-axis {
+  position: absolute;
+  left: 40px;
+  right: 0;
+  bottom: 0;
+  height: 24px;
+  display: flex;
+  justify-content: space-between;
+  padding: var(--space-xs) var(--space-md);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--vq-mid-gray);
+}
+
+.chart-line-container {
+  position: absolute;
+  left: 50px;
+  right: 20px;
+  top: 20px;
+  bottom: 30px;
+}
+
+.chart-line-container svg {
+  width: 100%;
+  height: 100%;
+}
+
+.chart-legend {
+  display: flex;
+  gap: var(--space-lg);
+  margin-top: var(--space-md);
+  justify-content: center;
+}
+
+.chart-legend-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: 12px;
+  color: var(--vq-mid-gray);
+}
+
+.chart-legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: var(--radius-full);
+}
+
+/* Stats Summary Row */
+.stats-summary-row {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+}
+
+.stat-box {
+  background: var(--vq-navy-90);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  text-align: center;
+}
+
+.stat-box-value {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 24px;
+  margin-bottom: var(--space-xs);
+}
+
+.stat-box-label {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--vq-mid-gray);
+}
+
+.stat-box-delta {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  margin-top: var(--space-xs);
+}
+
+.stat-box-delta.positive { color: var(--color-success); }
+.stat-box-delta.negative { color: var(--color-error); }
+
+/* Chart Placeholder */
+.chart-label {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--vq-mid-gray);
+  position: absolute;
+  top: var(--space-md);
+  left: var(--space-md);
+}
+
+/* Game Log Table */
+.game-log {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.game-log thead {
+  background: rgba(255,255,255,0.02);
+}
+
+.game-log th {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--vq-mid-gray);
+  padding: var(--space-md);
+  text-align: left;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.game-log td {
+  padding: var(--space-md);
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+  font-size: 13px;
+}
+
+.game-log tbody tr {
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.game-log tbody tr:hover {
+  background: rgba(255,255,255,0.02);
+}
+
+.game-result {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: var(--radius-full);
+}
+
+.game-result.win {
+  background: rgba(34, 197, 94, 0.15);
+  color: var(--color-success);
+}
+
+.game-result.loss {
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--color-error);
+}
+
+.stat-highlight {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: var(--vq-teal);
+}
+
+/* ==================== */
+/* TAB 3: ATTENDANCE    */
+/* ==================== */
+
+/* Attendance Stats Row */
+.attendance-stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+}
+
+.attendance-stat {
+  background: var(--vq-navy-90);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--radius-md);
+  padding: var(--space-lg);
+  text-align: center;
+  position: relative;
+}
+
+.attendance-stat-value {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 36px;
+}
+
+.attendance-stat-value.success { color: var(--color-success); }
+.attendance-stat-value.warning { color: var(--color-warning); }
+.attendance-stat-value.error { color: var(--color-error); }
+
+.attendance-stat-label {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--vq-mid-gray);
+  margin-top: var(--space-sm);
+}
+
+/* Streak Card */
+.streak-card {
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(34, 197, 94, 0.02) 100%);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+  border-radius: var(--radius-md);
+  padding: var(--space-lg);
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+  margin-bottom: var(--space-lg);
+}
+
+.streak-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-lg);
+  background: rgba(34, 197, 94, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+}
+
+.streak-info { flex: 1; }
+
+.streak-value {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 32px;
+  color: var(--color-success);
+  line-height: 1;
+}
+
+.streak-label {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--vq-mid-gray);
+  margin-top: var(--space-xs);
+}
+
+.streak-best {
+  text-align: right;
+}
+
+.streak-best-label {
+  font-size: 11px;
+  color: var(--vq-mid-gray);
+}
+
+.streak-best-value {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 20px;
+  color: var(--vq-white);
+}
+
+/* Event Type Breakdown */
+.event-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.event-type-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.event-type-label {
+  width: 100px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.event-type-bar {
+  flex: 1;
+  height: 8px;
+  background: rgba(255,255,255,0.06);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.event-type-fill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  transition: width 0.5s ease;
+}
+
+.event-type-fill.practice { background: var(--vq-teal); }
+.event-type-fill.match { background: var(--club-primary); }
+.event-type-fill.tournament { background: var(--club-secondary); }
+
+.event-type-value {
+  width: 60px;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 13px;
+  text-align: right;
+}
+
+/* Attendance Calendar */
+.attendance-calendar {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: var(--space-xs);
+}
+
+.calendar-day-header {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--vq-mid-gray);
+  text-align: center;
+  padding: var(--space-sm);
+}
+
+.calendar-day {
+  aspect-ratio: 1;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  background: var(--vq-navy-80);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.calendar-day:hover { transform: scale(1.1); }
+.calendar-day.empty { background: transparent; cursor: default; }
+.calendar-day.present { background: rgba(34, 197, 94, 0.3); color: var(--color-success); }
+.calendar-day.absent { background: rgba(239, 68, 68, 0.3); color: var(--color-error); }
+.calendar-day.late { background: rgba(245, 158, 11, 0.3); color: var(--color-warning); }
+.calendar-day.no-event { background: var(--vq-navy-80); color: var(--vq-mid-gray); }
+
+/* Missed Events Timeline */
+.missed-events { display: flex; flex-direction: column; gap: var(--space-sm); }
+
+.missed-event {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  background: var(--vq-navy-80);
+  border-radius: var(--radius-sm);
+  border-left: 3px solid var(--color-error);
+}
+
+.missed-event-date {
+  min-width: 60px;
+  text-align: center;
+}
+
+.missed-event-date .day {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 20px;
+  line-height: 1;
+}
+
+.missed-event-date .month {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--vq-mid-gray);
+}
+
+.missed-event-info { flex: 1; }
+
+.missed-event-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 13px;
+  text-transform: uppercase;
+}
+
+.missed-event-type {
+  font-size: 11px;
+  color: var(--vq-mid-gray);
+}
+
+.missed-event-reason {
+  font-size: 11px;
+  color: var(--color-warning);
+  background: rgba(245, 158, 11, 0.1);
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+}
+
+/* ==================== */
+/* TAB 4: NOTES         */
+/* ==================== */
+
+/* Note List */
+.notes-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.note-card {
+  background: var(--vq-navy-90);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.note-header {
+  padding: var(--space-md) var(--space-lg);
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.note-author-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-full);
+  background: var(--vq-navy-70);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 12px;
+  color: var(--vq-teal);
+}
+
+.note-author-info { flex: 1; }
+
+.note-author-name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.note-date {
+  font-size: 11px;
+  color: var(--vq-mid-gray);
+}
+
+.note-actions {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.note-action-btn {
+  background: transparent;
+  border: none;
+  color: var(--vq-mid-gray);
+  cursor: pointer;
+  padding: var(--space-xs);
+  border-radius: var(--radius-sm);
+  transition: all 0.2s;
+}
+
+.note-action-btn:hover {
+  color: var(--vq-white);
+  background: rgba(255,255,255,0.05);
+}
+
+.note-action-btn.delete:hover {
+  color: var(--color-error);
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.note-body {
+  padding: var(--space-lg);
+}
+
+.note-content {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--vq-light-gray);
+}
+
+.note-tags {
+  display: flex;
+  gap: var(--space-sm);
+  margin-top: var(--space-md);
+}
+
+.note-tag {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 3px 8px;
+  border-radius: var(--radius-full);
+  background: rgba(255,255,255,0.06);
+  color: var(--vq-mid-gray);
+}
+
+.note-tag.development { background: rgba(46, 196, 182, 0.15); color: var(--vq-teal); }
+.note-tag.concern { background: rgba(245, 158, 11, 0.15); color: var(--color-warning); }
+.note-tag.positive { background: rgba(34, 197, 94, 0.15); color: var(--color-success); }
+
+/* Add Note Form */
+.add-note-form {
+  background: var(--vq-navy-90);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--radius-md);
+  padding: var(--space-lg);
+  margin-bottom: var(--space-lg);
+}
+
+.add-note-textarea {
+  width: 100%;
+  min-height: 100px;
+  background: var(--vq-navy-80);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: var(--radius-sm);
+  padding: var(--space-md);
+  color: var(--vq-white);
+  font-family: var(--font-body);
+  font-size: 14px;
+  resize: vertical;
+  margin-bottom: var(--space-md);
+}
+
+.add-note-textarea::placeholder {
+  color: var(--vq-mid-gray);
+}
+
+.add-note-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tag-selector {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.tag-option {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  background: var(--vq-navy-80);
+  color: var(--vq-mid-gray);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tag-option:hover {
+  color: var(--vq-white);
+  border-color: rgba(255,255,255,0.1);
+}
+
+.tag-option.selected {
+  background: rgba(46, 196, 182, 0.15);
+  color: var(--vq-teal);
+  border-color: rgba(46, 196, 182, 0.3);
+}
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: var(--space-2xl);
+  color: var(--vq-mid-gray);
+}
+
+.empty-state-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-lg);
+  background: var(--vq-navy-80);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto var(--space-md);
+  font-size: 28px;
+  opacity: 0.5;
+}
+
+.empty-state-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 16px;
+  text-transform: uppercase;
+  color: var(--vq-white);
+  margin-bottom: var(--space-xs);
+}
+
+.empty-state-text {
+  font-size: 13px;
+  max-width: 320px;
+  margin: 0 auto;
+}
+
+/* Page Divider */
+.page-divider {
+  border: none;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+  margin: var(--space-2xl) 0;
+}
+
+/* Section Title */
+.section-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--vq-mid-gray);
+  margin-bottom: var(--space-md);
+}
+</style>
+</head>
+<body>
+
+<div class="page-container">
+  <!-- Breadcrumb -->
+  <nav class="breadcrumb">
+    <a href="#">Dashboard</a>
+    <span>/</span>
+    <a href="#">Players</a>
+    <span>/</span>
+    <span class="current">Erik Hansen</span>
+  </nav>
+
+  <!-- Player Hero Section -->
+  <div class="player-hero">
+    <!-- FIFA Card with Skill Ratings -->
+    <div class="fifa-card">
+      <div class="card-top-row">
+        <div class="card-rating-block">
+          <div class="card-tier">Gold</div>
+          <div class="card-rating">78</div>
+          <div class="card-position">OH</div>
+        </div>
+        <div class="card-trend-badge up">
+          <span class="trend-arrow">↑</span>
+          <span>+3</span>
+        </div>
+      </div>
+
+      <div class="card-avatar">EH</div>
+      <div class="card-name">Erik Hansen</div>
+      <div class="card-club">Oslo Volley U19</div>
+
+      <!-- FIFA-style Skill Attributes -->
+      <div class="card-skills">
+        <div class="card-skill">
+          <span class="card-skill-value">76<span class="card-skill-trend up">↑</span></span>
+          <span class="card-skill-label">SRV</span>
+        </div>
+        <div class="card-skill">
+          <span class="card-skill-value">72<span class="card-skill-trend down">↓</span></span>
+          <span class="card-skill-label">RCV</span>
+        </div>
+        <div class="card-skill">
+          <span class="card-skill-value">65</span>
+          <span class="card-skill-label">SET</span>
+        </div>
+        <div class="card-skill">
+          <span class="card-skill-value">74<span class="card-skill-trend up">↑</span></span>
+          <span class="card-skill-label">BLK</span>
+        </div>
+        <div class="card-skill">
+          <span class="card-skill-value">82<span class="card-skill-trend up">↑</span></span>
+          <span class="card-skill-label">ATK</span>
+        </div>
+        <div class="card-skill">
+          <span class="card-skill-value">68</span>
+          <span class="card-skill-label">DIG</span>
+        </div>
+        <div class="card-skill">
+          <span class="card-skill-value">80</span>
+          <span class="card-skill-label">MNT</span>
+        </div>
+        <div class="card-skill">
+          <span class="card-skill-value">77<span class="card-skill-trend up">↑</span></span>
+          <span class="card-skill-label">PHY</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Player Info Panel -->
+    <div class="player-info-panel">
+      <h1 class="player-name-lg">Erik Hansen</h1>
+      <div class="player-meta-row">
+        <span>Outside Hitter</span>
+        <span>•</span>
+        <span>#12</span>
+        <span>•</span>
+        <span>Age 17</span>
+        <span>•</span>
+        <span>Oslo Volley U19</span>
+      </div>
+
+      <!-- Skill Ratings Panel - Full Display -->
+      <div class="skill-ratings-panel">
+        <div class="skill-ratings-header">
+          <span class="skill-ratings-title">Skill Ratings</span>
+          <span class="skill-ratings-period">Last updated: 2 days ago • Changes vs 2 weeks ago</span>
+        </div>
+        <div class="skill-ratings-grid">
+          <div class="skill-rating-item" style="--skill-color: var(--club-primary)">
+            <div class="skill-rating-top">
+              <div class="skill-rating-value">76</div>
+              <div class="skill-rating-change up">↑ +2</div>
+            </div>
+            <div class="skill-rating-label">Serve</div>
+            <div class="skill-rating-bar">
+              <div class="skill-rating-fill" style="width: 76%;"></div>
+            </div>
+          </div>
+          <div class="skill-rating-item" style="--skill-color: var(--vq-teal)">
+            <div class="skill-rating-top">
+              <div class="skill-rating-value">72</div>
+              <div class="skill-rating-change down">↓ -1</div>
+            </div>
+            <div class="skill-rating-label">Receive</div>
+            <div class="skill-rating-bar">
+              <div class="skill-rating-fill" style="width: 72%;"></div>
+            </div>
+          </div>
+          <div class="skill-rating-item" style="--skill-color: var(--club-secondary)">
+            <div class="skill-rating-top">
+              <div class="skill-rating-value">65</div>
+              <div class="skill-rating-change stable">— 0</div>
+            </div>
+            <div class="skill-rating-label">Set</div>
+            <div class="skill-rating-bar">
+              <div class="skill-rating-fill" style="width: 65%;"></div>
+            </div>
+          </div>
+          <div class="skill-rating-item" style="--skill-color: var(--color-info)">
+            <div class="skill-rating-top">
+              <div class="skill-rating-value">74</div>
+              <div class="skill-rating-change up">↑ +3</div>
+            </div>
+            <div class="skill-rating-label">Block</div>
+            <div class="skill-rating-bar">
+              <div class="skill-rating-fill" style="width: 74%;"></div>
+            </div>
+          </div>
+          <div class="skill-rating-item" style="--skill-color: var(--color-success)">
+            <div class="skill-rating-top">
+              <div class="skill-rating-value">82</div>
+              <div class="skill-rating-change up">↑ +4</div>
+            </div>
+            <div class="skill-rating-label">Attack</div>
+            <div class="skill-rating-bar">
+              <div class="skill-rating-fill" style="width: 82%;"></div>
+            </div>
+          </div>
+          <div class="skill-rating-item" style="--skill-color: #9333EA">
+            <div class="skill-rating-top">
+              <div class="skill-rating-value">68</div>
+              <div class="skill-rating-change stable">— 0</div>
+            </div>
+            <div class="skill-rating-label">Digs</div>
+            <div class="skill-rating-bar">
+              <div class="skill-rating-fill" style="width: 68%;"></div>
+            </div>
+          </div>
+          <div class="skill-rating-item" style="--skill-color: #EC4899">
+            <div class="skill-rating-top">
+              <div class="skill-rating-value">80</div>
+              <div class="skill-rating-change stable">— 0</div>
+            </div>
+            <div class="skill-rating-label">Mental</div>
+            <div class="skill-rating-bar">
+              <div class="skill-rating-fill" style="width: 80%;"></div>
+            </div>
+          </div>
+          <div class="skill-rating-item" style="--skill-color: #F97316">
+            <div class="skill-rating-top">
+              <div class="skill-rating-value">77</div>
+              <div class="skill-rating-change up">↑ +1</div>
+            </div>
+            <div class="skill-rating-label">Physique</div>
+            <div class="skill-rating-bar">
+              <div class="skill-rating-fill" style="width: 77%;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="action-buttons">
+        <button class="btn btn-outline">Edit Player</button>
+        <button class="btn btn-teal">Add to Team</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('overview')">Overview</button>
+    <button class="tab" onclick="showTab('stats')">Stats History</button>
+    <button class="tab" onclick="showTab('attendance')">Attendance</button>
+    <button class="tab" onclick="showTab('notes')">Notes <span class="tab-badge">3</span></button>
+  </div>
+
+  <!-- ==================== -->
+  <!-- TAB 1: OVERVIEW      -->
+  <!-- ==================== -->
+  <div class="tab-content active" id="tab-overview">
+    <!-- Awards Highlight -->
+    <div class="awards-row">
+      <div class="award-item">
+        <span class="award-icon">🏆</span>
+        <span class="award-text">Most Improved - Jan 2026</span>
+      </div>
+      <div class="award-item">
+        <span class="award-icon">⭐</span>
+        <span class="award-text">Player of the Match x3</span>
+      </div>
+      <div class="award-item">
+        <span class="award-icon">🔥</span>
+        <span class="award-text">8 Game Streak</span>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <!-- Contact Information -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Contact Information</span>
+        </div>
+        <div class="card-body">
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="info-label">Email</span>
+              <span class="info-value">erik.hansen@email.com</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Phone</span>
+              <span class="info-value">+47 912 34 567</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Birth Date</span>
+              <span class="info-value">March 15, 2008</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Guardian</span>
+              <span class="info-value">Lars Hansen (Father)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Player Details -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Player Details</span>
+        </div>
+        <div class="card-body">
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="info-label">Position(s)</span>
+              <div class="position-tags">
+                <span class="position-tag">Outside Hitter</span>
+                <span class="position-tag">Opposite</span>
+              </div>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Jersey Number</span>
+              <span class="info-value" style="font-family: var(--font-mono); font-size: 24px; font-weight: 700;">#12</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Height</span>
+              <span class="info-value">185 cm</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">Dominant Hand</span>
+              <span class="info-value">Right</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Team History -->
+    <div style="margin-top: var(--space-lg);">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Team History</span>
+        </div>
+        <div>
+          <div class="team-history-item">
+            <div class="team-badge">OV</div>
+            <div class="team-info">
+              <div class="team-name">Oslo Volley U19</div>
+              <div class="team-meta">
+                <span>#12</span>
+                <span class="captain-badge">Captain</span>
+              </div>
+            </div>
+            <div class="team-dates">
+              <div>Member since</div>
+              <div style="color: var(--vq-white);">Sep 2024</div>
+            </div>
+          </div>
+          <div class="team-history-item" style="opacity: 0.6;">
+            <div class="team-badge" style="background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1); color: var(--vq-mid-gray);">KV</div>
+            <div class="team-info">
+              <div class="team-name">Kolbotn VBK U17</div>
+              <div class="team-meta">
+                <span>#8</span>
+              </div>
+            </div>
+            <div class="team-dates">
+              <div>Aug 2022 - Jun 2024</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== -->
+  <!-- TAB 2: STATS HISTORY -->
+  <!-- ==================== -->
+  <div class="tab-content" id="tab-stats">
+    <!-- Period Selector -->
+    <div class="period-selector">
+      <button class="period-btn">Last 5 Games</button>
+      <button class="period-btn active">This Season</button>
+      <button class="period-btn">Career</button>
+      <button class="period-btn">Custom Range</button>
+    </div>
+
+    <!-- Skill Progression Section -->
+    <div class="skill-progression-section">
+      <div class="skill-progression-header">
+        <span class="skill-progression-title">Skill Development Over Time</span>
+        <div class="skill-selector">
+          <button class="skill-selector-btn active">All Skills</button>
+          <button class="skill-selector-btn">Attack</button>
+          <button class="skill-selector-btn">Serve</button>
+          <button class="skill-selector-btn">Receive</button>
+          <button class="skill-selector-btn">Block</button>
+        </div>
+      </div>
+
+      <div class="skill-timeline-chart">
+        <div class="chart-area">
+          <div class="chart-y-axis">
+            <span>99</span>
+            <span>75</span>
+            <span>50</span>
+            <span>25</span>
+            <span>0</span>
+          </div>
+          <div class="chart-x-axis">
+            <span>Sep</span>
+            <span>Oct</span>
+            <span>Nov</span>
+            <span>Dec</span>
+            <span>Jan</span>
+            <span>Feb</span>
+          </div>
+          <div class="chart-line-container">
+            <svg viewBox="0 0 500 180" preserveAspectRatio="none">
+              <!-- Attack line (green) - highest -->
+              <defs>
+                <linearGradient id="attackGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" style="stop-color:#22C55E;stop-opacity:0.3" />
+                  <stop offset="100%" style="stop-color:#22C55E;stop-opacity:0" />
+                </linearGradient>
+              </defs>
+              <path d="M0,85 Q60,80 120,75 T240,65 T360,55 T500,45" fill="none" stroke="#22C55E" stroke-width="2.5"/>
+              <path d="M0,85 Q60,80 120,75 T240,65 T360,55 T500,45 L500,180 L0,180 Z" fill="url(#attackGrad)"/>
+
+              <!-- Serve line (red) -->
+              <path d="M0,100 Q60,98 120,95 T240,88 T360,80 T500,72" fill="none" stroke="#E63946" stroke-width="2"/>
+
+              <!-- Block line (blue) -->
+              <path d="M0,115 Q60,112 120,108 T240,100 T360,90 T500,78" fill="none" stroke="#3B82F6" stroke-width="2"/>
+
+              <!-- Receive line (teal) -->
+              <path d="M0,105 Q60,108 120,110 T240,108 T360,105 T500,95" fill="none" stroke="#2EC4B6" stroke-width="2"/>
+
+              <!-- Physique line (orange) -->
+              <path d="M0,110 Q60,108 120,105 T240,98 T360,88 T500,75" fill="none" stroke="#F97316" stroke-width="2" stroke-dasharray="4,2"/>
+
+              <!-- Data points for Attack -->
+              <circle cx="0" cy="85" r="4" fill="#22C55E"/>
+              <circle cx="100" cy="77" r="4" fill="#22C55E"/>
+              <circle cx="200" cy="70" r="4" fill="#22C55E"/>
+              <circle cx="300" cy="60" r="4" fill="#22C55E"/>
+              <circle cx="400" cy="52" r="4" fill="#22C55E"/>
+              <circle cx="500" cy="45" r="4" fill="#22C55E"/>
+            </svg>
+          </div>
+        </div>
+        <div class="chart-legend">
+          <div class="chart-legend-item">
+            <div class="chart-legend-dot" style="background: #22C55E;"></div>
+            <span>Attack (82)</span>
+          </div>
+          <div class="chart-legend-item">
+            <div class="chart-legend-dot" style="background: #E63946;"></div>
+            <span>Serve (76)</span>
+          </div>
+          <div class="chart-legend-item">
+            <div class="chart-legend-dot" style="background: #3B82F6;"></div>
+            <span>Block (74)</span>
+          </div>
+          <div class="chart-legend-item">
+            <div class="chart-legend-dot" style="background: #2EC4B6;"></div>
+            <span>Receive (72)</span>
+          </div>
+          <div class="chart-legend-item">
+            <div class="chart-legend-dot" style="background: #F97316; border-radius: 0;"></div>
+            <span>Physique (77)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats Summary Row -->
+    <div class="stats-summary-row">
+      <div class="stat-box">
+        <div class="stat-box-value">142</div>
+        <div class="stat-box-label">Total Kills</div>
+        <div class="stat-box-delta positive">+12 vs last period</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-box-value" style="color: var(--vq-teal)">48%</div>
+        <div class="stat-box-label">Kill %</div>
+        <div class="stat-box-delta positive">+3.2%</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-box-value">38</div>
+        <div class="stat-box-label">Aces</div>
+        <div class="stat-box-delta positive">+5</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-box-value" style="color: var(--club-secondary)">2.1</div>
+        <div class="stat-box-label">Pass Rating</div>
+        <div class="stat-box-delta negative">-0.1</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-box-value">24</div>
+        <div class="stat-box-label">Blocks</div>
+        <div class="stat-box-delta positive">+3</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-box-value">18</div>
+        <div class="stat-box-label">Digs</div>
+        <div class="stat-box-delta positive">+4</div>
+      </div>
+    </div>
+
+    <!-- Game Log -->
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Recent Games</span>
+        <button class="btn btn-outline" style="font-size: 10px; padding: 6px 12px;">View All</button>
+      </div>
+      <table class="game-log">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Opponent</th>
+            <th>Result</th>
+            <th>Kills</th>
+            <th>Kill %</th>
+            <th>Aces</th>
+            <th>Blocks</th>
+            <th>Rating Δ</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Feb 1</td>
+            <td>Stavanger VBK</td>
+            <td><span class="game-result win">3-1 W</span></td>
+            <td class="stat-highlight">18</td>
+            <td>52%</td>
+            <td>4</td>
+            <td>2</td>
+            <td style="color: var(--color-success);">+2</td>
+          </tr>
+          <tr>
+            <td>Jan 28</td>
+            <td>Trondheim Volley</td>
+            <td><span class="game-result win">3-0 W</span></td>
+            <td class="stat-highlight">14</td>
+            <td>48%</td>
+            <td>3</td>
+            <td>3</td>
+            <td style="color: var(--color-success);">+1</td>
+          </tr>
+          <tr>
+            <td>Jan 25</td>
+            <td>Bergen VBK</td>
+            <td><span class="game-result loss">1-3 L</span></td>
+            <td>8</td>
+            <td>38%</td>
+            <td>2</td>
+            <td>1</td>
+            <td style="color: var(--color-error);">-1</td>
+          </tr>
+          <tr>
+            <td>Jan 21</td>
+            <td>Drammen Elite</td>
+            <td><span class="game-result win">3-2 W</span></td>
+            <td class="stat-highlight">22</td>
+            <td>51%</td>
+            <td>5</td>
+            <td>4</td>
+            <td style="color: var(--color-success);">+3</td>
+          </tr>
+          <tr>
+            <td>Jan 18</td>
+            <td>Kristiansand VK</td>
+            <td><span class="game-result win">3-0 W</span></td>
+            <td class="stat-highlight">16</td>
+            <td>55%</td>
+            <td>6</td>
+            <td>2</td>
+            <td style="color: var(--color-success);">+2</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ==================== -->
+  <!-- TAB 3: ATTENDANCE    -->
+  <!-- ==================== -->
+  <div class="tab-content" id="tab-attendance">
+    <!-- Attendance Stats -->
+    <div class="attendance-stats-row">
+      <div class="attendance-stat">
+        <div class="attendance-stat-value success">95%</div>
+        <div class="attendance-stat-label">Overall Rate</div>
+      </div>
+      <div class="attendance-stat">
+        <div class="attendance-stat-value">38</div>
+        <div class="attendance-stat-label">Events Attended</div>
+      </div>
+      <div class="attendance-stat">
+        <div class="attendance-stat-value warning">2</div>
+        <div class="attendance-stat-label">Missed</div>
+      </div>
+      <div class="attendance-stat">
+        <div class="attendance-stat-value" style="color: var(--vq-teal);">3</div>
+        <div class="attendance-stat-label">Late Arrivals</div>
+      </div>
+    </div>
+
+    <!-- Current Streak -->
+    <div class="streak-card">
+      <div class="streak-icon">🔥</div>
+      <div class="streak-info">
+        <div class="streak-value">12 Events</div>
+        <div class="streak-label">Current Attendance Streak</div>
+      </div>
+      <div class="streak-best">
+        <div class="streak-best-label">Best Streak</div>
+        <div class="streak-best-value">18</div>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <!-- Event Type Breakdown -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">By Event Type</span>
+        </div>
+        <div class="card-body">
+          <div class="event-breakdown">
+            <div class="event-type-row">
+              <span class="event-type-label">Practices</span>
+              <div class="event-type-bar">
+                <div class="event-type-fill practice" style="width: 94%;"></div>
+              </div>
+              <span class="event-type-value" style="color: var(--vq-teal)">94%</span>
+            </div>
+            <div class="event-type-row">
+              <span class="event-type-label">Matches</span>
+              <div class="event-type-bar">
+                <div class="event-type-fill match" style="width: 100%;"></div>
+              </div>
+              <span class="event-type-value" style="color: var(--club-primary)">100%</span>
+            </div>
+            <div class="event-type-row">
+              <span class="event-type-label">Tournaments</span>
+              <div class="event-type-bar">
+                <div class="event-type-fill tournament" style="width: 100%;"></div>
+              </div>
+              <span class="event-type-value" style="color: var(--club-secondary)">100%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Attendance Calendar -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">January 2026</span>
+          <div style="display: flex; gap: var(--space-sm);">
+            <button class="btn btn-outline" style="padding: 4px 8px; font-size: 10px;">←</button>
+            <button class="btn btn-outline" style="padding: 4px 8px; font-size: 10px;">→</button>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="attendance-calendar">
+            <div class="calendar-day-header">Mon</div>
+            <div class="calendar-day-header">Tue</div>
+            <div class="calendar-day-header">Wed</div>
+            <div class="calendar-day-header">Thu</div>
+            <div class="calendar-day-header">Fri</div>
+            <div class="calendar-day-header">Sat</div>
+            <div class="calendar-day-header">Sun</div>
+            <div class="calendar-day empty"></div>
+            <div class="calendar-day empty"></div>
+            <div class="calendar-day no-event">1</div>
+            <div class="calendar-day present">2</div>
+            <div class="calendar-day no-event">3</div>
+            <div class="calendar-day present">4</div>
+            <div class="calendar-day no-event">5</div>
+            <div class="calendar-day no-event">6</div>
+            <div class="calendar-day present">7</div>
+            <div class="calendar-day no-event">8</div>
+            <div class="calendar-day present">9</div>
+            <div class="calendar-day no-event">10</div>
+            <div class="calendar-day present">11</div>
+            <div class="calendar-day no-event">12</div>
+            <div class="calendar-day no-event">13</div>
+            <div class="calendar-day present">14</div>
+            <div class="calendar-day no-event">15</div>
+            <div class="calendar-day late">16</div>
+            <div class="calendar-day no-event">17</div>
+            <div class="calendar-day present">18</div>
+            <div class="calendar-day no-event">19</div>
+            <div class="calendar-day no-event">20</div>
+            <div class="calendar-day present">21</div>
+            <div class="calendar-day no-event">22</div>
+            <div class="calendar-day absent">23</div>
+            <div class="calendar-day no-event">24</div>
+            <div class="calendar-day present">25</div>
+            <div class="calendar-day no-event">26</div>
+            <div class="calendar-day no-event">27</div>
+            <div class="calendar-day present">28</div>
+            <div class="calendar-day no-event">29</div>
+            <div class="calendar-day no-event">30</div>
+            <div class="calendar-day no-event">31</div>
+          </div>
+          <div style="display: flex; gap: var(--space-lg); margin-top: var(--space-md); font-size: 11px;">
+            <span style="display: flex; align-items: center; gap: var(--space-xs);"><span style="width: 12px; height: 12px; border-radius: 3px; background: rgba(34, 197, 94, 0.3);"></span> Present</span>
+            <span style="display: flex; align-items: center; gap: var(--space-xs);"><span style="width: 12px; height: 12px; border-radius: 3px; background: rgba(245, 158, 11, 0.3);"></span> Late</span>
+            <span style="display: flex; align-items: center; gap: var(--space-xs);"><span style="width: 12px; height: 12px; border-radius: 3px; background: rgba(239, 68, 68, 0.3);"></span> Absent</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Missed Events -->
+    <div style="margin-top: var(--space-lg);">
+      <p class="section-title">Missed Events</p>
+      <div class="missed-events">
+        <div class="missed-event">
+          <div class="missed-event-date">
+            <div class="day">23</div>
+            <div class="month">Jan</div>
+          </div>
+          <div class="missed-event-info">
+            <div class="missed-event-title">Team Practice</div>
+            <div class="missed-event-type">Practice • Lambertseter Hall</div>
+          </div>
+          <span class="missed-event-reason">Sick</span>
+        </div>
+        <div class="missed-event">
+          <div class="missed-event-date">
+            <div class="day">09</div>
+            <div class="month">Jan</div>
+          </div>
+          <div class="missed-event-info">
+            <div class="missed-event-title">Strength Training</div>
+            <div class="missed-event-type">Practice • Oslo Gym</div>
+          </div>
+          <span class="missed-event-reason">School Exam</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== -->
+  <!-- TAB 4: NOTES         -->
+  <!-- ==================== -->
+  <div class="tab-content" id="tab-notes">
+    <!-- Add Note Form -->
+    <div class="add-note-form">
+      <textarea class="add-note-textarea" placeholder="Write a note about this player's development, performance, or areas to focus on..."></textarea>
+      <div class="add-note-footer">
+        <div class="tag-selector">
+          <button class="tag-option">General</button>
+          <button class="tag-option selected">Development</button>
+          <button class="tag-option">Concern</button>
+          <button class="tag-option">Positive</button>
+        </div>
+        <button class="btn btn-primary">Add Note</button>
+      </div>
+    </div>
+
+    <!-- Notes List -->
+    <div class="notes-list">
+      <div class="note-card">
+        <div class="note-header">
+          <div class="note-author-avatar">MK</div>
+          <div class="note-author-info">
+            <div class="note-author-name">Magnus Karlsen</div>
+            <div class="note-date">February 1, 2026 at 20:45</div>
+          </div>
+          <div class="note-actions">
+            <button class="note-action-btn">✏️</button>
+            <button class="note-action-btn delete">🗑️</button>
+          </div>
+        </div>
+        <div class="note-body">
+          <p class="note-content">Outstanding performance in today's match against Stavanger. Erik showed excellent leadership on the court, communicating well with teammates and maintaining composure during tight moments. His serve receive has improved noticeably - good to see the extra practice paying off. Attack rating jumped +2 points this game!</p>
+          <div class="note-tags">
+            <span class="note-tag positive">Positive</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="note-card">
+        <div class="note-header">
+          <div class="note-author-avatar">MK</div>
+          <div class="note-author-info">
+            <div class="note-author-name">Magnus Karlsen</div>
+            <div class="note-date">January 25, 2026 at 19:30</div>
+          </div>
+          <div class="note-actions">
+            <button class="note-action-btn">✏️</button>
+            <button class="note-action-btn delete">🗑️</button>
+          </div>
+        </div>
+        <div class="note-body">
+          <p class="note-content">Struggled against Bergen's strong block today. Receive rating dropped -1 point. Need to work on shot selection and finding the seams. Setting up extra blocking practice sessions this week - will pair Erik with our middle blockers to simulate game situations.</p>
+          <div class="note-tags">
+            <span class="note-tag development">Development</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="note-card">
+        <div class="note-header">
+          <div class="note-author-avatar">AS</div>
+          <div class="note-author-info">
+            <div class="note-author-name">Anna Svensson</div>
+            <div class="note-date">January 15, 2026 at 18:00</div>
+          </div>
+          <div class="note-actions">
+            <button class="note-action-btn">✏️</button>
+            <button class="note-action-btn delete">🗑️</button>
+          </div>
+        </div>
+        <div class="note-body">
+          <p class="note-content">Parent meeting with Lars Hansen (father). Discussed Erik's progress and goals for the season. Family is supportive and understanding of the increased training load. Confirmed availability for the upcoming tournament in Gothenburg.</p>
+          <div class="note-tags">
+            <span class="note-tag">General</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function showTab(tabId) {
+  // Remove active from all tabs and contents
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+  // Add active to clicked tab
+  event.target.classList.add('active');
+
+  // Show corresponding content
+  document.getElementById('tab-' + tabId).classList.add('active');
+}
+</script>
+
+</body>
+</html>

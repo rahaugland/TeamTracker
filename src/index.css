@@ -2,29 +2,15 @@
 
 @plugin "tailwindcss-animate";
 
-@custom-variant dark (&:is(.dark *));
-
 /* Base styles */
 * {
-  border-color: hsl(214.3 31.8% 91.4%);
+  border-color: rgba(255, 255, 255, 0.06);
 }
 
 body {
-  background-color: hsl(0 0% 100%);
-  color: hsl(222.2 84% 4.9%);
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-}
-
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-  * {
-    border-color: hsl(217.2 32.6% 17.5%);
-  }
-
-  body {
-    background-color: hsl(222.2 84% 4.9%);
-    color: hsl(210 40% 98%);
-  }
+  background-color: #0A1628;
+  color: #FFFFFF;
+  font-family: 'Barlow', sans-serif;
 }
 
 @theme inline {
@@ -35,6 +21,21 @@ body {
   --radius-2xl: calc(var(--radius) + 8px);
   --radius-3xl: calc(var(--radius) + 12px);
   --radius-4xl: calc(var(--radius) + 16px);
+
+  /* Navy color scale - matches wireframe */
+  --color-navy: #0A1628;
+  --color-navy-90: #0f1e35;
+  --color-navy-80: #162843;
+  --color-navy-70: #1e3452;
+  --color-navy-60: #2a4268;
+
+  /* Brand colors */
+  --color-vq-navy: #0A1628;
+  --color-vq-teal: #2EC4B6;
+  --color-club-primary: #E63946;
+  --color-club-primary-dim: #c42d39;
+  --color-club-secondary: #FFB703;
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -70,80 +71,37 @@ body {
 
 :root {
   --radius: 0.625rem;
-  /* Light, energetic background with subtle warmth */
-  --background: oklch(0.98 0.005 85);
-  --foreground: oklch(0.15 0.02 260);
-  /* Cards with subtle gradients */
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.15 0.02 260);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.15 0.02 260);
-  /* Vibrant volleyball orange primary */
-  --primary: oklch(0.62 0.18 35);
-  --primary-foreground: oklch(1 0 0);
-  /* Electric blue secondary */
-  --secondary: oklch(0.55 0.15 240);
-  --secondary-foreground: oklch(1 0 0);
-  /* Muted with subtle warmth */
-  --muted: oklch(0.96 0.01 85);
-  --muted-foreground: oklch(0.50 0.02 260);
-  /* Energetic accent - teal */
-  --accent: oklch(0.65 0.12 200);
-  --accent-foreground: oklch(1 0 0);
-  /* Destructive red - lighter and more vibrant */
-  --destructive: oklch(0.68 0.26 25);
-  --border: oklch(0.90 0.01 85);
-  --input: oklch(0.96 0.01 85);
-  --ring: oklch(0.62 0.18 35);
-  /* Vibrant chart colors */
-  --chart-1: oklch(0.65 0.20 35);
-  --chart-2: oklch(0.60 0.15 240);
-  --chart-3: oklch(0.68 0.12 200);
-  --chart-4: oklch(0.70 0.18 300);
-  --chart-5: oklch(0.75 0.15 130);
-  /* Dark gradient sidebar */
-  --sidebar: oklch(0.20 0.03 260);
-  --sidebar-foreground: oklch(0.95 0.01 85);
-  --sidebar-primary: oklch(0.62 0.18 35);
-  --sidebar-primary-foreground: oklch(1 0 0);
-  --sidebar-accent: oklch(0.30 0.04 260);
-  --sidebar-accent-foreground: oklch(0.95 0.01 85);
-  --sidebar-border: oklch(0.30 0.04 260);
-  --sidebar-ring: oklch(0.62 0.18 35);
-}
-
-.dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.72 0.22 25);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --background: #0A1628;
+  --foreground: #FFFFFF;
+  --card: #0f1e35;
+  --card-foreground: #FFFFFF;
+  --popover: #0f1e35;
+  --popover-foreground: #FFFFFF;
+  --primary: #E63946;
+  --primary-foreground: #FFFFFF;
+  --secondary: #FFB703;
+  --secondary-foreground: #0A1628;
+  --muted: #162843;
+  --muted-foreground: #8B95A5;
+  --accent: #2EC4B6;
+  --accent-foreground: #0A1628;
+  --destructive: #EF4444;
+  --border: rgba(255, 255, 255, 0.06);
+  --input: rgba(255, 255, 255, 0.1);
+  --ring: #E63946;
+  --chart-1: #E63946;
+  --chart-2: #FFB703;
+  --chart-3: #2EC4B6;
+  --chart-4: #22C55E;
+  --chart-5: #3B82F6;
+  --sidebar: #0f1e35;
+  --sidebar-foreground: #FFFFFF;
+  --sidebar-primary: #E63946;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: rgba(255, 255, 255, 0.04);
+  --sidebar-accent-foreground: #FFFFFF;
+  --sidebar-border: rgba(255, 255, 255, 0.06);
+  --sidebar-ring: #E63946;
 }
 
 @layer base {
@@ -156,42 +114,56 @@ body {
 }
 
 @layer utilities {
-  /* Gradient utilities for vibrant backgrounds */
+  /* Font utilities */
+  .font-display {
+    font-family: 'Barlow Condensed', sans-serif;
+  }
+
+  .font-mono {
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .text-stat {
+    font-family: 'JetBrains Mono', monospace;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Gradient utilities */
   .gradient-primary {
-    background: linear-gradient(135deg, oklch(0.62 0.18 35) 0%, oklch(0.68 0.20 25) 100%);
+    background: linear-gradient(135deg, #E63946 0%, #FF6B6B 100%);
   }
 
   .gradient-secondary {
-    background: linear-gradient(135deg, oklch(0.55 0.15 240) 0%, oklch(0.60 0.18 250) 100%);
+    background: linear-gradient(135deg, #FFB703 0%, #FFCB47 100%);
   }
 
   .gradient-accent {
-    background: linear-gradient(135deg, oklch(0.65 0.12 200) 0%, oklch(0.70 0.14 210) 100%);
+    background: linear-gradient(135deg, #2EC4B6 0%, #4DD9CC 100%);
   }
 
   .gradient-sidebar {
-    background: linear-gradient(180deg, oklch(0.18 0.04 260) 0%, oklch(0.22 0.03 270) 100%);
+    background: #0f1e35;
   }
 
   .gradient-hero {
-    background: linear-gradient(135deg, oklch(0.62 0.18 35) 0%, oklch(0.55 0.15 240) 100%);
+    background: linear-gradient(135deg, #E63946 0%, #C62828 100%);
   }
 
   .gradient-card-border {
-    background: linear-gradient(135deg, oklch(0.62 0.18 35) 0%, oklch(0.55 0.15 240) 50%, oklch(0.65 0.12 200) 100%);
+    background: linear-gradient(135deg, #E63946 0%, #FFB703 50%, #2EC4B6 100%);
   }
 
   /* Subtle card backgrounds */
   .card-gradient-orange {
-    background: linear-gradient(135deg, oklch(0.99 0.01 35) 0%, oklch(1 0 0) 100%);
+    background: linear-gradient(135deg, rgba(230, 57, 70, 0.1) 0%, #0f1e35 100%);
   }
 
   .card-gradient-blue {
-    background: linear-gradient(135deg, oklch(0.99 0.01 240) 0%, oklch(1 0 0) 100%);
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, #0f1e35 100%);
   }
 
   .card-gradient-teal {
-    background: linear-gradient(135deg, oklch(0.99 0.01 200) 0%, oklch(1 0 0) 100%);
+    background: linear-gradient(135deg, rgba(46, 196, 182, 0.1) 0%, #0f1e35 100%);
   }
 
   /* Animated gradient backgrounds */
@@ -215,28 +187,28 @@ body {
   }
 
   .hover-glow:hover {
-    box-shadow: 0 8px 16px -4px oklch(0.62 0.18 35 / 0.3);
+    box-shadow: 0 8px 16px -4px rgba(230, 57, 70, 0.3);
     transform: translateY(-2px);
   }
 
   /* Status badge colors */
   .status-success {
-    background: linear-gradient(135deg, oklch(0.75 0.15 130) 0%, oklch(0.70 0.18 120) 100%);
-    color: oklch(1 0 0);
+    background: linear-gradient(135deg, #22C55E 0%, #16A34A 100%);
+    color: #FFFFFF;
   }
 
   .status-warning {
-    background: linear-gradient(135deg, oklch(0.75 0.18 70) 0%, oklch(0.70 0.20 60) 100%);
-    color: oklch(1 0 0);
+    background: linear-gradient(135deg, #FFB703 0%, #E5A503 100%);
+    color: #0A1628;
   }
 
   .status-error {
-    background: linear-gradient(135deg, oklch(0.65 0.20 25) 0%, oklch(0.60 0.22 20) 100%);
-    color: oklch(1 0 0);
+    background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+    color: #FFFFFF;
   }
 
   .status-info {
-    background: linear-gradient(135deg, oklch(0.60 0.15 240) 0%, oklch(0.65 0.18 230) 100%);
-    color: oklch(1 0 0);
+    background: linear-gradient(135deg, #3B82F6 0%, #2563EB 100%);
+    color: #FFFFFF;
   }
 }

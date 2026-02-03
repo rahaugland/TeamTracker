@@ -7,17 +7,28 @@ interface SkillProgressionChartProps {
   progression: SkillProgressionPoint[];
 }
 
+// Match FIFA card skill colors
 const SKILL_COLORS: Record<string, string> = {
-  passing: '#3b82f6',
-  setting: '#8b5cf6',
-  hitting: '#ef4444',
-  blocking: '#f59e0b',
-  serving: '#10b981',
-  'serve-receive': '#06b6d4',
-  defense: '#ec4899',
-  transition: '#6366f1',
-  footwork: '#84cc16',
-  conditioning: '#f97316',
+  serve: '#E63946',     // club-primary red
+  receive: '#2EC4B6',   // vq-teal
+  set: '#FFB703',       // club-secondary yellow
+  block: '#3B82F6',     // blue
+  attack: '#22C55E',    // green
+  dig: '#9333EA',       // purple
+  mental: '#EC4899',    // pink
+  physique: '#F97316',  // orange
+};
+
+// Skill display names
+const SKILL_LABELS: Record<string, string> = {
+  serve: 'Serve',
+  receive: 'Receive',
+  set: 'Set',
+  block: 'Block',
+  attack: 'Attack',
+  dig: 'Dig',
+  mental: 'Mental',
+  physique: 'Physique',
 };
 
 /**
@@ -61,11 +72,11 @@ export function SkillProgressionChart({ progression }: SkillProgressionChartProp
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-white border border-gray-200 rounded-lg shadow-lg p-3">
-          <p className="font-semibold text-sm mb-2">{label}</p>
+        <div className="bg-card border border-white/10 rounded-lg shadow-lg p-3">
+          <p className="font-semibold text-sm mb-2 text-foreground">{label}</p>
           {payload.map((entry: any) => (
             <p key={entry.dataKey} className="text-sm" style={{ color: entry.color }}>
-              <span className="font-medium">{entry.name}:</span> {entry.value.toFixed(2)}
+              <span className="font-medium">{entry.name}:</span> {Math.round(entry.value)}
             </p>
           ))}
         </div>
@@ -97,21 +108,21 @@ export function SkillProgressionChart({ progression }: SkillProgressionChartProp
       <CardContent>
         <ResponsiveContainer width="100%" height={400}>
           <LineChart data={chartData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
             <XAxis
               dataKey="month"
-              tick={{ fontSize: 11 }}
-              stroke="#888"
+              tick={{ fontSize: 11, fill: '#8B95A5' }}
+              stroke="#8B95A5"
             />
             <YAxis
-              tick={{ fontSize: 11 }}
-              stroke="#888"
-              domain={[0, 5]}
-              ticks={[1, 2, 3, 4, 5]}
-              label={{ value: 'Level', angle: -90, position: 'insideLeft', style: { fontSize: 11 } }}
+              tick={{ fontSize: 11, fill: '#8B95A5' }}
+              stroke="#8B95A5"
+              domain={[0, 99]}
+              ticks={[0, 25, 50, 75, 99]}
+              label={{ value: 'Rating', angle: -90, position: 'insideLeft', style: { fontSize: 11, fill: '#8B95A5' } }}
             />
             <Tooltip content={<CustomTooltip />} />
-            <Legend wrapperStyle={{ fontSize: 11 }} />
+            <Legend wrapperStyle={{ fontSize: 11, color: '#8B95A5' }} />
             {skills.map(skill => (
               <Line
                 key={skill}
@@ -120,7 +131,7 @@ export function SkillProgressionChart({ progression }: SkillProgressionChartProp
                 stroke={SKILL_COLORS[skill] || '#666'}
                 strokeWidth={2}
                 dot={{ r: 3 }}
-                name={skill.charAt(0).toUpperCase() + skill.slice(1)}
+                name={SKILL_LABELS[skill] || skill.charAt(0).toUpperCase() + skill.slice(1)}
               />
             ))}
           </LineChart>

@@ -67,20 +67,20 @@ export function DragDropAttendance({
         {
           id: 'available',
           title: t('attendance.columnsTitle.available'),
-          bgColor: 'bg-gray-50',
-          textColor: 'text-gray-700',
+          bgColor: 'bg-white/5',
+          textColor: 'text-muted-foreground',
         },
         {
           id: 'playing',
           title: t('attendance.columnsTitle.playing'),
-          bgColor: 'bg-green-50',
-          textColor: 'text-green-700',
+          bgColor: 'bg-emerald-500/10',
+          textColor: 'text-emerald-400',
         },
         {
           id: 'not_selected',
           title: t('attendance.status.not_selected'),
-          bgColor: 'bg-purple-50',
-          textColor: 'text-purple-700',
+          bgColor: 'bg-purple-500/10',
+          textColor: 'text-purple-400',
         },
       ];
     }
@@ -89,38 +89,38 @@ export function DragDropAttendance({
       {
         id: 'unmarked',
         title: t('attendance.columnsTitle.unmarked'),
-        bgColor: 'bg-gray-50',
-        textColor: 'text-gray-700',
+        bgColor: 'bg-white/5',
+        textColor: 'text-muted-foreground',
       },
       {
         id: 'present',
         title: t('attendance.status.present'),
-        bgColor: 'bg-green-50',
-        textColor: 'text-green-700',
+        bgColor: 'bg-emerald-500/10',
+        textColor: 'text-emerald-400',
       },
       {
         id: 'late',
         title: t('attendance.status.late'),
-        bgColor: 'bg-orange-50',
-        textColor: 'text-orange-700',
+        bgColor: 'bg-club-secondary/10',
+        textColor: 'text-club-secondary',
       },
       {
         id: 'absent',
         title: t('attendance.status.absent'),
-        bgColor: 'bg-red-50',
-        textColor: 'text-red-700',
+        bgColor: 'bg-club-primary/10',
+        textColor: 'text-club-primary',
       },
       {
         id: 'excused',
         title: t('attendance.status.excused'),
-        bgColor: 'bg-blue-50',
-        textColor: 'text-blue-700',
+        bgColor: 'bg-vq-teal/10',
+        textColor: 'text-vq-teal',
       },
       {
         id: 'not_selected',
         title: t('attendance.status.not_selected'),
-        bgColor: 'bg-purple-50',
-        textColor: 'text-purple-700',
+        bgColor: 'bg-purple-500/10',
+        textColor: 'text-purple-400',
       },
     ];
   }, [isGameMode, t]);

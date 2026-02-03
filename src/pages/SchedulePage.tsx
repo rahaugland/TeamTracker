@@ -8,15 +8,15 @@ import { getActiveSeason } from '@/services/seasons.service';
 import { getTeams } from '@/services/teams.service';
 import type { Event, EventType } from '@/types/database.types';
 import type { EventFormData } from '@/lib/validations/event';
-import { formatDateTimeForDatabase } from '@/lib/date-utils';
+import { formatDateTimeForDatabase, format, parseISO, isToday as checkIsToday } from '@/lib/date-utils';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { EventForm } from '@/components/forms/EventForm';
 import { EmptyState } from '@/components/common/EmptyState';
 import { CalendarView } from '@/components/calendar/CalendarView';
-import { Calendar, List, History, Clock } from 'lucide-react';
+import { ScheduleItem, type ScheduleItemType } from '@/components/schedule';
+import { Calendar, List, History, Clock, Plus } from 'lucide-react';
 import {
   Select,
   SelectContent,
@@ -176,9 +176,27 @@ export function SchedulePage() {
       game: 'status-success',
       tournament: 'bg-gradient-to-r from-purple-500 to-pink-500 text-white',
       meeting: 'status-warning',
-      other: 'bg-gray-500 text-white',
+      other: 'bg-muted-foreground text-white',
     };
     return colors[type];
+  };
+
+  // Helper to map EventType to ScheduleItemType
+  const mapEventTypeToScheduleType = (type: EventType): ScheduleItemType => {
+    if (type === 'game' || type === 'tournament') return 'match';
+    return 'practice';
+  };
+
+  // Format event meta information
+  const formatEventMeta = (event: Event): string => {
+    const time = format(parseISO(event.start_time), 'HH:mm');
+    const endTime = format(parseISO(event.end_time), 'HH:mm');
+    const timeRange = `${time} - ${endTime}`;
+
+    if (event.location) {
+      return `${event.location}, ${timeRange}`;
+    }
+    return timeRange;
   };
 
   if (isLoading) {
@@ -201,154 +219,154 @@ export function SchedulePage() {
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-navy">
       {/* Page Header */}
-      <div className="gradient-primary px-4 py-12 mb-8 shadow-lg">
+      <div className="px-4 py-8 mb-6">
         <div className="container max-w-6xl mx-auto">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div className="flex-1">
-              <h1 className="text-4xl font-bold text-white mb-2">{t('navigation.schedule')}</h1>
-              {teams.length > 1 ? (
-                <Select value={activeTeamId || ''} onValueChange={setActiveTeam}>
-                  <SelectTrigger className="w-full sm:w-64 bg-white/10 border-white/20 text-white">
-                    <SelectValue placeholder={t('team.selectTeam')} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {teams.map((team) => (
-                      <SelectItem key={team.id} value={team.id}>
-                        {team.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              ) : (
-                <p className="text-white/90 text-lg">{activeTeam.name}</p>
+          <div className="flex flex-col gap-4">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <h1 className="font-display text-3xl font-extrabold uppercase tracking-wider text-white mb-2">
+                  {t('navigation.schedule')}
+                </h1>
+                {teams.length > 1 ? (
+                  <Select value={activeTeamId || ''} onValueChange={setActiveTeam}>
+                    <SelectTrigger className="w-full sm:w-64 bg-white/10 border-white/20 text-white">
+                      <SelectValue placeholder={t('team.selectTeam')} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {teams.map((team) => (
+                        <SelectItem key={team.id} value={team.id}>
+                          {team.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <p className="text-white/60 text-sm">
+                    {activeTeam.name} • {format(new Date(), 'MMMM yyyy')}
+                  </p>
+                )}
+              </div>
+              {isCoach && (
+                <Button
+                  onClick={() => setShowCreateDialog(true)}
+                  size="sm"
+                  className="bg-club-primary hover:bg-club-primary/90"
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  {t('event.addEvent')}
+                </Button>
               )}
-            </div>
-            <div className="flex items-center gap-2">
-          <div className="flex items-center border rounded-md">
-            <Button
-              variant={!showPast ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => setShowPast(false)}
-              className="rounded-r-none"
-            >
-              <Clock className="h-4 w-4 mr-2" />
-              {t('schedule.upcoming')}
-            </Button>
-            <Button
-              variant={showPast ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => setShowPast(true)}
-              className="rounded-l-none"
-            >
-              <History className="h-4 w-4 mr-2" />
-              {t('schedule.past')}
-            </Button>
-          </div>
-          <div className="flex items-center border rounded-md">
-            <Button
-              variant={viewMode === 'list' ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => setViewMode('list')}
-              className="rounded-r-none"
-            >
-              <List className="h-4 w-4 mr-2" />
-              {t('calendar.listView')}
-            </Button>
-            <Button
-              variant={viewMode === 'calendar' ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => setViewMode('calendar')}
-              className="rounded-l-none"
-            >
-              <Calendar className="h-4 w-4 mr-2" />
-              {t('calendar.calendarView')}
-            </Button>
-          </div>
-          {isCoach && (
-            <Button onClick={() => setShowCreateDialog(true)} size="lg" className="shadow-xl">
-              {t('event.addEvent')}
-            </Button>
-          )}
             </div>
           </div>
         </div>
       </div>
 
       <div className="container max-w-6xl mx-auto px-4 pb-8">
-      {viewMode === 'calendar' ? (
-        <>
-          <Tabs value={selectedType} onValueChange={(v) => setSelectedType(v as EventType | 'all')} className="mb-6">
-            <TabsList>
-              <TabsTrigger value="all">{t('common.labels.all')}</TabsTrigger>
-              <TabsTrigger value="practice">{t('event.types.practice')}</TabsTrigger>
-              <TabsTrigger value="game">{t('event.types.game')}</TabsTrigger>
-              <TabsTrigger value="tournament">{t('event.types.tournament')}</TabsTrigger>
-              <TabsTrigger value="meeting">{t('event.types.meeting')}</TabsTrigger>
-            </TabsList>
-          </Tabs>
-          <CalendarView events={filteredEvents} />
-        </>
-      ) : (
-        <Tabs value={selectedType} onValueChange={(v) => setSelectedType(v as EventType | 'all')}>
-          <TabsList>
-            <TabsTrigger value="all">{t('common.labels.all')}</TabsTrigger>
-            <TabsTrigger value="practice">{t('event.types.practice')}</TabsTrigger>
-            <TabsTrigger value="game">{t('event.types.game')}</TabsTrigger>
-            <TabsTrigger value="tournament">{t('event.types.tournament')}</TabsTrigger>
-            <TabsTrigger value="meeting">{t('event.types.meeting')}</TabsTrigger>
-          </TabsList>
+        {/* View Mode Tabs */}
+        <div className="flex items-center gap-2 mb-6">
+          <Button
+            variant={viewMode === 'list' ? 'default' : 'ghost'}
+            size="sm"
+            onClick={() => setViewMode('list')}
+            className={viewMode === 'list' ? 'bg-white/10' : 'text-white/60 hover:text-white hover:bg-white/5'}
+          >
+            <List className="h-4 w-4 mr-2" />
+            {t('calendar.listView')}
+          </Button>
+          <Button
+            variant={viewMode === 'calendar' ? 'default' : 'ghost'}
+            size="sm"
+            onClick={() => setViewMode('calendar')}
+            className={viewMode === 'calendar' ? 'bg-white/10' : 'text-white/60 hover:text-white hover:bg-white/5'}
+          >
+            <Calendar className="h-4 w-4 mr-2" />
+            {t('calendar.calendarView')}
+          </Button>
+        </div>
 
-          <TabsContent value={selectedType} className="mt-6">
-            {filteredEvents.length === 0 ? (
-              <EmptyState
-                title={t('event.noEvents')}
-                description={t('event.noEventsDescription')}
-              />
-            ) : (
-              <div className="space-y-4">
-                {filteredEvents.map((event) => (
-                  <Card
-                    key={event.id}
-                    className="cursor-pointer hover:shadow-md transition-shadow"
-                    onClick={() => navigate(`/events/${event.id}`)}
+        {viewMode === 'calendar' ? (
+          <>
+            <Tabs value={selectedType} onValueChange={(v) => setSelectedType(v as EventType | 'all')} className="mb-6">
+              <TabsList className="bg-navy-80 border-white/5">
+                <TabsTrigger value="all">{t('common.labels.all')}</TabsTrigger>
+                <TabsTrigger value="practice">{t('event.types.practice')}</TabsTrigger>
+                <TabsTrigger value="game">{t('event.types.game')}</TabsTrigger>
+                <TabsTrigger value="tournament">{t('event.types.tournament')}</TabsTrigger>
+                <TabsTrigger value="meeting">{t('event.types.meeting')}</TabsTrigger>
+              </TabsList>
+            </Tabs>
+            <CalendarView events={filteredEvents} />
+          </>
+        ) : (
+          <div className="bg-navy-90 rounded-lg border border-white/[0.04] overflow-hidden">
+            {/* Card Header with Filter Tabs and Time Toggle */}
+            <div className="p-4 border-b border-white/[0.04]">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <Tabs value={selectedType} onValueChange={(v) => setSelectedType(v as EventType | 'all')} className="flex-1">
+                  <TabsList className="bg-navy-80 border-white/5">
+                    <TabsTrigger value="all">{t('common.labels.all')}</TabsTrigger>
+                    <TabsTrigger value="practice">{t('event.types.practice')}</TabsTrigger>
+                    <TabsTrigger value="game">{t('event.types.game')}</TabsTrigger>
+                    <TabsTrigger value="tournament">{t('event.types.tournament')}</TabsTrigger>
+                    <TabsTrigger value="meeting">{t('event.types.meeting')}</TabsTrigger>
+                  </TabsList>
+                </Tabs>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant={!showPast ? 'default' : 'ghost'}
+                    size="sm"
+                    onClick={() => setShowPast(false)}
+                    className={!showPast ? 'bg-white/10' : 'text-white/60 hover:text-white hover:bg-white/5'}
                   >
-                    <CardHeader>
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-2">
-                            <span className={`px-2 py-1 rounded-md text-xs font-medium ${getEventTypeColor(event.type)}`}>
-                              {t(`event.types.${event.type}`)}
-                            </span>
-                            {event.opponent && (
-                              <span className="text-sm text-muted-foreground">
-                                vs {event.opponent}
-                              </span>
-                            )}
-                          </div>
-                          <CardTitle>{event.title}</CardTitle>
-                          <CardDescription>
-                            {formatDateTime(event.start_time)}
-                            {event.location && ` • ${event.location}`}
-                          </CardDescription>
-                        </div>
-                      </div>
-                    </CardHeader>
-                    {event.notes && (
-                      <CardContent>
-                        <p className="text-sm text-muted-foreground line-clamp-2">
-                          {event.notes}
-                        </p>
-                      </CardContent>
-                    )}
-                  </Card>
-                ))}
+                    <Clock className="h-4 w-4 mr-2" />
+                    {t('schedule.upcoming')}
+                  </Button>
+                  <Button
+                    variant={showPast ? 'default' : 'ghost'}
+                    size="sm"
+                    onClick={() => setShowPast(true)}
+                    className={showPast ? 'bg-white/10' : 'text-white/60 hover:text-white hover:bg-white/5'}
+                  >
+                    <History className="h-4 w-4 mr-2" />
+                    {t('schedule.past')}
+                  </Button>
+                </div>
               </div>
-            )}
-          </TabsContent>
-        </Tabs>
-      )}
+            </div>
+
+            {/* Schedule List */}
+            <div className="p-4">
+              {filteredEvents.length === 0 ? (
+                <EmptyState
+                  title={t('event.noEvents')}
+                  description={t('event.noEventsDescription')}
+                />
+              ) : (
+                <div className="space-y-2">
+                  {filteredEvents.map((event) => {
+                    const eventDate = parseISO(event.start_time);
+                    const isEventToday = checkIsToday(eventDate);
+
+                    return (
+                      <ScheduleItem
+                        key={event.id}
+                        day={format(eventDate, 'dd')}
+                        month={format(eventDate, 'MMM')}
+                        title={event.opponent ? `vs ${event.opponent}` : event.title}
+                        meta={formatEventMeta(event)}
+                        type={mapEventTypeToScheduleType(event.type)}
+                        isToday={isEventToday}
+                        onClick={() => navigate(`/events/${event.id}`)}
+                      />
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
       <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>

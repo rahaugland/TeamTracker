@@ -3,29 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/store';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-  FormDescription,
-} from '@/components/ui/form';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { practiceBlockSchema, type PracticeBlockFormData, blockTypes } from '@/lib/validations/practice-plan';
 import {
   getPracticePlan,
   createPracticeBlock,
@@ -42,7 +20,7 @@ import { ConfirmDialog } from '@/components/common/ConfirmDialog';
 
 /**
  * PracticePlanBuilderPage
- * Edit practice plan with block management (add, reorder, delete)
+ * Edit practice plan with two-panel drag-and-drop builder
  */
 export function PracticePlanBuilderPage() {
   const { id } = useParams<{ id: string }>();
@@ -53,27 +31,13 @@ export function PracticePlanBuilderPage() {
   const [plan, setPlan] = useState<PracticePlanWithBlocks | null>(null);
   const [drills, setDrills] = useState<Drill[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showAddBlockDialog, setShowAddBlockDialog] = useState(false);
-  const [isAddingBlock, setIsAddingBlock] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState<{ open: boolean; blockId: string | null }>({
     open: false,
     blockId: null,
   });
   const [drillSearch, setDrillSearch] = useState('');
   const [drillSkillFilter, setDrillSkillFilter] = useState<string | null>(null);
-
-  const form = useForm<PracticeBlockFormData>({
-    resolver: zodResolver(practiceBlockSchema),
-    defaultValues: {
-      type: 'warmup',
-      drill_id: null,
-      custom_title: '',
-      duration_minutes: 15,
-      notes: '',
-    },
-  });
-
-  const blockType = form.watch('type');
+  const [planName, setPlanName] = useState('');
 
   useEffect(() => {
     if (id) {
@@ -87,6 +51,7 @@ export function PracticePlanBuilderPage() {
     try {
       const planData = await getPracticePlan(planId);
       setPlan(planData);
+      setPlanName(planData.name);
     } catch (error) {
       console.error('Error loading practice plan:', error);
     } finally {
@@ -103,29 +68,22 @@ export function PracticePlanBuilderPage() {
     }
   };
 
-  const handleAddBlock = async (data: PracticeBlockFormData) => {
+  const handleAddDrillBlock = async (drill: Drill) => {
     if (!id || !plan) return;
 
-    setIsAddingBlock(true);
     try {
       await createPracticeBlock({
         practice_plan_id: id,
         order_index: plan.practice_blocks.length,
-        type: data.type,
-        drill_id: data.drill_id || undefined,
-        custom_title: data.custom_title || undefined,
-        duration_minutes: data.duration_minutes,
-        notes: data.notes,
+        type: 'drill',
+        drill_id: drill.id,
+        duration_minutes: 15,
+        notes: '',
       });
 
-      // Reload plan data
       await loadPlanData(id);
-      setShowAddBlockDialog(false);
-      form.reset();
     } catch (error) {
-      console.error('Error adding block:', error);
-    } finally {
-      setIsAddingBlock(false);
+      console.error('Error adding drill block:', error);
     }
   };
 
@@ -171,6 +129,30 @@ export function PracticePlanBuilderPage() {
     return t(`practice.blockTypes.${block.type}`);
   };
 
+  const getSectionBlocks = (sectionType: 'warmup' | 'main' | 'game') => {
+    if (!plan) return [];
+
+    return plan.practice_blocks.filter(block => {
+      if (sectionType === 'warmup') return block.type === 'warmup';
+      if (sectionType === 'game') return block.type === 'scrimmage' || block.type === 'game';
+      // Main section includes drills and custom blocks
+      return block.type === 'drill' || block.type === 'custom';
+    });
+  };
+
+  const getSectionDuration = (sectionType: 'warmup' | 'main' | 'game') => {
+    const blocks = getSectionBlocks(sectionType);
+    return blocks.reduce((sum, block) => sum + block.duration_minutes, 0);
+  };
+
+  const filteredDrills = drills.filter((drill) => {
+    const matchesSearch = drillSearch === '' ||
+      drill.name.toLowerCase().includes(drillSearch.toLowerCase());
+    const matchesSkill = !drillSkillFilter ||
+      drill.skill_tags.includes(drillSkillFilter);
+    return matchesSearch && matchesSkill;
+  });
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -190,292 +172,306 @@ export function PracticePlanBuilderPage() {
   const totalDuration = calculatePlanDuration(plan.practice_blocks);
 
   return (
-    <div className="container max-w-5xl mx-auto py-8 px-4">
-      <Button variant="outline" onClick={() => navigate('/practice-plans')} className="mb-4">
-        {t('common.buttons.back')}
-      </Button>
-
-      <div className="mb-8">
-        <div className="flex items-start justify-between">
-          <div>
-            <h1 className="text-3xl font-bold mb-2">{plan.name}</h1>
-            <p className="text-muted-foreground">{plan.team.name}</p>
-            {plan.date && (
-              <p className="text-sm text-muted-foreground">
-                {new Date(plan.date).toLocaleDateString()}
-              </p>
-            )}
-          </div>
-          <div className="text-right">
-            <p className="text-sm text-muted-foreground">{t('practice.totalDuration')}</p>
-            <p className="text-2xl font-bold">{totalDuration} min</p>
-          </div>
+    <div className="h-screen flex flex-col bg-navy">
+      {/* Breadcrumb */}
+      <div className="px-6 py-4 border-b border-white/6">
+        <div className="flex items-center gap-2 text-sm">
+          <button
+            onClick={() => navigate('/dashboard')}
+            className="text-muted-foreground hover:text-white transition-colors"
+          >
+            Dashboard
+          </button>
+          <span className="text-muted-foreground">/</span>
+          <button
+            onClick={() => navigate('/practice-plans')}
+            className="text-muted-foreground hover:text-white transition-colors"
+          >
+            Practice Plans
+          </button>
+          <span className="text-muted-foreground">/</span>
+          <span className="text-white">Edit Plan</span>
         </div>
       </div>
 
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold">Practice Blocks</h2>
-        <Button onClick={() => { setShowAddBlockDialog(true); setDrillSearch(''); setDrillSkillFilter(null); }}>
-          {t('practice.addBlock')}
-        </Button>
-      </div>
+      {/* Two-Panel Layout */}
+      <div className="flex-1 grid grid-cols-[300px_1fr] gap-6 p-6 overflow-hidden">
+        {/* Left Panel: Drill Library */}
+        <div className="bg-navy-90 border border-white/6 rounded-lg flex flex-col overflow-hidden">
+          {/* Library Header */}
+          <div className="p-4 border-b border-white/6">
+            <Input
+              placeholder="Search drills..."
+              value={drillSearch}
+              onChange={(e) => setDrillSearch(e.target.value)}
+              className="w-full bg-navy-80 border-white/10 text-white placeholder:text-muted-foreground text-sm mb-2"
+            />
+            <div className="flex flex-wrap gap-1">
+              <button
+                onClick={() => setDrillSkillFilter(null)}
+                className={`font-display font-semibold text-[10px] tracking-wider uppercase px-2.5 py-1 rounded-full transition-all border ${
+                  !drillSkillFilter
+                    ? 'bg-vq-teal text-navy border-vq-teal'
+                    : 'bg-navy-80 text-muted-foreground border-transparent hover:text-white hover:border-white/10'
+                }`}
+              >
+                All
+              </button>
+              {SKILL_TAGS.map((skill) => (
+                <button
+                  key={skill}
+                  onClick={() => setDrillSkillFilter(drillSkillFilter === skill ? null : skill)}
+                  className={`font-display font-semibold text-[10px] tracking-wider uppercase px-2.5 py-1 rounded-full transition-all border ${
+                    drillSkillFilter === skill
+                      ? 'bg-vq-teal text-navy border-vq-teal'
+                      : 'bg-navy-80 text-muted-foreground border-transparent hover:text-white hover:border-white/10'
+                  }`}
+                >
+                  {skill.replace('-', ' ')}
+                </button>
+              ))}
+            </div>
+          </div>
 
-      {/* Blocks List */}
-      <div className="space-y-3">
-        {plan.practice_blocks.length === 0 ? (
-          <Card>
-            <CardContent className="py-8 text-center">
-              <p className="text-muted-foreground">
-                No blocks yet. Add your first block to start building the practice plan.
+          {/* Library List */}
+          <div className="flex-1 overflow-y-auto p-4 space-y-2">
+            {filteredDrills.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center py-4">
+                {t('drill.noDrills')}
               </p>
-            </CardContent>
-          </Card>
-        ) : (
-          plan.practice_blocks.map((block, index) => (
-            <Card key={block.id}>
-              <CardContent className="py-4">
-                <div className="flex items-center gap-4">
-                  <div className="flex flex-col gap-1">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleMoveUp(block.id)}
-                      disabled={index === 0}
-                      className="h-8 w-8 p-0"
-                    >
-                      ↑
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleMoveDown(block.id)}
-                      disabled={index === plan.practice_blocks.length - 1}
-                      className="h-8 w-8 p-0"
-                    >
-                      ↓
-                    </Button>
+            ) : (
+              filteredDrills.map((drill) => (
+                <div
+                  key={drill.id}
+                  onClick={() => handleAddDrillBlock(drill)}
+                  className="p-3 bg-navy-80 rounded border border-transparent hover:border-vq-teal transition-all cursor-pointer"
+                >
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="font-display font-bold text-[13px] uppercase text-white">
+                      {drill.name}
+                    </span>
+                    <span className="font-mono text-[11px] text-vq-teal">
+                      15 min
+                    </span>
                   </div>
-
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="px-2 py-1 text-xs font-medium bg-primary/10 text-primary rounded">
-                        {t(`practice.blockTypes.${block.type}`)}
+                  <div className="flex gap-1">
+                    {drill.skill_tags.slice(0, 2).map((tag) => (
+                      <span
+                        key={tag}
+                        className="text-[9px] px-1.5 py-0.5 rounded-full bg-white/6 text-muted-foreground"
+                      >
+                        {tag}
                       </span>
-                      <h3 className="font-medium">{getBlockTitle(block)}</h3>
-                    </div>
-                    <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                      <span>{block.duration_minutes} min</span>
-                      {block.drill && (
-                        <span>Level {block.drill.progression_level}</span>
+                    ))}
+                    <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-white/6 text-muted-foreground">
+                      Level {drill.progression_level}
+                    </span>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+
+        {/* Right Panel: Plan Canvas */}
+        <div className="bg-navy-90 border border-white/6 rounded-lg flex flex-col overflow-hidden">
+          {/* Canvas Header */}
+          <div className="px-6 py-4 border-b border-white/6 flex items-center justify-between">
+            <input
+              type="text"
+              value={planName}
+              onChange={(e) => setPlanName(e.target.value)}
+              className="bg-transparent border-none font-display font-extrabold text-xl uppercase text-white placeholder:text-muted-foreground outline-none w-80"
+              placeholder="Plan name..."
+            />
+            <div className="flex items-center gap-6">
+              <span className="font-mono text-sm text-vq-teal">
+                Total: {totalDuration} min
+              </span>
+              <Button
+                size="sm"
+                className="bg-primary hover:bg-primary/90"
+              >
+                Save Plan
+              </Button>
+            </div>
+          </div>
+
+          {/* Canvas Body */}
+          <div className="flex-1 overflow-y-auto p-6 space-y-6">
+            {/* Warmup Section */}
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <span className="font-display font-bold text-xs uppercase tracking-[2px] text-muted-foreground">
+                  Warmup
+                </span>
+                <span className="font-mono text-xs text-muted-foreground">
+                  {getSectionDuration('warmup')} min
+                </span>
+              </div>
+              <div className="space-y-2">
+                {getSectionBlocks('warmup').map((block, index) => (
+                  <div
+                    key={block.id}
+                    className="flex items-center gap-3 p-3 bg-navy-80 rounded border-l-[3px] border-vq-teal"
+                  >
+                    <span className="w-6 h-6 rounded-full bg-vq-teal text-navy flex items-center justify-center font-display font-extrabold text-xs">
+                      {index + 1}
+                    </span>
+                    <div className="flex-1">
+                      <p className="font-display font-bold text-sm text-white">
+                        {getBlockTitle(block)}
+                      </p>
+                      {block.notes && (
+                        <p className="text-[11px] text-muted-foreground mt-0.5">
+                          {block.notes}
+                        </p>
                       )}
                     </div>
-                    {block.notes && (
-                      <p className="text-sm text-muted-foreground mt-2">{block.notes}</p>
-                    )}
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="text"
+                        value={`${block.duration_minutes} min`}
+                        readOnly
+                        className="w-16 bg-navy-70 border border-white/10 rounded px-2 py-1 font-mono text-xs text-white text-center"
+                      />
+                      <button
+                        onClick={() => setDeleteConfirm({ open: true, blockId: block.id })}
+                        className="w-6 h-6 rounded text-muted-foreground hover:bg-red-500/10 hover:text-red-500 transition-colors flex items-center justify-center"
+                      >
+                        ×
+                      </button>
+                    </div>
                   </div>
-
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={() => setDeleteConfirm({ open: true, blockId: block.id })}
-                  >
-                    {t('common.buttons.delete')}
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))
-        )}
-      </div>
-
-      {/* Add Block Dialog */}
-      <Dialog open={showAddBlockDialog} onOpenChange={setShowAddBlockDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{t('practice.addBlock')}</DialogTitle>
-          </DialogHeader>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(handleAddBlock)} className="space-y-4">
-              <FormField
-                control={form.control}
-                name="type"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Block Type *</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {blockTypes.map((type) => (
-                          <SelectItem key={type} value={type}>
-                            {t(`practice.blockTypes.${type}`)}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
+                ))}
+                {getSectionBlocks('warmup').length === 0 && (
+                  <div className="border-2 border-dashed border-white/10 rounded-lg p-8 text-center">
+                    <p className="text-sm text-muted-foreground">
+                      Drag drills here to add
+                    </p>
+                  </div>
                 )}
-              />
-
-              {blockType === 'drill' && (
-                <FormField
-                  control={form.control}
-                  name="drill_id"
-                  render={({ field }) => {
-                    const filteredDrills = drills.filter((d) => {
-                      const matchesSearch = drillSearch === '' ||
-                        d.name.toLowerCase().includes(drillSearch.toLowerCase());
-                      const matchesSkill = !drillSkillFilter ||
-                        d.skill_tags.includes(drillSkillFilter);
-                      return matchesSearch && matchesSkill;
-                    });
-                    const selectedDrill = drills.find(d => d.id === field.value);
-
-                    return (
-                      <FormItem>
-                        <FormLabel>{t('practice.selectDrill')} *</FormLabel>
-                        <div className="space-y-2">
-                          <Input
-                            placeholder={t('drill.searchDrills')}
-                            value={drillSearch}
-                            onChange={(e) => setDrillSearch(e.target.value)}
-                          />
-                          <div className="flex flex-wrap gap-1">
-                            <button
-                              type="button"
-                              onClick={() => setDrillSkillFilter(null)}
-                              className={`px-2 py-1 text-xs rounded-md border transition-colors ${
-                                !drillSkillFilter
-                                  ? 'bg-primary text-primary-foreground border-primary'
-                                  : 'bg-background hover:bg-accent border-input'
-                              }`}
-                            >
-                              {t('common.labels.all')}
-                            </button>
-                            {SKILL_TAGS.map((skill) => (
-                              <button
-                                key={skill}
-                                type="button"
-                                onClick={() => setDrillSkillFilter(drillSkillFilter === skill ? null : skill)}
-                                className={`px-2 py-1 text-xs rounded-md border transition-colors ${
-                                  drillSkillFilter === skill
-                                    ? 'bg-primary text-primary-foreground border-primary'
-                                    : 'bg-background hover:bg-accent border-input'
-                                }`}
-                              >
-                                {t(`drill.skills.${skill.replace('-', '')}` as any)}
-                              </button>
-                            ))}
-                          </div>
-                          <div className="border rounded-md max-h-48 overflow-y-auto">
-                            {filteredDrills.length === 0 ? (
-                              <p className="text-sm text-muted-foreground text-center py-4">
-                                {t('drill.noDrills')}
-                              </p>
-                            ) : (
-                              filteredDrills.map((drill) => (
-                                <button
-                                  key={drill.id}
-                                  type="button"
-                                  onClick={() => field.onChange(drill.id)}
-                                  className={`w-full text-left px-3 py-2 text-sm hover:bg-accent transition-colors flex items-center justify-between ${
-                                    field.value === drill.id ? 'bg-accent font-medium' : ''
-                                  }`}
-                                >
-                                  <span>{drill.name}</span>
-                                  <span className="text-xs text-muted-foreground ml-2 shrink-0">
-                                    L{drill.progression_level}
-                                  </span>
-                                </button>
-                              ))
-                            )}
-                          </div>
-                          {selectedDrill && (
-                            <p className="text-xs text-muted-foreground">
-                              {t('practice.selectDrill')}: <span className="font-medium">{selectedDrill.name}</span>
-                            </p>
-                          )}
-                        </div>
-                        <FormMessage />
-                      </FormItem>
-                    );
-                  }}
-                />
-              )}
-
-              {blockType === 'custom' && (
-                <FormField
-                  control={form.control}
-                  name="custom_title"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('practice.customTitle')} *</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Custom block title" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              )}
-
-              <FormField
-                control={form.control}
-                name="duration_minutes"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('practice.blockDuration')} *</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        min="1"
-                        {...field}
-                        onChange={(e) => field.onChange(parseInt(e.target.value))}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="notes"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>{t('common.labels.notes')}</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        placeholder="Additional notes..."
-                        rows={3}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <div className="flex gap-4 justify-end">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setShowAddBlockDialog(false)}
-                >
-                  {t('common.buttons.cancel')}
-                </Button>
-                <Button type="submit" disabled={isAddingBlock}>
-                  {isAddingBlock ? t('common.messages.saving') : t('common.buttons.add')}
-                </Button>
               </div>
-            </form>
-          </Form>
-        </DialogContent>
-      </Dialog>
+            </div>
+
+            {/* Main Focus Section */}
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <span className="font-display font-bold text-xs uppercase tracking-[2px] text-muted-foreground">
+                  Main Focus
+                </span>
+                <span className="font-mono text-xs text-muted-foreground">
+                  {getSectionDuration('main')} min
+                </span>
+              </div>
+              <div className="space-y-2">
+                {getSectionBlocks('main').map((block, index) => {
+                  const globalIndex = getSectionBlocks('warmup').length + index + 1;
+                  return (
+                    <div
+                      key={block.id}
+                      className="flex items-center gap-3 p-3 bg-navy-80 rounded border-l-[3px] border-vq-teal"
+                    >
+                      <span className="w-6 h-6 rounded-full bg-vq-teal text-navy flex items-center justify-center font-display font-extrabold text-xs">
+                        {globalIndex}
+                      </span>
+                      <div className="flex-1">
+                        <p className="font-display font-bold text-sm text-white">
+                          {getBlockTitle(block)}
+                        </p>
+                        {block.notes && (
+                          <p className="text-[11px] text-muted-foreground mt-0.5">
+                            {block.notes}
+                          </p>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="text"
+                          value={`${block.duration_minutes} min`}
+                          readOnly
+                          className="w-16 bg-navy-70 border border-white/10 rounded px-2 py-1 font-mono text-xs text-white text-center"
+                        />
+                        <button
+                          onClick={() => setDeleteConfirm({ open: true, blockId: block.id })}
+                          className="w-6 h-6 rounded text-muted-foreground hover:bg-red-500/10 hover:text-red-500 transition-colors flex items-center justify-center"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+                {getSectionBlocks('main').length === 0 && (
+                  <div className="border-2 border-dashed border-white/10 rounded-lg p-8 text-center">
+                    <p className="text-sm text-muted-foreground">
+                      Drag drills here to add
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Game Play Section */}
+            <div>
+              <div className="flex items-center justify-between mb-3">
+                <span className="font-display font-bold text-xs uppercase tracking-[2px] text-muted-foreground">
+                  Game Play
+                </span>
+                <span className="font-mono text-xs text-muted-foreground">
+                  {getSectionDuration('game')} min
+                </span>
+              </div>
+              <div className="space-y-2">
+                {getSectionBlocks('game').map((block, index) => {
+                  const globalIndex = getSectionBlocks('warmup').length + getSectionBlocks('main').length + index + 1;
+                  return (
+                    <div
+                      key={block.id}
+                      className="flex items-center gap-3 p-3 bg-navy-80 rounded border-l-[3px] border-vq-teal"
+                    >
+                      <span className="w-6 h-6 rounded-full bg-vq-teal text-navy flex items-center justify-center font-display font-extrabold text-xs">
+                        {globalIndex}
+                      </span>
+                      <div className="flex-1">
+                        <p className="font-display font-bold text-sm text-white">
+                          {getBlockTitle(block)}
+                        </p>
+                        {block.notes && (
+                          <p className="text-[11px] text-muted-foreground mt-0.5">
+                            {block.notes}
+                          </p>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="text"
+                          value={`${block.duration_minutes} min`}
+                          readOnly
+                          className="w-16 bg-navy-70 border border-white/10 rounded px-2 py-1 font-mono text-xs text-white text-center"
+                        />
+                        <button
+                          onClick={() => setDeleteConfirm({ open: true, blockId: block.id })}
+                          className="w-6 h-6 rounded text-muted-foreground hover:bg-red-500/10 hover:text-red-500 transition-colors flex items-center justify-center"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+                {getSectionBlocks('game').length === 0 && (
+                  <div className="border-2 border-dashed border-white/10 rounded-lg p-8 text-center">
+                    <p className="text-sm text-muted-foreground">
+                      Drag drills here to add
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
       {/* Delete Confirmation */}
       <ConfirmDialog

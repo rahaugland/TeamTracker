@@ -26,11 +26,11 @@ interface GoalTrackerProps {
 }
 
 const METRIC_COLORS: Record<GoalMetricType, string> = {
-  kill_pct: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
-  pass_rating: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
-  serve_pct: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
-  attendance: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
-  custom: 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200',
+  kill_pct: 'bg-club-primary/15 text-club-primary',
+  pass_rating: 'bg-vq-teal/15 text-vq-teal',
+  serve_pct: 'bg-emerald-400/15 text-emerald-400',
+  attendance: 'bg-club-secondary/15 text-club-secondary',
+  custom: 'bg-white/10 text-foreground',
 };
 
 export function GoalTracker({ goals, isCoach, onCreateGoal, onToggleComplete, onDeleteGoal }: GoalTrackerProps) {
@@ -156,7 +156,7 @@ export function GoalTracker({ goals, isCoach, onCreateGoal, onToggleComplete, on
                   <div key={goal.id} className="rounded-lg border p-3 opacity-60">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <Check className="h-4 w-4 text-green-600" />
+                        <Check className="h-4 w-4 text-emerald-400" />
                         <span className="font-medium line-through">{goal.title}</span>
                         <Badge variant="secondary" className={METRIC_COLORS[goal.metric_type]}>
                           {t(`goals.metricTypes.${goal.metric_type}`)}

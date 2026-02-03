@@ -26,7 +26,7 @@ export function RotationBreakdown({ rotationStats }: RotationBreakdownProps) {
             <div
               key={rs.rotation}
               className={`rounded-lg border p-3 ${
-                rs.isBelowAverage ? 'border-red-300 bg-red-50 dark:border-red-800 dark:bg-red-950' : 'border-border'
+                rs.isBelowAverage ? 'border-club-primary/30 bg-club-primary/10' : 'border-border'
               }`}
             >
               <div className="flex items-center justify-between mb-2">
@@ -52,7 +52,7 @@ export function RotationBreakdown({ rotationStats }: RotationBreakdownProps) {
                 </div>
               </div>
               {rs.isBelowAverage && (
-                <p className="text-xs text-red-600 dark:text-red-400 mt-2">
+                <p className="text-xs text-club-primary mt-2">
                   {t('stats.rotationBreakdown.belowAverage')}
                 </p>
               )}

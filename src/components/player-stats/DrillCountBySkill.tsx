@@ -6,6 +6,32 @@ interface DrillCountBySkillProps {
   participation: DrillParticipation[];
 }
 
+interface DrillTooltipPayload {
+  payload: {
+    skill: string;
+    count: number;
+    minutes: number;
+  };
+}
+
+function DrillSkillTooltip({ active, payload }: { active?: boolean; payload?: DrillTooltipPayload[] }) {
+  if (active && payload && payload.length) {
+    const data = payload[0].payload;
+    return (
+      <div className="bg-card border border-white/10 rounded-lg shadow-lg p-3">
+        <p className="font-semibold text-sm text-foreground">{data.skill}</p>
+        <p className="text-sm mt-1 text-foreground">
+          <span className="font-medium">Drills:</span> {data.count}
+        </p>
+        <p className="text-sm text-foreground">
+          <span className="font-medium">Minutes:</span> {data.minutes}
+        </p>
+      </div>
+    );
+  }
+  return null;
+}
+
 /**
  * Horizontal bar chart showing drill count per skill tag
  */
@@ -17,24 +43,6 @@ export function DrillCountBySkill({ participation }: DrillCountBySkillProps) {
       count: p.drillCount,
       minutes: p.totalMinutes,
     }));
-
-  const CustomTooltip = ({ active, payload }: any) => {
-    if (active && payload && payload.length) {
-      const data = payload[0].payload;
-      return (
-        <div className="bg-white border border-gray-200 rounded-lg shadow-lg p-3">
-          <p className="font-semibold text-sm">{data.skill}</p>
-          <p className="text-sm mt-1">
-            <span className="font-medium">Drills:</span> {data.count}
-          </p>
-          <p className="text-sm">
-            <span className="font-medium">Minutes:</span> {data.minutes}
-          </p>
-        </div>
-      );
-    }
-    return null;
-  };
 
   if (participation.length === 0) {
     return (
@@ -63,21 +71,21 @@ export function DrillCountBySkill({ participation }: DrillCountBySkillProps) {
             layout="vertical"
             margin={{ top: 5, right: 20, left: 80, bottom: 5 }}
           >
-            <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
             <XAxis
               type="number"
-              tick={{ fontSize: 12 }}
-              stroke="#888"
+              tick={{ fontSize: 12, fill: '#8B95A5' }}
+              stroke="#8B95A5"
             />
             <YAxis
               type="category"
               dataKey="skill"
-              tick={{ fontSize: 12 }}
-              stroke="#888"
+              tick={{ fontSize: 12, fill: '#8B95A5' }}
+              stroke="#8B95A5"
               width={70}
             />
-            <Tooltip content={<CustomTooltip />} />
-            <Bar dataKey="count" fill="#3b82f6" />
+            <Tooltip content={<DrillSkillTooltip />} />
+            <Bar dataKey="count" fill="#2EC4B6" />
           </BarChart>
         </ResponsiveContainer>
       </CardContent>

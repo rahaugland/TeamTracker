@@ -17,6 +17,36 @@ interface DefenseTrendChartProps {
   gameStats: GameStatLine[];
 }
 
+interface DefenseTooltipPayload {
+  payload: {
+    opponent: string;
+    date: string;
+    digs: number;
+    passRating: number;
+  };
+}
+
+function DefenseTooltip({ active, payload }: { active?: boolean; payload?: DefenseTooltipPayload[] }) {
+  if (active && payload && payload.length) {
+    const data = payload[0].payload;
+    return (
+      <div className="bg-card border border-white/10 rounded-lg shadow-lg p-3">
+        <p className="font-semibold text-sm text-foreground">{data.opponent}</p>
+        <p className="text-xs text-muted-foreground">
+          {format(new Date(data.date), 'MMM d, yyyy')}
+        </p>
+        <p className="text-sm mt-1 text-foreground">
+          <span className="font-medium text-vq-teal">Digs:</span> {data.digs}
+        </p>
+        <p className="text-sm text-foreground">
+          <span className="font-medium text-purple-400">Pass Rating:</span> {data.passRating.toFixed(1)}
+        </p>
+      </div>
+    );
+  }
+  return null;
+}
+
 /**
  * Combo chart showing digs (bars) and pass rating (line)
  */
@@ -32,27 +62,6 @@ export function DefenseTrendChart({ gameStats }: DefenseTrendChartProps) {
       passRating: Math.round(game.passRating * 10) / 10, // 1 decimal
       opponent: game.event.opponent || 'Unknown',
     }));
-
-  const CustomTooltip = ({ active, payload }: any) => {
-    if (active && payload && payload.length) {
-      const data = payload[0].payload;
-      return (
-        <div className="bg-white border border-gray-200 rounded-lg shadow-lg p-3">
-          <p className="font-semibold text-sm">{data.opponent}</p>
-          <p className="text-xs text-muted-foreground">
-            {format(new Date(data.date), 'MMM d, yyyy')}
-          </p>
-          <p className="text-sm mt-1">
-            <span className="font-medium text-blue-600">Digs:</span> {data.digs}
-          </p>
-          <p className="text-sm">
-            <span className="font-medium text-purple-600">Pass Rating:</span> {data.passRating.toFixed(1)}
-          </p>
-        </div>
-      );
-    }
-    return null;
-  };
 
   if (chartData.length === 0) {
     return (
@@ -77,36 +86,36 @@ export function DefenseTrendChart({ gameStats }: DefenseTrendChartProps) {
       <CardContent>
         <ResponsiveContainer width="100%" height={300}>
           <ComposedChart data={chartData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
             <XAxis
               dataKey="game"
-              tick={{ fontSize: 12 }}
-              stroke="#888"
+              tick={{ fontSize: 12, fill: '#8B95A5' }}
+              stroke="#8B95A5"
             />
             <YAxis
               yAxisId="left"
-              tick={{ fontSize: 12 }}
-              stroke="#888"
-              label={{ value: 'Digs', angle: -90, position: 'insideLeft', style: { fontSize: 12 } }}
+              tick={{ fontSize: 12, fill: '#8B95A5' }}
+              stroke="#8B95A5"
+              label={{ value: 'Digs', angle: -90, position: 'insideLeft', style: { fontSize: 12, fill: '#8B95A5' } }}
             />
             <YAxis
               yAxisId="right"
               orientation="right"
-              tick={{ fontSize: 12 }}
-              stroke="#888"
-              label={{ value: 'Pass Rating', angle: 90, position: 'insideRight', style: { fontSize: 12 } }}
+              tick={{ fontSize: 12, fill: '#8B95A5' }}
+              stroke="#8B95A5"
+              label={{ value: 'Pass Rating', angle: 90, position: 'insideRight', style: { fontSize: 12, fill: '#8B95A5' } }}
               domain={[0, 3]}
             />
-            <Tooltip content={<CustomTooltip />} />
-            <Legend wrapperStyle={{ fontSize: 12 }} />
-            <Bar yAxisId="left" dataKey="digs" fill="#3b82f6" name="Digs" />
+            <Tooltip content={<DefenseTooltip />} />
+            <Legend wrapperStyle={{ fontSize: 12, color: '#8B95A5' }} />
+            <Bar yAxisId="left" dataKey="digs" fill="#2EC4B6" name="Digs" />
             <Line
               yAxisId="right"
               type="monotone"
               dataKey="passRating"
-              stroke="#9333ea"
+              stroke="#A78BFA"
               strokeWidth={2}
-              dot={{ fill: '#9333ea', r: 4 }}
+              dot={{ fill: '#A78BFA', r: 4 }}
               name="Pass Rating"
             />
           </ComposedChart>

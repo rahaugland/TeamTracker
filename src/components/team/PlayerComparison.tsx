@@ -152,24 +152,24 @@ export function PlayerComparison({ players, isLoading = false }: PlayerCompariso
               <div>
                 <ResponsiveContainer width="100%" height={300}>
                   <RadarChart data={radarData}>
-                    <PolarGrid />
-                    <PolarAngleAxis dataKey="category" />
-                    <PolarRadiusAxis angle={90} domain={[0, 99]} />
+                    <PolarGrid stroke="rgba(255,255,255,0.2)" />
+                    <PolarAngleAxis dataKey="category" tick={{ fill: '#8B95A5' }} />
+                    <PolarRadiusAxis angle={90} domain={[0, 99]} tick={{ fill: '#8B95A5' }} />
                     <Radar
                       name={player1.name}
                       dataKey="player1"
-                      stroke="#3b82f6"
-                      fill="#3b82f6"
+                      stroke="#2EC4B6"
+                      fill="#2EC4B6"
                       fillOpacity={0.5}
                     />
                     <Radar
                       name={player2.name}
                       dataKey="player2"
-                      stroke="#ef4444"
-                      fill="#ef4444"
+                      stroke="#E63946"
+                      fill="#E63946"
                       fillOpacity={0.5}
                     />
-                    <Legend />
+                    <Legend wrapperStyle={{ color: '#8B95A5' }} />
                   </RadarChart>
                 </ResponsiveContainer>
               </div>
@@ -184,17 +184,17 @@ export function PlayerComparison({ players, isLoading = false }: PlayerCompariso
                 <div className="flex items-center justify-between text-sm mb-1">
                   <span>{t('team.dashboard.attack')}</span>
                   <div className="flex gap-4">
-                    <span className="text-blue-600 font-medium">
+                    <span className="text-vq-teal font-medium">
                       {player1.rating?.subRatings.attack || 0}
                     </span>
-                    <span className="text-red-600 font-medium">
+                    <span className="text-club-primary font-medium">
                       {player2.rating?.subRatings.attack || 0}
                     </span>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-2">
-                  <Progress value={player1.rating?.subRatings.attack || 0} className="bg-blue-100" />
-                  <Progress value={player2.rating?.subRatings.attack || 0} className="bg-red-100" />
+                  <Progress value={player1.rating?.subRatings.attack || 0} className="bg-vq-teal/20" />
+                  <Progress value={player2.rating?.subRatings.attack || 0} className="bg-club-primary/20" />
                 </div>
               </div>
 
@@ -203,17 +203,17 @@ export function PlayerComparison({ players, isLoading = false }: PlayerCompariso
                 <div className="flex items-center justify-between text-sm mb-1">
                   <span>{t('team.dashboard.serve')}</span>
                   <div className="flex gap-4">
-                    <span className="text-blue-600 font-medium">
+                    <span className="text-vq-teal font-medium">
                       {player1.rating?.subRatings.serve || 0}
                     </span>
-                    <span className="text-red-600 font-medium">
+                    <span className="text-club-primary font-medium">
                       {player2.rating?.subRatings.serve || 0}
                     </span>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-2">
-                  <Progress value={player1.rating?.subRatings.serve || 0} className="bg-blue-100" />
-                  <Progress value={player2.rating?.subRatings.serve || 0} className="bg-red-100" />
+                  <Progress value={player1.rating?.subRatings.serve || 0} className="bg-vq-teal/20" />
+                  <Progress value={player2.rating?.subRatings.serve || 0} className="bg-club-primary/20" />
                 </div>
               </div>
 
@@ -222,17 +222,17 @@ export function PlayerComparison({ players, isLoading = false }: PlayerCompariso
                 <div className="flex items-center justify-between text-sm mb-1">
                   <span>{t('team.dashboard.reception')}</span>
                   <div className="flex gap-4">
-                    <span className="text-blue-600 font-medium">
+                    <span className="text-vq-teal font-medium">
                       {player1.rating?.subRatings.reception || 0}
                     </span>
-                    <span className="text-red-600 font-medium">
+                    <span className="text-club-primary font-medium">
                       {player2.rating?.subRatings.reception || 0}
                     </span>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-2">
-                  <Progress value={player1.rating?.subRatings.reception || 0} className="bg-blue-100" />
-                  <Progress value={player2.rating?.subRatings.reception || 0} className="bg-red-100" />
+                  <Progress value={player1.rating?.subRatings.reception || 0} className="bg-vq-teal/20" />
+                  <Progress value={player2.rating?.subRatings.reception || 0} className="bg-club-primary/20" />
                 </div>
               </div>
 
@@ -241,10 +241,10 @@ export function PlayerComparison({ players, isLoading = false }: PlayerCompariso
                 <div className="flex items-center justify-between text-sm mb-1">
                   <span>{t('team.dashboard.consistency')}</span>
                   <div className="flex gap-4">
-                    <span className="text-blue-600 font-medium">
+                    <span className="text-vq-teal font-medium">
                       {player1.rating?.subRatings.consistency || 0}
                     </span>
-                    <span className="text-red-600 font-medium">
+                    <span className="text-club-primary font-medium">
                       {player2.rating?.subRatings.consistency || 0}
                     </span>
                   </div>
@@ -252,11 +252,11 @@ export function PlayerComparison({ players, isLoading = false }: PlayerCompariso
                 <div className="grid grid-cols-2 gap-2">
                   <Progress
                     value={player1.rating?.subRatings.consistency || 0}
-                    className="bg-blue-100"
+                    className="bg-vq-teal/20"
                   />
                   <Progress
                     value={player2.rating?.subRatings.consistency || 0}
-                    className="bg-red-100"
+                    className="bg-club-primary/20"
                   />
                 </div>
               </div>
@@ -266,10 +266,10 @@ export function PlayerComparison({ players, isLoading = false }: PlayerCompariso
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-muted-foreground">{t('player.stats.gamesPlayed')}</span>
                   <div className="flex gap-4">
-                    <Badge variant="outline" className="border-blue-600 text-blue-600">
+                    <Badge variant="outline" className="border-vq-teal text-vq-teal">
                       {player1.rating?.gamesPlayed || 0}
                     </Badge>
-                    <Badge variant="outline" className="border-red-600 text-red-600">
+                    <Badge variant="outline" className="border-club-primary text-club-primary">
                       {player2.rating?.gamesPlayed || 0}
                     </Badge>
                   </div>

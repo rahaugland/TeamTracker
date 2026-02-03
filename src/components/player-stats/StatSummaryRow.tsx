@@ -1,11 +1,14 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import type { AggregatedStats } from '@/services/player-stats.service';
 import type { GameStatLine } from '@/services/player-stats.service';
 
 interface StatSummaryRowProps {
   aggregatedStats: AggregatedStats;
   gameStats: GameStatLine[];
+  variant?: '4-card' | '6-card';
+  previousStats?: AggregatedStats;
 }
 
 /**
@@ -36,23 +39,80 @@ function calculateTrend(
  */
 function TrendIcon({ direction }: { direction: 'up' | 'down' | 'neutral' }) {
   if (direction === 'up') {
-    return <TrendingUp className="h-4 w-4 text-green-600" />;
+    return <TrendingUp className="h-4 w-4 text-emerald-400" />;
   }
   if (direction === 'down') {
-    return <TrendingDown className="h-4 w-4 text-red-600" />;
+    return <TrendingDown className="h-4 w-4 text-club-primary" />;
   }
-  return <Minus className="h-4 w-4 text-gray-400" />;
+  return <Minus className="h-4 w-4 text-muted-foreground" />;
 }
 
 /**
- * Summary row with 4 key stats and trend indicators
+ * Summary row with 4 or 6 key stats and trend indicators
+ * variant='4-card': Kill%, Serve%, Pass Rating, Blocks/Game (original)
+ * variant='6-card': Total Kills, Kill%, Aces, Pass Rating, Blocks, Digs (wireframe style)
  */
-export function StatSummaryRow({ aggregatedStats, gameStats }: StatSummaryRowProps) {
+export function StatSummaryRow({
+  aggregatedStats,
+  gameStats,
+  variant = '4-card',
+  previousStats,
+}: StatSummaryRowProps) {
   const killPctTrend = calculateTrend(gameStats, (g) => g.killPercentage);
   const servePctTrend = calculateTrend(gameStats, (g) => g.servePercentage);
   const passRatingTrend = calculateTrend(gameStats, (g) => g.passRating);
   const blocksPerGameTrend = calculateTrend(gameStats, (g) => g.totalBlocks);
 
+  // For 6-card variant with period comparison
+  if (variant === '6-card') {
+    const totalBlocks = aggregatedStats.totalBlockSolos + aggregatedStats.totalBlockAssists;
+    const prevBlocks = previousStats
+      ? previousStats.totalBlockSolos + previousStats.totalBlockAssists
+      : null;
+
+    return (
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-6">
+        <StatBox
+          value={aggregatedStats.totalKills}
+          label="Total Kills"
+          delta={previousStats ? aggregatedStats.totalKills - previousStats.totalKills : null}
+        />
+        <StatBox
+          value={`${(aggregatedStats.killPercentage * 100).toFixed(0)}%`}
+          label="Kill %"
+          delta={previousStats
+            ? parseFloat(((aggregatedStats.killPercentage - previousStats.killPercentage) * 100).toFixed(1))
+            : null}
+          valueColor="text-vq-teal"
+        />
+        <StatBox
+          value={aggregatedStats.totalAces}
+          label="Aces"
+          delta={previousStats ? aggregatedStats.totalAces - previousStats.totalAces : null}
+        />
+        <StatBox
+          value={aggregatedStats.passRating.toFixed(1)}
+          label="Pass Rating"
+          delta={previousStats
+            ? parseFloat((aggregatedStats.passRating - previousStats.passRating).toFixed(1))
+            : null}
+          valueColor="text-club-secondary"
+        />
+        <StatBox
+          value={totalBlocks}
+          label="Blocks"
+          delta={prevBlocks !== null ? totalBlocks - prevBlocks : null}
+        />
+        <StatBox
+          value={aggregatedStats.totalDigs}
+          label="Digs"
+          delta={previousStats ? aggregatedStats.totalDigs - previousStats.totalDigs : null}
+        />
+      </div>
+    );
+  }
+
+  // Original 4-card variant
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
       <Card>
@@ -122,6 +182,38 @@ export function StatSummaryRow({ aggregatedStats, gameStats }: StatSummaryRowPro
           </p>
         </CardContent>
       </Card>
+    </div>
+  );
+}
+
+// Helper component for 6-card variant stat boxes
+interface StatBoxProps {
+  value: string | number;
+  label: string;
+  delta?: number | null;
+  valueColor?: string;
+}
+
+function StatBox({ value, label, delta, valueColor }: StatBoxProps) {
+  return (
+    <div className="bg-navy-90 border border-white/[0.06] rounded-lg p-4 text-center">
+      <p className={cn(
+        'font-mono font-bold text-2xl mb-1',
+        valueColor || 'text-white'
+      )}>
+        {value}
+      </p>
+      <p className="font-display font-semibold text-[9px] uppercase tracking-wider text-gray-500">
+        {label}
+      </p>
+      {delta !== null && delta !== undefined && (
+        <p className={cn(
+          'font-mono text-[10px] mt-1',
+          delta > 0 ? 'text-green-400' : delta < 0 ? 'text-red-400' : 'text-gray-500'
+        )}>
+          {delta > 0 ? '+' : ''}{delta} vs last period
+        </p>
+      )}
     </div>
   );
 }

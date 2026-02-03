@@ -8,16 +8,16 @@ interface TrainingVolumeChartProps {
 }
 
 const SKILL_COLORS: Record<string, string> = {
-  passing: '#3b82f6',
-  setting: '#8b5cf6',
-  hitting: '#ef4444',
-  blocking: '#f59e0b',
-  serving: '#10b981',
-  'serve-receive': '#06b6d4',
-  defense: '#ec4899',
-  transition: '#6366f1',
-  footwork: '#84cc16',
-  conditioning: '#f97316',
+  passing: '#2EC4B6',
+  setting: '#A78BFA',
+  hitting: '#E63946',
+  blocking: '#FFB703',
+  serving: '#34D399',
+  'serve-receive': '#38BDF8',
+  defense: '#F472B6',
+  transition: '#818CF8',
+  footwork: '#A3E635',
+  conditioning: '#FB923C',
 };
 
 /**
@@ -49,8 +49,8 @@ export function TrainingVolumeChart({ volume }: TrainingVolumeChartProps) {
     if (active && payload && payload.length) {
       const total = payload.reduce((sum: number, entry: any) => sum + entry.value, 0);
       return (
-        <div className="bg-white border border-gray-200 rounded-lg shadow-lg p-3">
-          <p className="font-semibold text-sm mb-2">{label}</p>
+        <div className="bg-card border border-white/10 rounded-lg shadow-lg p-3">
+          <p className="font-semibold text-sm mb-2 text-foreground">{label}</p>
           <p className="text-xs text-muted-foreground mb-1">Total: {total} minutes</p>
           {payload
             .filter((entry: any) => entry.value > 0)
@@ -88,19 +88,19 @@ export function TrainingVolumeChart({ volume }: TrainingVolumeChartProps) {
       <CardContent>
         <ResponsiveContainer width="100%" height={400}>
           <AreaChart data={chartData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
             <XAxis
               dataKey="month"
-              tick={{ fontSize: 11 }}
-              stroke="#888"
+              tick={{ fontSize: 11, fill: '#8B95A5' }}
+              stroke="#8B95A5"
             />
             <YAxis
-              tick={{ fontSize: 11 }}
-              stroke="#888"
-              label={{ value: 'Minutes', angle: -90, position: 'insideLeft', style: { fontSize: 11 } }}
+              tick={{ fontSize: 11, fill: '#8B95A5' }}
+              stroke="#8B95A5"
+              label={{ value: 'Minutes', angle: -90, position: 'insideLeft', style: { fontSize: 11, fill: '#8B95A5' } }}
             />
             <Tooltip content={<CustomTooltip />} />
-            <Legend wrapperStyle={{ fontSize: 11 }} />
+            <Legend wrapperStyle={{ fontSize: 11, color: '#8B95A5' }} />
             {skills.map(skill => (
               <Area
                 key={skill}

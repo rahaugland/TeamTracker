@@ -23,10 +23,10 @@ interface EventRSVPSectionProps {
 }
 
 const STATUS_CONFIG: { key: RsvpStatus; color: string; bgColor: string; activeColor: string }[] = [
-  { key: 'attending', color: 'text-green-700 dark:text-green-300', bgColor: 'bg-green-100 dark:bg-green-900/30', activeColor: 'bg-green-100 dark:bg-green-900/40 border-green-300 dark:border-green-700' },
-  { key: 'not_attending', color: 'text-red-700 dark:text-red-300', bgColor: 'bg-red-100 dark:bg-red-900/30', activeColor: 'bg-red-100 dark:bg-red-900/40 border-red-300 dark:border-red-700' },
-  { key: 'maybe', color: 'text-amber-700 dark:text-amber-300', bgColor: 'bg-amber-100 dark:bg-amber-900/30', activeColor: 'bg-amber-100 dark:bg-amber-900/40 border-amber-300 dark:border-amber-700' },
-  { key: 'pending', color: 'text-gray-600 dark:text-gray-400', bgColor: 'bg-gray-100 dark:bg-gray-800/50', activeColor: 'bg-gray-100 dark:bg-gray-800/60 border-gray-300 dark:border-gray-600' },
+  { key: 'attending', color: 'text-emerald-400', bgColor: 'bg-emerald-500/15', activeColor: 'bg-emerald-500/20 border-emerald-500/30' },
+  { key: 'not_attending', color: 'text-club-primary', bgColor: 'bg-club-primary/15', activeColor: 'bg-club-primary/20 border-club-primary/30' },
+  { key: 'maybe', color: 'text-club-secondary', bgColor: 'bg-club-secondary/15', activeColor: 'bg-club-secondary/20 border-club-secondary/30' },
+  { key: 'pending', color: 'text-muted-foreground', bgColor: 'bg-white/10', activeColor: 'bg-white/15 border-white/20' },
 ];
 
 export function EventRSVPSection({

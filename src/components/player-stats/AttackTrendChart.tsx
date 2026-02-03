@@ -7,6 +7,32 @@ interface AttackTrendChartProps {
   gameStats: GameStatLine[];
 }
 
+interface TooltipPayload {
+  payload: {
+    opponent: string;
+    date: string;
+    killPct: number;
+  };
+}
+
+function AttackTooltip({ active, payload }: { active?: boolean; payload?: TooltipPayload[] }) {
+  if (active && payload && payload.length) {
+    const data = payload[0].payload;
+    return (
+      <div className="bg-card border border-white/10 rounded-lg shadow-lg p-3">
+        <p className="font-semibold text-sm text-foreground">{data.opponent}</p>
+        <p className="text-xs text-muted-foreground">
+          {format(new Date(data.date), 'MMM d, yyyy')}
+        </p>
+        <p className="text-sm mt-1 text-foreground">
+          <span className="font-medium">Kill %:</span> {data.killPct.toFixed(1)}%
+        </p>
+      </div>
+    );
+  }
+  return null;
+}
+
 /**
  * Line chart showing kill percentage trend over games
  */
@@ -21,24 +47,6 @@ export function AttackTrendChart({ gameStats }: AttackTrendChartProps) {
       killPct: Math.round(game.killPercentage * 1000) / 10, // Convert to percentage with 1 decimal
       opponent: game.event.opponent || 'Unknown',
     }));
-
-  const CustomTooltip = ({ active, payload }: any) => {
-    if (active && payload && payload.length) {
-      const data = payload[0].payload;
-      return (
-        <div className="bg-white border border-gray-200 rounded-lg shadow-lg p-3">
-          <p className="font-semibold text-sm">{data.opponent}</p>
-          <p className="text-xs text-muted-foreground">
-            {format(new Date(data.date), 'MMM d, yyyy')}
-          </p>
-          <p className="text-sm mt-1">
-            <span className="font-medium">Kill %:</span> {data.killPct.toFixed(1)}%
-          </p>
-        </div>
-      );
-    }
-    return null;
-  };
 
   if (chartData.length === 0) {
     return (
@@ -63,25 +71,25 @@ export function AttackTrendChart({ gameStats }: AttackTrendChartProps) {
       <CardContent>
         <ResponsiveContainer width="100%" height={300}>
           <LineChart data={chartData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
             <XAxis
               dataKey="game"
-              tick={{ fontSize: 12 }}
-              stroke="#888"
+              tick={{ fontSize: 12, fill: '#8B95A5' }}
+              stroke="#8B95A5"
             />
             <YAxis
-              tick={{ fontSize: 12 }}
-              stroke="#888"
-              label={{ value: 'Kill %', angle: -90, position: 'insideLeft', style: { fontSize: 12 } }}
+              tick={{ fontSize: 12, fill: '#8B95A5' }}
+              stroke="#8B95A5"
+              label={{ value: 'Kill %', angle: -90, position: 'insideLeft', style: { fontSize: 12, fill: '#8B95A5' } }}
               domain={[0, 100]}
             />
-            <Tooltip content={<CustomTooltip />} />
+            <Tooltip content={<AttackTooltip />} />
             <Line
               type="monotone"
               dataKey="killPct"
-              stroke="#ef4444"
+              stroke="#E63946"
               strokeWidth={2}
-              dot={{ fill: '#ef4444', r: 4 }}
+              dot={{ fill: '#E63946', r: 4 }}
               activeDot={{ r: 6 }}
             />
           </LineChart>
