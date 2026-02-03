@@ -37,6 +37,7 @@ export interface UpdateEventInput {
   sets_won?: number;
   sets_lost?: number;
   set_scores?: number[][];
+  is_finalized?: boolean;
 }
 
 export interface EventWithDetails extends Event {

@@ -66,7 +66,7 @@ export function PlayerDetailPage() {
   });
   const [showAddToTeamModal, setShowAddToTeamModal] = useState(false);
 
-  const isCoach = user?.role === 'head_coach' || user?.role === 'assistant_coach' || user?.role === 'coach';
+  const isCoach = user?.role === 'head_coach' || user?.role === 'assistant_coach';
   const isPlayer = user?.role === 'player';
   const [activeTab, setActiveTab] = useState<'overview' | 'stats-history' | 'attendance' | 'notes'>('overview');
 
@@ -95,6 +95,11 @@ export function PlayerDetailPage() {
       setPlayer(playerData);
       setNotes(notesData);
       setIsLoading(false);
+
+      if (!playerData) {
+        setIsLoadingStats(false);
+        return;
+      }
 
       // Load stats in background
       try {

@@ -53,6 +53,11 @@ export function SkillRatingsPanel({ playerId, teamId }: SkillRatingsPanelProps) 
       try {
         // Get player data for position
         const player = await getPlayer(playerId);
+        if (!player) {
+          setSkills([]);
+          setIsLoading(false);
+          return;
+        }
         const primaryPosition = player.positions[0] || 'all_around';
 
         // Get game stats - same data source as FIFA card

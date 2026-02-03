@@ -704,7 +704,7 @@ export async function getMissedEventsTimeline(
   // Filter by team post-query
   // Supabase returns event as object, not array
   type MissedEventRecord = { status: AttendanceStatus; event: { start_time: string; team_id: string } | null };
-  let records = (data || []) as MissedEventRecord[];
+  let records = (data || []) as unknown as MissedEventRecord[];
   if (teamId) {
     records = records.filter(r => r.event?.team_id === teamId);
   }

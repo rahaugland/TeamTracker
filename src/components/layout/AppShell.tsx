@@ -33,7 +33,7 @@ export function AppShell({ children }: AppShellProps) {
 
   const isPlayer = user?.role === 'player';
   const isParent = user?.role === 'parent';
-  const isCoach = user?.role === 'coach' || user?.role === 'head_coach';
+  const isCoach = user?.role === 'head_coach' || user?.role === 'assistant_coach';
   const activeTeam = getActiveTeam();
 
   const handleSync = async () => {
