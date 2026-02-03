@@ -107,8 +107,8 @@ export function SelfAssessmentForm({
                   <Star
                     className={`w-8 h-8 transition-colors ${
                       value <= rating
-                        ? 'fill-yellow-400 text-yellow-400'
-                        : 'text-gray-300 dark:text-gray-600'
+                        ? 'fill-club-secondary text-club-secondary'
+                        : 'text-white/20'
                     }`}
                   />
                 </button>

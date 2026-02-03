@@ -107,8 +107,8 @@ export function FifaCard({
                   className={cn(
                     'flex items-center gap-0.5 rounded-full px-2 py-0.5 text-sm font-bold',
                     trendDirection === 'up'
-                      ? 'bg-green-500/30 text-green-100'
-                      : 'bg-red-500/30 text-red-100'
+                      ? 'bg-emerald-500/30 text-emerald-100'
+                      : 'bg-club-primary/30 text-club-primary'
                   )}
                 >
                   <span>{trendDirection === 'up' ? '↑' : '↓'}</span>

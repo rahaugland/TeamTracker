@@ -76,10 +76,10 @@ export function AttendanceTracker({
   // Get RSVP badge color
   const getRSVPBadgeColor = (status: RsvpStatus): string => {
     const colors: Record<RsvpStatus, string> = {
-      attending: 'bg-green-100 text-green-800',
-      not_attending: 'bg-red-100 text-red-800',
-      maybe: 'bg-yellow-100 text-yellow-800',
-      pending: 'bg-gray-100 text-gray-600',
+      attending: 'bg-emerald-500/15 text-emerald-400',
+      not_attending: 'bg-club-primary/15 text-club-primary',
+      maybe: 'bg-club-secondary/15 text-club-secondary',
+      pending: 'bg-white/10 text-muted-foreground',
     };
     return colors[status];
   };
@@ -87,11 +87,11 @@ export function AttendanceTracker({
   // Get attendance badge color
   const getAttendanceBadgeColor = (status: AttendanceStatus): string => {
     const colors: Record<AttendanceStatus, string> = {
-      present: 'bg-green-600 text-white',
-      absent: 'bg-red-600 text-white',
-      late: 'bg-orange-600 text-white',
-      excused: 'bg-blue-600 text-white',
-      not_selected: 'bg-purple-600 text-white',
+      present: 'bg-emerald-500 text-white',
+      absent: 'bg-club-primary text-white',
+      late: 'bg-club-secondary text-white',
+      excused: 'bg-vq-teal text-white',
+      not_selected: 'bg-purple-500 text-white',
     };
     return colors[status];
   };
@@ -327,29 +327,29 @@ export function AttendanceTracker({
         {teamPlayers.length > 0 && (
           <div className="mt-4 pt-4 border-t">
             <div className="grid grid-cols-2 sm:grid-cols-6 gap-2 text-center">
-              <div className="p-2 rounded-lg bg-green-50">
-                <p className="text-2xl font-bold text-green-600">{summary.present}</p>
-                <p className="text-xs text-green-700">{t('attendance.status.present')}</p>
+              <div className="p-2 rounded-lg bg-emerald-500/10">
+                <p className="text-2xl font-bold text-stat text-emerald-400">{summary.present}</p>
+                <p className="text-xs text-emerald-400">{t('attendance.status.present')}</p>
               </div>
-              <div className="p-2 rounded-lg bg-red-50">
-                <p className="text-2xl font-bold text-red-600">{summary.absent}</p>
-                <p className="text-xs text-red-700">{t('attendance.status.absent')}</p>
+              <div className="p-2 rounded-lg bg-club-primary/10">
+                <p className="text-2xl font-bold text-stat text-club-primary">{summary.absent}</p>
+                <p className="text-xs text-club-primary">{t('attendance.status.absent')}</p>
               </div>
-              <div className="p-2 rounded-lg bg-orange-50">
-                <p className="text-2xl font-bold text-orange-600">{summary.late}</p>
-                <p className="text-xs text-orange-700">{t('attendance.status.late')}</p>
+              <div className="p-2 rounded-lg bg-club-secondary/10">
+                <p className="text-2xl font-bold text-stat text-club-secondary">{summary.late}</p>
+                <p className="text-xs text-club-secondary">{t('attendance.status.late')}</p>
               </div>
-              <div className="p-2 rounded-lg bg-blue-50">
-                <p className="text-2xl font-bold text-blue-600">{summary.excused}</p>
-                <p className="text-xs text-blue-700">{t('attendance.status.excused')}</p>
+              <div className="p-2 rounded-lg bg-vq-teal/10">
+                <p className="text-2xl font-bold text-stat text-vq-teal">{summary.excused}</p>
+                <p className="text-xs text-vq-teal">{t('attendance.status.excused')}</p>
               </div>
-              <div className="p-2 rounded-lg bg-purple-50">
-                <p className="text-2xl font-bold text-purple-600">{summary.not_selected}</p>
-                <p className="text-xs text-purple-700">{t('attendance.status.not_selected')}</p>
+              <div className="p-2 rounded-lg bg-purple-500/10">
+                <p className="text-2xl font-bold text-stat text-purple-400">{summary.not_selected}</p>
+                <p className="text-xs text-purple-400">{t('attendance.status.not_selected')}</p>
               </div>
-              <div className="p-2 rounded-lg bg-gray-50">
-                <p className="text-2xl font-bold text-gray-600">{summary.notMarked}</p>
-                <p className="text-xs text-gray-700">{t('attendance.notMarked')}</p>
+              <div className="p-2 rounded-lg bg-white/5">
+                <p className="text-2xl font-bold text-stat text-muted-foreground">{summary.notMarked}</p>
+                <p className="text-xs text-muted-foreground">{t('attendance.notMarked')}</p>
               </div>
             </div>
           </div>

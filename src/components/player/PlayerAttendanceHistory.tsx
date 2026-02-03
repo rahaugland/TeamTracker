@@ -31,15 +31,15 @@ export function PlayerAttendanceHistory({
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'present':
-        return <CheckCircle2 className="w-4 h-4 text-green-600" />;
+        return <CheckCircle2 className="w-4 h-4 text-emerald-400" />;
       case 'late':
-        return <Clock className="w-4 h-4 text-yellow-600" />;
+        return <Clock className="w-4 h-4 text-club-secondary" />;
       case 'absent':
-        return <XCircle className="w-4 h-4 text-red-600" />;
+        return <XCircle className="w-4 h-4 text-club-primary" />;
       case 'excused':
-        return <AlertCircle className="w-4 h-4 text-blue-600" />;
+        return <AlertCircle className="w-4 h-4 text-vq-teal" />;
       case 'not_selected':
-        return <XCircle className="w-4 h-4 text-purple-600" />;
+        return <XCircle className="w-4 h-4 text-purple-400" />;
       default:
         return null;
     }
@@ -48,17 +48,17 @@ export function PlayerAttendanceHistory({
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'present':
-        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
+        return 'bg-emerald-500/15 text-emerald-400';
       case 'late':
-        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300';
+        return 'bg-club-secondary/15 text-club-secondary';
       case 'absent':
-        return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300';
+        return 'bg-club-primary/15 text-club-primary';
       case 'excused':
-        return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300';
+        return 'bg-vq-teal/15 text-vq-teal';
       case 'not_selected':
-        return 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300';
+        return 'bg-purple-500/15 text-purple-400';
       default:
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300';
+        return 'bg-muted text-muted-foreground';
     }
   };
 
@@ -81,9 +81,9 @@ export function PlayerAttendanceHistory({
               <span className="text-sm font-medium">
                 {t('dashboard.widgets.averageAttendance')}
               </span>
-              <span className="text-2xl font-bold">{attendanceRate}%</span>
+              <span className="text-2xl text-stat font-bold">{attendanceRate}%</span>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-2">
+            <div className="w-full bg-muted rounded-full h-2">
               <div
                 className="bg-primary rounded-full h-2 transition-all"
                 style={{ width: `${attendanceRate}%` }}
@@ -92,50 +92,50 @@ export function PlayerAttendanceHistory({
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="text-center p-3 bg-green-50 dark:bg-green-950 rounded-lg">
+            <div className="text-center p-3 bg-emerald-500/10 rounded-lg">
               <div className="flex items-center justify-center mb-1">
-                <CheckCircle2 className="w-5 h-5 text-green-600" />
+                <CheckCircle2 className="w-5 h-5 text-emerald-400" />
               </div>
-              <div className="text-2xl font-bold text-green-700 dark:text-green-400">
+              <div className="text-2xl text-stat font-bold text-emerald-400">
                 {presentCount}
               </div>
-              <div className="text-xs text-green-600 dark:text-green-500">
+              <div className="text-xs text-emerald-400/80">
                 {t('attendance.status.present')}
               </div>
             </div>
 
-            <div className="text-center p-3 bg-yellow-50 dark:bg-yellow-950 rounded-lg">
+            <div className="text-center p-3 bg-club-secondary/10 rounded-lg">
               <div className="flex items-center justify-center mb-1">
-                <Clock className="w-5 h-5 text-yellow-600" />
+                <Clock className="w-5 h-5 text-club-secondary" />
               </div>
-              <div className="text-2xl font-bold text-yellow-700 dark:text-yellow-400">
+              <div className="text-2xl text-stat font-bold text-club-secondary">
                 {lateCount}
               </div>
-              <div className="text-xs text-yellow-600 dark:text-yellow-500">
+              <div className="text-xs text-club-secondary/80">
                 {t('attendance.status.late')}
               </div>
             </div>
 
-            <div className="text-center p-3 bg-red-50 dark:bg-red-950 rounded-lg">
+            <div className="text-center p-3 bg-club-primary/10 rounded-lg">
               <div className="flex items-center justify-center mb-1">
-                <XCircle className="w-5 h-5 text-red-600" />
+                <XCircle className="w-5 h-5 text-club-primary" />
               </div>
-              <div className="text-2xl font-bold text-red-700 dark:text-red-400">
+              <div className="text-2xl text-stat font-bold text-club-primary">
                 {absentCount}
               </div>
-              <div className="text-xs text-red-600 dark:text-red-500">
+              <div className="text-xs text-club-primary/80">
                 {t('attendance.status.absent')}
               </div>
             </div>
 
-            <div className="text-center p-3 bg-blue-50 dark:bg-blue-950 rounded-lg">
+            <div className="text-center p-3 bg-vq-teal/10 rounded-lg">
               <div className="flex items-center justify-center mb-1">
-                <AlertCircle className="w-5 h-5 text-blue-600" />
+                <AlertCircle className="w-5 h-5 text-vq-teal" />
               </div>
-              <div className="text-2xl font-bold text-blue-700 dark:text-blue-400">
+              <div className="text-2xl text-stat font-bold text-vq-teal">
                 {excusedCount}
               </div>
-              <div className="text-xs text-blue-600 dark:text-blue-500">
+              <div className="text-xs text-vq-teal/80">
                 {t('attendance.status.excused')}
               </div>
             </div>

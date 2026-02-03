@@ -173,7 +173,7 @@ export function ErrorHandlingExample() {
     <div className="container mx-auto p-6 space-y-6">
       <div>
         <h1 className="text-3xl font-bold mb-2">Error Handling & Logging Examples</h1>
-        <p className="text-gray-600">
+        <p className="text-muted-foreground">
           This page demonstrates the error handling and logging features. Check browser console
           for detailed logs.
         </p>
@@ -188,7 +188,7 @@ export function ErrorHandlingExample() {
         <CardContent>
           <div className="flex items-center gap-2">
             <div
-              className={`w-3 h-3 rounded-full ${isOnline ? 'bg-green-500' : 'bg-red-500'}`}
+              className={`w-3 h-3 rounded-full ${isOnline ? 'bg-emerald-500' : 'bg-club-primary'}`}
             />
             <span className="font-medium">
               {isOnline ? 'Online' : 'Offline'}
@@ -311,8 +311,8 @@ export function ErrorHandlingExample() {
           <CardDescription>Learn more about error handling</CardDescription>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-gray-600">
-            See <code className="bg-gray-100 px-2 py-1 rounded">ERROR_HANDLING_GUIDE.md</code> for
+          <p className="text-sm text-muted-foreground">
+            See <code className="bg-muted/50 px-2 py-1 rounded">ERROR_HANDLING_GUIDE.md</code> for
             complete documentation on how to use the error handling and logging system in your
             components.
           </p>

@@ -55,7 +55,7 @@ export function SeasonSummary({ teamId, startDate, endDate }: SeasonSummaryProps
                 <span className="truncate mr-2">{match.opponent || '\u2014'}</span>
                 <div className="flex items-center gap-2 shrink-0">
                   <span className="text-muted-foreground">{match.setsWon}\u2013{match.setsLost}</span>
-                  <span className={`text-xs font-bold px-1.5 py-0.5 rounded ${match.won ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                  <span className={`text-xs font-bold px-1.5 py-0.5 rounded ${match.won ? 'bg-emerald-500/15 text-emerald-400' : 'bg-club-primary/15 text-club-primary'}`}>
                     {match.won ? t('awards.seasonSummary.win') : t('awards.seasonSummary.loss')}
                   </span>
                 </div>

@@ -76,11 +76,11 @@ export function TopDrillsWidget({ teamId, limit = 5, dateRange }: TopDrillsWidge
             {drills.map((drill, index) => (
               <div
                 key={drill.drillId}
-                className="flex items-center gap-3 p-3 rounded-lg border hover:bg-accent transition-colors"
+                className="flex items-center gap-3 p-3 rounded-lg border border-white/[0.06] hover:bg-white/[0.04] transition-colors"
               >
                 <div className="flex-shrink-0">
                   {index === 0 ? (
-                    <Trophy className="h-5 w-5 text-primary" />
+                    <Trophy className="h-5 w-5 text-club-secondary" />
                   ) : (
                     <div className="h-5 w-5 rounded-full bg-muted flex items-center justify-center">
                       <span className="text-xs font-medium text-muted-foreground">
@@ -97,7 +97,7 @@ export function TopDrillsWidget({ teamId, limit = 5, dateRange }: TopDrillsWidge
                     </p>
                     {drill.averageRating && (
                       <div className="flex items-center gap-1">
-                        <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                        <Star className="h-3 w-3 fill-club-secondary text-club-secondary" />
                         <span className="text-xs text-muted-foreground">
                           {drill.averageRating.toFixed(1)}
                         </span>

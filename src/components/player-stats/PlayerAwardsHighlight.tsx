@@ -7,6 +7,7 @@ import type { GameAwardType, SeasonAwardType } from '@/types/database.types';
 
 interface PlayerAwardsHighlightProps {
   playerId: string;
+  variant?: 'full' | 'compact';
 }
 
 const SEASON_AWARD_META: Record<SeasonAwardType, { icon: string; label: string; gradient: string }> = {
@@ -85,7 +86,7 @@ function buildHighlights(summary: PlayerAwardsSummary): HighlightItem[] {
   return items.slice(0, 5);
 }
 
-export function PlayerAwardsHighlight({ playerId }: PlayerAwardsHighlightProps) {
+export function PlayerAwardsHighlight({ playerId, variant = 'full' }: PlayerAwardsHighlightProps) {
   const navigate = useNavigate();
   const [summary, setSummary] = useState<PlayerAwardsSummary | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -105,6 +106,35 @@ export function PlayerAwardsHighlight({ playerId }: PlayerAwardsHighlightProps) 
   const highlights = buildHighlights(summary);
   if (highlights.length === 0) return null;
 
+  // Compact variant - horizontal row with icons and counts
+  if (variant === 'compact') {
+    return (
+      <div className="flex flex-wrap gap-3 p-4 bg-gradient-to-br from-club-secondary/10 to-club-secondary/[0.02] border border-club-secondary/15 rounded-lg mb-6">
+        {highlights.slice(0, 4).map((item) => (
+          <div
+            key={`${item.type}-${item.awardType}`}
+            className="flex items-center gap-2 px-3 py-2 bg-club-secondary/10 rounded-md"
+          >
+            <span className="text-xl">{item.icon}</span>
+            <span className="font-display font-semibold text-xs uppercase tracking-wide text-club-secondary">
+              {item.label}
+              {item.count > 1 && ` x${item.count}`}
+            </span>
+          </div>
+        ))}
+        {summary.totalAwards > 4 && (
+          <button
+            onClick={() => navigate(`/players/${playerId}/stats#awards`)}
+            className="flex items-center gap-2 px-3 py-2 text-xs text-club-secondary hover:underline"
+          >
+            +{summary.totalAwards - 4} more
+          </button>
+        )}
+      </div>
+    );
+  }
+
+  // Full variant - cards with details
   return (
     <div className="mb-6">
       <div className="flex items-center justify-between mb-3">

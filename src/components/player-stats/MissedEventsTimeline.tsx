@@ -27,7 +27,7 @@ export function MissedEventsTimeline({ events }: MissedEventsTimelineProps) {
 
     const actualStartDate = minDate < startDate ? startDate : minDate;
 
-    let currentDate = new Date(actualStartDate);
+    const currentDate = new Date(actualStartDate);
     currentDate.setDate(currentDate.getDate() - currentDate.getDay()); // Start on Sunday
 
     while (currentDate <= today) {
@@ -52,19 +52,19 @@ export function MissedEventsTimeline({ events }: MissedEventsTimelineProps) {
   }, [events]);
 
   const getStatusColor = (status: string | null) => {
-    if (!status) return 'bg-gray-100';
+    if (!status) return 'bg-white/10';
 
     switch (status) {
       case 'present':
-        return 'bg-green-500';
+        return 'bg-emerald-400';
       case 'late':
-        return 'bg-yellow-500';
+        return 'bg-club-secondary';
       case 'absent':
-        return 'bg-red-500';
+        return 'bg-club-primary';
       case 'excused':
-        return 'bg-blue-400';
+        return 'bg-vq-teal';
       default:
-        return 'bg-gray-200';
+        return 'bg-white/5';
     }
   };
 
@@ -113,7 +113,7 @@ export function MissedEventsTimeline({ events }: MissedEventsTimelineProps) {
                 {week.map((day, dayIndex) => (
                   <div
                     key={dayIndex}
-                    className={`w-3 h-3 rounded-sm ${getStatusColor(day.status)} transition-all hover:ring-2 hover:ring-gray-400 cursor-pointer`}
+                    className={`w-3 h-3 rounded-sm ${getStatusColor(day.status)} transition-all hover:ring-2 hover:ring-white/30 cursor-pointer`}
                     title={`${day.date}: ${getStatusLabel(day.status)}`}
                   />
                 ))}
@@ -124,23 +124,23 @@ export function MissedEventsTimeline({ events }: MissedEventsTimelineProps) {
 
         <div className="flex items-center justify-center gap-4 text-xs text-muted-foreground mt-4 border-t pt-4">
           <div className="flex items-center gap-1">
-            <div className="w-3 h-3 rounded-sm bg-green-500" />
+            <div className="w-3 h-3 rounded-sm bg-emerald-400" />
             <span>Present</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-3 h-3 rounded-sm bg-yellow-500" />
+            <div className="w-3 h-3 rounded-sm bg-club-secondary" />
             <span>Late</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-3 h-3 rounded-sm bg-red-500" />
+            <div className="w-3 h-3 rounded-sm bg-club-primary" />
             <span>Absent</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-3 h-3 rounded-sm bg-blue-400" />
+            <div className="w-3 h-3 rounded-sm bg-vq-teal" />
             <span>Excused</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-3 h-3 rounded-sm bg-gray-100 border border-gray-300" />
+            <div className="w-3 h-3 rounded-sm bg-white/10 border border-white/20" />
             <span>No event</span>
           </div>
         </div>

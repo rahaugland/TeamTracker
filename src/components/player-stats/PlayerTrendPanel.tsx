@@ -126,9 +126,9 @@ function getSparklineBar(rating: number): { char: string; color: string } {
   const normalized = Math.min(99, Math.max(1, rating));
 
   // Determine color based on rating tier
-  let color = 'bg-red-500';
-  if (normalized >= 70) color = 'bg-green-500';
-  else if (normalized >= 50) color = 'bg-yellow-500';
+  let color = 'bg-club-primary';
+  if (normalized >= 70) color = 'bg-emerald-400';
+  else if (normalized >= 50) color = 'bg-club-secondary';
 
   // Determine height (1-8 scale)
   const height = Math.ceil((normalized / 99) * 8);
@@ -192,9 +192,9 @@ export function PlayerTrendPanel({
                 </div>
               </div>
               {/* Form bar */}
-              <div className="w-full bg-gray-200 rounded-full h-2">
+              <div className="w-full bg-white/10 rounded-full h-2">
                 <div
-                  className="bg-blue-600 h-2 rounded-full transition-all"
+                  className="bg-vq-teal h-2 rounded-full transition-all"
                   style={{ width: `${(playerForm.formRating / 99) * 100}%` }}
                 />
               </div>
@@ -322,10 +322,10 @@ function StatRow({ label, value, trend }: { label: string; value: string; trend:
  */
 function TrendIcon({ direction }: { direction: 'up' | 'down' | 'stable' }) {
   if (direction === 'up') {
-    return <TrendingUp className="h-4 w-4 text-green-600" />;
+    return <TrendingUp className="h-4 w-4 text-emerald-400" />;
   }
   if (direction === 'down') {
-    return <TrendingDown className="h-4 w-4 text-red-600" />;
+    return <TrendingDown className="h-4 w-4 text-club-primary" />;
   }
-  return <Minus className="h-4 w-4 text-gray-400" />;
+  return <Minus className="h-4 w-4 text-muted-foreground" />;
 }

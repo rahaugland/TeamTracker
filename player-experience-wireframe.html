@@ -1,0 +1,2298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VolleyQuest - Player Experience Wireframe</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800;900&family=Barlow:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      /* Navy Theme */
+      --navy-100: #0A1628;
+      --navy-90: #0F1D32;
+      --navy-80: #162544;
+      --navy-70: #1E2D4D;
+
+      /* Brand Colors */
+      --club-primary: #E63946;
+      --club-secondary: #FFB703;
+      --vq-teal: #2EC4B6;
+
+      /* Semantic */
+      --success: #22C55E;
+      --warning: #F59E0B;
+      --error: #EF4444;
+      --info: #3B82F6;
+
+      /* Text */
+      --text-primary: #FFFFFF;
+      --text-secondary: #A0AEC0;
+      --text-muted: #64748B;
+
+      /* Borders */
+      --border-subtle: rgba(255, 255, 255, 0.06);
+      --border-default: rgba(255, 255, 255, 0.1);
+      --border-emphasis: rgba(255, 255, 255, 0.2);
+
+      /* Fonts */
+      --font-display: 'Barlow Condensed', sans-serif;
+      --font-body: 'Barlow', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: var(--navy-100);
+      color: var(--text-primary);
+      font-family: var(--font-body);
+      min-height: 100vh;
+    }
+
+    /* ============ NAVIGATION ============ */
+    .page-tabs {
+      display: flex;
+      gap: 8px;
+      padding: 20px 24px;
+      background: var(--navy-90);
+      border-bottom: 1px solid var(--border-subtle);
+      overflow-x: auto;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .page-tab {
+      padding: 12px 20px;
+      background: transparent;
+      border: 1px solid var(--border-default);
+      border-radius: 8px;
+      color: var(--text-secondary);
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .page-tab:hover {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: var(--border-emphasis);
+    }
+
+    .page-tab.active {
+      background: var(--club-primary);
+      border-color: var(--club-primary);
+      color: white;
+    }
+
+    /* ============ PAGE CONTAINER ============ */
+    .page-container {
+      display: none;
+      padding: 32px 24px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .page-container.active {
+      display: block;
+    }
+
+    /* ============ HEADER ============ */
+    .page-header {
+      margin-bottom: 32px;
+    }
+
+    .page-title {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 32px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 4px;
+    }
+
+    .page-subtitle {
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+
+    /* ============ GRID LAYOUTS ============ */
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 300px 1fr;
+      gap: 32px;
+      margin-bottom: 32px;
+    }
+
+    @media (max-width: 1024px) {
+      .hero-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    @media (max-width: 768px) {
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .two-col-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    @media (max-width: 900px) {
+      .two-col-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* ============ FIFA PLAYER CARD ============ */
+    .fifa-card {
+      width: 280px;
+      min-height: 440px;
+      border-radius: 16px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(145deg, #2a1f0a 0%, #1a1508 50%, #2a1a05 100%);
+      border: 1px solid rgba(255, 183, 3, 0.35);
+      box-shadow:
+        0 8px 32px rgba(255, 183, 3, 0.15),
+        inset 0 1px 0 rgba(255, 183, 3, 0.1);
+    }
+
+    .fifa-card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -30%;
+      width: 200px;
+      height: 200px;
+      background: radial-gradient(circle, rgba(255, 183, 3, 0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .fifa-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 8px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .fifa-rating-block {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .fifa-tier {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      color: var(--club-secondary);
+      margin-bottom: 2px;
+    }
+
+    .fifa-overall {
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: 56px;
+      line-height: 1;
+      background: linear-gradient(135deg, var(--club-secondary) 0%, #FFD166 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .fifa-position {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 14px;
+      color: rgba(255, 183, 3, 0.6);
+      letter-spacing: 2px;
+    }
+
+    .fifa-trend-badge {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 12px;
+    }
+
+    .fifa-trend-badge.up {
+      background: rgba(34, 197, 94, 0.2);
+      color: var(--success);
+    }
+
+    .fifa-trend-badge.down {
+      background: rgba(239, 68, 68, 0.2);
+      color: var(--error);
+    }
+
+    .fifa-avatar {
+      width: 88px;
+      height: 88px;
+      border-radius: 12px;
+      background: rgba(255, 183, 3, 0.1);
+      border: 2px solid rgba(255, 183, 3, 0.3);
+      margin: 16px auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    .fifa-avatar-initials {
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: 32px;
+      color: var(--club-secondary);
+    }
+
+    .fifa-player-name {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 18px;
+      text-transform: uppercase;
+      text-align: center;
+      letter-spacing: 2px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .fifa-club-name {
+      font-size: 11px;
+      color: var(--text-muted);
+      text-align: center;
+      margin-top: 2px;
+      margin-bottom: 16px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .fifa-skills-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      padding-top: 16px;
+      border-top: 1px solid rgba(255, 183, 3, 0.15);
+      margin-top: auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    .fifa-skill-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 10px;
+      background: rgba(0, 0, 0, 0.25);
+      border-radius: 6px;
+    }
+
+    .fifa-skill-value {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--club-secondary);
+      display: flex;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .fifa-skill-trend {
+      font-size: 10px;
+    }
+
+    .fifa-skill-trend.up { color: var(--success); }
+    .fifa-skill-trend.down { color: var(--error); }
+
+    .fifa-skill-label {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    /* ============ CARDS ============ */
+    .card {
+      background: var(--navy-90);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .card-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .card-title {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .card-content {
+      padding: 20px;
+    }
+
+    /* ============ STAT CARDS ============ */
+    .stat-card {
+      background: var(--navy-90);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .stat-card.highlight {
+      border-color: var(--club-primary);
+      background: linear-gradient(180deg, rgba(230, 57, 70, 0.08) 0%, var(--navy-90) 100%);
+    }
+
+    .stat-card-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 12px;
+      font-size: 20px;
+    }
+
+    .stat-card-value {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 32px;
+      margin-bottom: 4px;
+    }
+
+    .stat-card-value.teal { color: var(--vq-teal); }
+    .stat-card-value.gold { color: var(--club-secondary); }
+    .stat-card-value.red { color: var(--club-primary); }
+    .stat-card-value.green { color: var(--success); }
+
+    .stat-card-label {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+    }
+
+    .stat-card-subtitle {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* ============ NEXT EVENT HERO ============ */
+    .next-event-hero {
+      background: linear-gradient(135deg, rgba(230, 57, 70, 0.12) 0%, rgba(46, 196, 182, 0.08) 100%);
+      border: 1px solid rgba(230, 57, 70, 0.25);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
+    .next-event-label {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--club-primary);
+      margin-bottom: 8px;
+    }
+
+    .next-event-title {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 24px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 16px;
+    }
+
+    .next-event-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 24px;
+      margin-bottom: 20px;
+    }
+
+    .next-event-meta-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .next-event-meta-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+
+    .next-event-meta-text {
+      font-size: 14px;
+    }
+
+    .next-event-meta-sublabel {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .rsvp-buttons {
+      display: flex;
+      gap: 12px;
+    }
+
+    /* ============ BUTTONS ============ */
+    .btn {
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s ease;
+    }
+
+    .btn-primary {
+      background: var(--club-primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #d32f3c;
+      transform: translateY(-1px);
+    }
+
+    .btn-success {
+      background: var(--success);
+      color: white;
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--border-default);
+      color: var(--text-primary);
+    }
+
+    .btn-outline:hover {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: var(--border-emphasis);
+    }
+
+    .btn-ghost {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-secondary);
+    }
+
+    .btn-sm {
+      padding: 8px 16px;
+      font-size: 11px;
+    }
+
+    /* ============ SCHEDULE LIST ============ */
+    .schedule-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .schedule-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px;
+      background: var(--navy-80);
+      border-radius: 12px;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .schedule-date-block {
+      width: 56px;
+      height: 64px;
+      background: var(--navy-100);
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .schedule-date-day {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 24px;
+      line-height: 1;
+    }
+
+    .schedule-date-month {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+    }
+
+    .schedule-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .schedule-title {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 15px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+
+    .schedule-meta {
+      display: flex;
+      gap: 16px;
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .schedule-type-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .schedule-type-badge.practice {
+      background: rgba(46, 196, 182, 0.15);
+      color: var(--vq-teal);
+    }
+
+    .schedule-type-badge.match {
+      background: rgba(230, 57, 70, 0.15);
+      color: var(--club-primary);
+    }
+
+    .schedule-type-badge.tournament {
+      background: rgba(255, 183, 3, 0.15);
+      color: var(--club-secondary);
+    }
+
+    .schedule-rsvp {
+      display: flex;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .rsvp-badge {
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .rsvp-badge.attending {
+      background: rgba(34, 197, 94, 0.15);
+      color: var(--success);
+      border: 1px solid rgba(34, 197, 94, 0.3);
+    }
+
+    .rsvp-badge.not-attending {
+      background: rgba(239, 68, 68, 0.15);
+      color: var(--error);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .rsvp-badge.pending {
+      background: rgba(255, 183, 3, 0.15);
+      color: var(--club-secondary);
+      border: 1px solid rgba(255, 183, 3, 0.3);
+    }
+
+    /* ============ QUICK ACTION BUTTONS ============ */
+    .quick-rsvp-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      border: 1px solid var(--border-default);
+      background: transparent;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      transition: all 0.2s ease;
+    }
+
+    .quick-rsvp-btn:hover {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .quick-rsvp-btn.active-yes {
+      background: rgba(34, 197, 94, 0.2);
+      border-color: var(--success);
+      color: var(--success);
+    }
+
+    .quick-rsvp-btn.active-no {
+      background: rgba(239, 68, 68, 0.2);
+      border-color: var(--error);
+      color: var(--error);
+    }
+
+    /* ============ PROGRESS SECTION ============ */
+    .streak-cards {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    @media (max-width: 768px) {
+      .streak-cards {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .streak-card {
+      background: var(--navy-90);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 20px;
+    }
+
+    .streak-card-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      margin-bottom: 12px;
+    }
+
+    .streak-card-value {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 28px;
+      margin-bottom: 4px;
+    }
+
+    .streak-card-label {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+    }
+
+    .streak-card-subtitle {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* ============ GOALS LIST ============ */
+    .goals-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .goal-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px;
+      background: var(--navy-80);
+      border-radius: 12px;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .goal-item.completed {
+      opacity: 0.6;
+    }
+
+    .goal-checkbox {
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      border: 2px solid var(--border-emphasis);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+
+    .goal-checkbox.checked {
+      background: var(--success);
+      border-color: var(--success);
+      color: white;
+    }
+
+    .goal-info {
+      flex: 1;
+    }
+
+    .goal-title {
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .goal-progress {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .goal-progress-bar {
+      flex: 1;
+      height: 6px;
+      background: var(--navy-100);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .goal-progress-fill {
+      height: 100%;
+      background: var(--vq-teal);
+      border-radius: 3px;
+      transition: width 0.3s ease;
+    }
+
+    .goal-progress-text {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    /* ============ SKILL BARS ============ */
+    .skill-bars {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .skill-bar-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .skill-bar-label {
+      width: 80px;
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-secondary);
+    }
+
+    .skill-bar-track {
+      flex: 1;
+      height: 24px;
+      background: var(--navy-100);
+      border-radius: 4px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .skill-bar-fill {
+      height: 100%;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      padding-left: 12px;
+      transition: width 0.5s ease;
+    }
+
+    .skill-bar-value {
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 13px;
+      color: white;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    }
+
+    .skill-bar-trend {
+      width: 32px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 600;
+      text-align: right;
+    }
+
+    .skill-bar-trend.up { color: var(--success); }
+    .skill-bar-trend.down { color: var(--error); }
+    .skill-bar-trend.stable { color: var(--text-muted); }
+
+    /* ============ TIMELINE ============ */
+    .timeline {
+      position: relative;
+      padding-left: 24px;
+    }
+
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 8px;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: var(--border-default);
+    }
+
+    .timeline-item {
+      position: relative;
+      padding-bottom: 24px;
+    }
+
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: -20px;
+      top: 4px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--navy-90);
+      border: 2px solid var(--vq-teal);
+    }
+
+    .timeline-item.highlight::before {
+      background: var(--club-primary);
+      border-color: var(--club-primary);
+    }
+
+    .timeline-date {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .timeline-title {
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .timeline-desc {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    /* ============ CHARTS PLACEHOLDER ============ */
+    .chart-placeholder {
+      height: 200px;
+      background: var(--navy-80);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      font-size: 13px;
+      border: 1px dashed var(--border-default);
+    }
+
+    /* ============ TREND INDICATOR ============ */
+    .trend-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .trend-indicator.up { color: var(--success); }
+    .trend-indicator.down { color: var(--error); }
+    .trend-indicator.stable { color: var(--text-muted); }
+
+    /* ============ ANNOUNCEMENTS ============ */
+    .announcement-card {
+      padding: 16px;
+      background: var(--navy-80);
+      border-radius: 10px;
+      border-left: 3px solid var(--club-secondary);
+      margin-bottom: 12px;
+    }
+
+    .announcement-card.pinned {
+      border-left-color: var(--club-primary);
+      background: linear-gradient(90deg, rgba(230, 57, 70, 0.08) 0%, var(--navy-80) 100%);
+    }
+
+    .announcement-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .announcement-pin {
+      font-size: 12px;
+      color: var(--club-primary);
+    }
+
+    .announcement-date {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .announcement-title {
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .announcement-text {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    /* ============ PROFILE SECTION ============ */
+    .profile-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 24px;
+      margin-bottom: 32px;
+      padding-bottom: 32px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .profile-avatar {
+      width: 120px;
+      height: 120px;
+      border-radius: 16px;
+      background: var(--navy-80);
+      border: 2px solid var(--border-default);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .profile-avatar-initials {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 48px;
+      color: var(--club-secondary);
+    }
+
+    .profile-info {
+      flex: 1;
+    }
+
+    .profile-name {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 36px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 8px;
+    }
+
+    .profile-meta {
+      display: flex;
+      gap: 24px;
+      margin-bottom: 16px;
+    }
+
+    .profile-meta-item {
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+
+    .profile-meta-label {
+      color: var(--text-muted);
+      margin-right: 8px;
+    }
+
+    .profile-teams {
+      display: flex;
+      gap: 8px;
+    }
+
+    .team-badge {
+      padding: 6px 12px;
+      background: rgba(46, 196, 182, 0.15);
+      border-radius: 6px;
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 12px;
+      color: var(--vq-teal);
+    }
+
+    /* ============ EMPTY STATE ============ */
+    .empty-state {
+      text-align: center;
+      padding: 48px 24px;
+      color: var(--text-muted);
+    }
+
+    .empty-state-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+
+    .empty-state-title {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 16px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+      color: var(--text-secondary);
+    }
+
+    .empty-state-desc {
+      font-size: 13px;
+    }
+
+    /* ============ MOBILE NAV ============ */
+    .mobile-nav {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--navy-90);
+      border-top: 1px solid var(--border-subtle);
+      padding: 8px 16px;
+      z-index: 1000;
+    }
+
+    @media (max-width: 768px) {
+      .mobile-nav {
+        display: flex;
+        justify-content: space-around;
+      }
+
+      .page-tabs {
+        display: none;
+      }
+
+      .page-container {
+        padding-bottom: 80px;
+      }
+    }
+
+    .mobile-nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      padding: 8px 16px;
+      border-radius: 8px;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .mobile-nav-item.active {
+      color: var(--club-primary);
+      background: rgba(230, 57, 70, 0.1);
+    }
+
+    .mobile-nav-icon {
+      font-size: 20px;
+    }
+
+    .mobile-nav-label {
+      font-family: var(--font-display);
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* ============ FORM ELEMENTS ============ */
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-label {
+      display: block;
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 12px 16px;
+      background: var(--navy-80);
+      border: 1px solid var(--border-default);
+      border-radius: 8px;
+      color: var(--text-primary);
+      font-family: var(--font-body);
+      font-size: 14px;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: var(--vq-teal);
+    }
+
+    .form-textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    /* ============ RATINGS INPUT ============ */
+    .rating-input {
+      display: flex;
+      gap: 4px;
+    }
+
+    .rating-star {
+      font-size: 24px;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: color 0.2s ease;
+    }
+
+    .rating-star.active {
+      color: var(--club-secondary);
+    }
+
+    /* ============ GAME LOG ============ */
+    .game-log-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .game-log-table th {
+      padding: 12px 16px;
+      text-align: left;
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .game-log-table td {
+      padding: 14px 16px;
+      font-size: 13px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .game-log-table td.stat {
+      font-family: var(--font-mono);
+      font-weight: 600;
+    }
+
+    .game-result {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 12px;
+    }
+
+    .game-result.win {
+      background: rgba(34, 197, 94, 0.15);
+      color: var(--success);
+    }
+
+    .game-result.loss {
+      background: rgba(239, 68, 68, 0.15);
+      color: var(--error);
+    }
+
+    /* ============ SECTION DIVIDER ============ */
+    .section-title {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 18px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .section-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border-subtle);
+    }
+  </style>
+</head>
+<body>
+
+<!-- Page Navigation -->
+<nav class="page-tabs">
+  <button class="page-tab active" onclick="showPage('dashboard')">Dashboard</button>
+  <button class="page-tab" onclick="showPage('schedule')">Schedule</button>
+  <button class="page-tab" onclick="showPage('stats')">My Stats</button>
+  <button class="page-tab" onclick="showPage('progress')">Progress</button>
+  <button class="page-tab" onclick="showPage('profile')">Profile</button>
+</nav>
+
+<!-- Mobile Navigation -->
+<nav class="mobile-nav">
+  <div class="mobile-nav-item active" onclick="showPage('dashboard')">
+    <span class="mobile-nav-icon">🏠</span>
+    <span class="mobile-nav-label">Home</span>
+  </div>
+  <div class="mobile-nav-item" onclick="showPage('schedule')">
+    <span class="mobile-nav-icon">📅</span>
+    <span class="mobile-nav-label">Schedule</span>
+  </div>
+  <div class="mobile-nav-item" onclick="showPage('stats')">
+    <span class="mobile-nav-icon">📊</span>
+    <span class="mobile-nav-label">Stats</span>
+  </div>
+  <div class="mobile-nav-item" onclick="showPage('progress')">
+    <span class="mobile-nav-icon">🎯</span>
+    <span class="mobile-nav-label">Goals</span>
+  </div>
+  <div class="mobile-nav-item" onclick="showPage('profile')">
+    <span class="mobile-nav-icon">👤</span>
+    <span class="mobile-nav-label">Profile</span>
+  </div>
+</nav>
+
+<!-- ============ DASHBOARD PAGE ============ -->
+<div id="dashboard" class="page-container active">
+  <div class="page-header">
+    <h1 class="page-title">Welcome, Erik!</h1>
+    <p class="page-subtitle">Oslo Volley U19 - Outside Hitter</p>
+  </div>
+
+  <!-- Hero Grid: FIFA Card + Next Event -->
+  <div class="hero-grid">
+    <!-- FIFA Card -->
+    <div class="fifa-card">
+      <div class="fifa-card-header">
+        <div class="fifa-rating-block">
+          <span class="fifa-tier">Gold</span>
+          <span class="fifa-overall">78</span>
+          <span class="fifa-position">OH</span>
+        </div>
+        <div class="fifa-trend-badge up">
+          <span>↑</span>
+          <span>+3</span>
+        </div>
+      </div>
+
+      <div class="fifa-avatar">
+        <span class="fifa-avatar-initials">EH</span>
+      </div>
+
+      <div class="fifa-player-name">Erik Hansen</div>
+      <div class="fifa-club-name">Oslo Volley U19</div>
+
+      <div class="fifa-skills-grid">
+        <div class="fifa-skill-row">
+          <span class="fifa-skill-value">76 <span class="fifa-skill-trend up">↑</span></span>
+          <span class="fifa-skill-label">SRV</span>
+        </div>
+        <div class="fifa-skill-row">
+          <span class="fifa-skill-value">72 <span class="fifa-skill-trend down">↓</span></span>
+          <span class="fifa-skill-label">RCV</span>
+        </div>
+        <div class="fifa-skill-row">
+          <span class="fifa-skill-value">68</span>
+          <span class="fifa-skill-label">SET</span>
+        </div>
+        <div class="fifa-skill-row">
+          <span class="fifa-skill-value">81 <span class="fifa-skill-trend up">↑</span></span>
+          <span class="fifa-skill-label">BLK</span>
+        </div>
+        <div class="fifa-skill-row">
+          <span class="fifa-skill-value">84 <span class="fifa-skill-trend up">↑</span></span>
+          <span class="fifa-skill-label">ATK</span>
+        </div>
+        <div class="fifa-skill-row">
+          <span class="fifa-skill-value">70</span>
+          <span class="fifa-skill-label">DIG</span>
+        </div>
+        <div class="fifa-skill-row">
+          <span class="fifa-skill-value">75</span>
+          <span class="fifa-skill-label">MNT</span>
+        </div>
+        <div class="fifa-skill-row">
+          <span class="fifa-skill-value">79 <span class="fifa-skill-trend up">↑</span></span>
+          <span class="fifa-skill-label">PHY</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Next Event + Quick Stats -->
+    <div>
+      <!-- Next Event Hero -->
+      <div class="next-event-hero">
+        <div class="next-event-label">Next Event</div>
+        <div class="next-event-title">Practice Session</div>
+        <div class="next-event-meta">
+          <div class="next-event-meta-item">
+            <div class="next-event-meta-icon">📅</div>
+            <div>
+              <div class="next-event-meta-text">Thursday, Feb 6</div>
+              <div class="next-event-meta-sublabel">In 3 days</div>
+            </div>
+          </div>
+          <div class="next-event-meta-item">
+            <div class="next-event-meta-icon">⏰</div>
+            <div>
+              <div class="next-event-meta-text">18:00 - 20:00</div>
+              <div class="next-event-meta-sublabel">2 hours</div>
+            </div>
+          </div>
+          <div class="next-event-meta-item">
+            <div class="next-event-meta-icon">📍</div>
+            <div>
+              <div class="next-event-meta-text">Ekeberg Hall</div>
+              <div class="next-event-meta-sublabel">Court 2</div>
+            </div>
+          </div>
+        </div>
+        <div class="rsvp-buttons">
+          <button class="btn btn-success">✓ Attending</button>
+          <button class="btn btn-outline">Can't Make It</button>
+        </div>
+      </div>
+
+      <!-- Quick Stats -->
+      <div class="stats-grid">
+        <div class="stat-card highlight">
+          <div class="stat-card-value red">7</div>
+          <div class="stat-card-label">Current Streak</div>
+          <div class="stat-card-subtitle">🔥 Personal best!</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-value green">92%</div>
+          <div class="stat-card-label">Attendance</div>
+          <div class="stat-card-subtitle">23/25 events</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-value gold">3</div>
+          <div class="stat-card-label">Goals Active</div>
+          <div class="stat-card-subtitle">2 completed</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-value teal">12</div>
+          <div class="stat-card-label">Games Played</div>
+          <div class="stat-card-subtitle">This season</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Upcoming Events Preview -->
+  <div class="section-title">Upcoming This Week</div>
+  <div class="schedule-list" style="margin-bottom: 32px;">
+    <div class="schedule-item">
+      <div class="schedule-date-block">
+        <span class="schedule-date-day">06</span>
+        <span class="schedule-date-month">Feb</span>
+      </div>
+      <div class="schedule-info">
+        <div class="schedule-type-badge practice">Practice</div>
+        <div class="schedule-title">Practice Session</div>
+        <div class="schedule-meta">
+          <span>18:00 - 20:00</span>
+          <span>Ekeberg Hall</span>
+        </div>
+      </div>
+      <div class="schedule-rsvp">
+        <span class="rsvp-badge attending">✓ Going</span>
+      </div>
+    </div>
+    <div class="schedule-item">
+      <div class="schedule-date-block">
+        <span class="schedule-date-day">08</span>
+        <span class="schedule-date-month">Feb</span>
+      </div>
+      <div class="schedule-info">
+        <div class="schedule-type-badge match">Match</div>
+        <div class="schedule-title">vs Asker VBK</div>
+        <div class="schedule-meta">
+          <span>14:00</span>
+          <span>Home Game</span>
+        </div>
+      </div>
+      <div class="schedule-rsvp">
+        <span class="rsvp-badge pending">Respond</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Announcements -->
+  <div class="section-title">Team Announcements</div>
+  <div class="announcement-card pinned">
+    <div class="announcement-header">
+      <span class="announcement-pin">📌</span>
+      <span class="announcement-date">Feb 2, 2026</span>
+    </div>
+    <div class="announcement-title">New Practice Schedule</div>
+    <div class="announcement-text">Starting next week, Thursday practices will begin at 17:30 instead of 18:00. Please update your calendars!</div>
+  </div>
+  <div class="announcement-card">
+    <div class="announcement-header">
+      <span class="announcement-date">Feb 1, 2026</span>
+    </div>
+    <div class="announcement-title">Tournament Registration Open</div>
+    <div class="announcement-text">Spring tournament registration is now open. Let Coach Sara know if you want to participate by Feb 10.</div>
+  </div>
+</div>
+
+<!-- ============ SCHEDULE PAGE ============ -->
+<div id="schedule" class="page-container">
+  <div class="page-header">
+    <h1 class="page-title">Schedule</h1>
+    <p class="page-subtitle">Your upcoming events and commitments</p>
+  </div>
+
+  <!-- Month Filter -->
+  <div style="display: flex; gap: 8px; margin-bottom: 24px;">
+    <button class="btn btn-primary btn-sm">February</button>
+    <button class="btn btn-outline btn-sm">March</button>
+    <button class="btn btn-outline btn-sm">April</button>
+    <button class="btn btn-ghost btn-sm" style="margin-left: auto;">📅 Calendar View</button>
+  </div>
+
+  <!-- RSVP Summary -->
+  <div class="stats-grid" style="margin-bottom: 32px;">
+    <div class="stat-card">
+      <div class="stat-card-value teal">8</div>
+      <div class="stat-card-label">Events This Month</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-value green">5</div>
+      <div class="stat-card-label">Confirmed</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-value gold">2</div>
+      <div class="stat-card-label">Pending RSVP</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-value red">1</div>
+      <div class="stat-card-label">Can't Attend</div>
+    </div>
+  </div>
+
+  <!-- Schedule List -->
+  <div class="section-title">February 2026</div>
+  <div class="schedule-list">
+    <div class="schedule-item">
+      <div class="schedule-date-block">
+        <span class="schedule-date-day">06</span>
+        <span class="schedule-date-month">Feb</span>
+      </div>
+      <div class="schedule-info">
+        <div class="schedule-type-badge practice">Practice</div>
+        <div class="schedule-title">Practice Session</div>
+        <div class="schedule-meta">
+          <span>18:00 - 20:00</span>
+          <span>Ekeberg Hall, Court 2</span>
+        </div>
+      </div>
+      <div class="schedule-rsvp">
+        <button class="quick-rsvp-btn active-yes" title="Attending">✓</button>
+        <button class="quick-rsvp-btn" title="Not Attending">✕</button>
+      </div>
+    </div>
+
+    <div class="schedule-item">
+      <div class="schedule-date-block">
+        <span class="schedule-date-day">08</span>
+        <span class="schedule-date-month">Feb</span>
+      </div>
+      <div class="schedule-info">
+        <div class="schedule-type-badge match">Match</div>
+        <div class="schedule-title">vs Asker VBK</div>
+        <div class="schedule-meta">
+          <span>14:00</span>
+          <span>Home - Ekeberg Hall</span>
+        </div>
+      </div>
+      <div class="schedule-rsvp">
+        <button class="quick-rsvp-btn" title="Attending">✓</button>
+        <button class="quick-rsvp-btn" title="Not Attending">✕</button>
+      </div>
+    </div>
+
+    <div class="schedule-item">
+      <div class="schedule-date-block">
+        <span class="schedule-date-day">10</span>
+        <span class="schedule-date-month">Feb</span>
+      </div>
+      <div class="schedule-info">
+        <div class="schedule-type-badge practice">Practice</div>
+        <div class="schedule-title">Practice Session</div>
+        <div class="schedule-meta">
+          <span>18:00 - 20:00</span>
+          <span>Ekeberg Hall, Court 2</span>
+        </div>
+      </div>
+      <div class="schedule-rsvp">
+        <button class="quick-rsvp-btn active-yes" title="Attending">✓</button>
+        <button class="quick-rsvp-btn" title="Not Attending">✕</button>
+      </div>
+    </div>
+
+    <div class="schedule-item">
+      <div class="schedule-date-block">
+        <span class="schedule-date-day">13</span>
+        <span class="schedule-date-month">Feb</span>
+      </div>
+      <div class="schedule-info">
+        <div class="schedule-type-badge practice">Practice</div>
+        <div class="schedule-title">Practice Session</div>
+        <div class="schedule-meta">
+          <span>18:00 - 20:00</span>
+          <span>Ekeberg Hall, Court 2</span>
+        </div>
+      </div>
+      <div class="schedule-rsvp">
+        <button class="quick-rsvp-btn active-yes" title="Attending">✓</button>
+        <button class="quick-rsvp-btn" title="Not Attending">✕</button>
+      </div>
+    </div>
+
+    <div class="schedule-item">
+      <div class="schedule-date-block">
+        <span class="schedule-date-day">15</span>
+        <span class="schedule-date-month">Feb</span>
+      </div>
+      <div class="schedule-info">
+        <div class="schedule-type-badge match">Match</div>
+        <div class="schedule-title">vs Sandnes VBK</div>
+        <div class="schedule-meta">
+          <span>16:00</span>
+          <span>Away - Sandnes Arena</span>
+        </div>
+      </div>
+      <div class="schedule-rsvp">
+        <button class="quick-rsvp-btn active-yes" title="Attending">✓</button>
+        <button class="quick-rsvp-btn" title="Not Attending">✕</button>
+      </div>
+    </div>
+
+    <div class="schedule-item" style="opacity: 0.6;">
+      <div class="schedule-date-block">
+        <span class="schedule-date-day">17</span>
+        <span class="schedule-date-month">Feb</span>
+      </div>
+      <div class="schedule-info">
+        <div class="schedule-type-badge practice">Practice</div>
+        <div class="schedule-title">Practice Session</div>
+        <div class="schedule-meta">
+          <span>18:00 - 20:00</span>
+          <span>Ekeberg Hall, Court 2</span>
+        </div>
+      </div>
+      <div class="schedule-rsvp">
+        <button class="quick-rsvp-btn" title="Attending">✓</button>
+        <button class="quick-rsvp-btn active-no" title="Not Attending">✕</button>
+      </div>
+    </div>
+
+    <div class="schedule-item">
+      <div class="schedule-date-block">
+        <span class="schedule-date-day">21</span>
+        <span class="schedule-date-month">Feb</span>
+      </div>
+      <div class="schedule-info">
+        <div class="schedule-type-badge tournament">Tournament</div>
+        <div class="schedule-title">Spring Cup Day 1</div>
+        <div class="schedule-meta">
+          <span>All Day</span>
+          <span>Ullevål Arena</span>
+        </div>
+      </div>
+      <div class="schedule-rsvp">
+        <button class="quick-rsvp-btn active-yes" title="Attending">✓</button>
+        <button class="quick-rsvp-btn" title="Not Attending">✕</button>
+      </div>
+    </div>
+
+    <div class="schedule-item">
+      <div class="schedule-date-block">
+        <span class="schedule-date-day">22</span>
+        <span class="schedule-date-month">Feb</span>
+      </div>
+      <div class="schedule-info">
+        <div class="schedule-type-badge tournament">Tournament</div>
+        <div class="schedule-title">Spring Cup Day 2</div>
+        <div class="schedule-meta">
+          <span>All Day</span>
+          <span>Ullevål Arena</span>
+        </div>
+      </div>
+      <div class="schedule-rsvp">
+        <button class="quick-rsvp-btn active-yes" title="Attending">✓</button>
+        <button class="quick-rsvp-btn" title="Not Attending">✕</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ STATS PAGE ============ -->
+<div id="stats" class="page-container">
+  <div class="page-header">
+    <h1 class="page-title">My Stats</h1>
+    <p class="page-subtitle">Track your volleyball performance</p>
+  </div>
+
+  <!-- Period Filter -->
+  <div style="display: flex; gap: 8px; margin-bottom: 24px;">
+    <button class="btn btn-outline btn-sm">Last 30 Days</button>
+    <button class="btn btn-primary btn-sm">This Season</button>
+    <button class="btn btn-outline btn-sm">All Time</button>
+  </div>
+
+  <!-- Skill Ratings Overview -->
+  <div class="two-col-grid" style="margin-bottom: 32px;">
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Skill Ratings</span>
+        <span class="trend-indicator up">↑ +3 avg last 2 weeks</span>
+      </div>
+      <div class="card-content">
+        <div class="skill-bars">
+          <div class="skill-bar-row">
+            <span class="skill-bar-label">Serve</span>
+            <div class="skill-bar-track">
+              <div class="skill-bar-fill" style="width: 76%; background: linear-gradient(90deg, var(--club-primary), #FF6B6B);">
+                <span class="skill-bar-value">76</span>
+              </div>
+            </div>
+            <span class="skill-bar-trend up">+2</span>
+          </div>
+          <div class="skill-bar-row">
+            <span class="skill-bar-label">Receive</span>
+            <div class="skill-bar-track">
+              <div class="skill-bar-fill" style="width: 72%; background: linear-gradient(90deg, var(--vq-teal), #5CD9D0);">
+                <span class="skill-bar-value">72</span>
+              </div>
+            </div>
+            <span class="skill-bar-trend down">-1</span>
+          </div>
+          <div class="skill-bar-row">
+            <span class="skill-bar-label">Set</span>
+            <div class="skill-bar-track">
+              <div class="skill-bar-fill" style="width: 68%; background: linear-gradient(90deg, var(--club-secondary), #FFD166);">
+                <span class="skill-bar-value">68</span>
+              </div>
+            </div>
+            <span class="skill-bar-trend stable">—</span>
+          </div>
+          <div class="skill-bar-row">
+            <span class="skill-bar-label">Block</span>
+            <div class="skill-bar-track">
+              <div class="skill-bar-fill" style="width: 81%; background: linear-gradient(90deg, #8B5CF6, #A78BFA);">
+                <span class="skill-bar-value">81</span>
+              </div>
+            </div>
+            <span class="skill-bar-trend up">+4</span>
+          </div>
+          <div class="skill-bar-row">
+            <span class="skill-bar-label">Attack</span>
+            <div class="skill-bar-track">
+              <div class="skill-bar-fill" style="width: 84%; background: linear-gradient(90deg, var(--club-primary), #FF6B6B);">
+                <span class="skill-bar-value">84</span>
+              </div>
+            </div>
+            <span class="skill-bar-trend up">+3</span>
+          </div>
+          <div class="skill-bar-row">
+            <span class="skill-bar-label">Dig</span>
+            <div class="skill-bar-track">
+              <div class="skill-bar-fill" style="width: 70%; background: linear-gradient(90deg, var(--vq-teal), #5CD9D0);">
+                <span class="skill-bar-value">70</span>
+              </div>
+            </div>
+            <span class="skill-bar-trend stable">—</span>
+          </div>
+          <div class="skill-bar-row">
+            <span class="skill-bar-label">Mental</span>
+            <div class="skill-bar-track">
+              <div class="skill-bar-fill" style="width: 75%; background: linear-gradient(90deg, #EC4899, #F472B6);">
+                <span class="skill-bar-value">75</span>
+              </div>
+            </div>
+            <span class="skill-bar-trend stable">—</span>
+          </div>
+          <div class="skill-bar-row">
+            <span class="skill-bar-label">Physique</span>
+            <div class="skill-bar-track">
+              <div class="skill-bar-fill" style="width: 79%; background: linear-gradient(90deg, var(--club-secondary), #FFD166);">
+                <span class="skill-bar-value">79</span>
+              </div>
+            </div>
+            <span class="skill-bar-trend up">+2</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Rating Progression</span>
+      </div>
+      <div class="card-content">
+        <div class="chart-placeholder">
+          📈 Line chart showing overall rating over time<br>
+          (74 → 76 → 75 → 78)
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Season Stats Summary -->
+  <div class="section-title">Season Statistics</div>
+  <div class="stats-grid" style="margin-bottom: 32px;">
+    <div class="stat-card">
+      <div class="stat-card-value teal">12</div>
+      <div class="stat-card-label">Games Played</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-value gold">48</div>
+      <div class="stat-card-label">Total Kills</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-value green">42%</div>
+      <div class="stat-card-label">Kill %</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-value red">15</div>
+      <div class="stat-card-label">Aces</div>
+    </div>
+  </div>
+
+  <div class="stats-grid" style="margin-bottom: 32px;">
+    <div class="stat-card">
+      <div class="stat-card-value teal">2.4</div>
+      <div class="stat-card-label">Pass Rating</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-value gold">24</div>
+      <div class="stat-card-label">Total Blocks</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-value green">38</div>
+      <div class="stat-card-label">Digs</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-value red">92%</div>
+      <div class="stat-card-label">Attendance</div>
+    </div>
+  </div>
+
+  <!-- Game Log -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">Recent Games</span>
+      <button class="btn btn-ghost btn-sm">View All</button>
+    </div>
+    <div class="card-content" style="padding: 0;">
+      <table class="game-log-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Opponent</th>
+            <th>Result</th>
+            <th>K</th>
+            <th>K%</th>
+            <th>A</th>
+            <th>B</th>
+            <th>D</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Feb 1</td>
+            <td>Bærum VBK</td>
+            <td><span class="game-result win">W 3-1</span></td>
+            <td class="stat">6</td>
+            <td class="stat">46%</td>
+            <td class="stat">2</td>
+            <td class="stat">3</td>
+            <td class="stat">4</td>
+          </tr>
+          <tr>
+            <td>Jan 25</td>
+            <td>Drammen VBK</td>
+            <td><span class="game-result loss">L 1-3</span></td>
+            <td class="stat">4</td>
+            <td class="stat">33%</td>
+            <td class="stat">1</td>
+            <td class="stat">2</td>
+            <td class="stat">5</td>
+          </tr>
+          <tr>
+            <td>Jan 18</td>
+            <td>Kolbotn IL</td>
+            <td><span class="game-result win">W 3-2</span></td>
+            <td class="stat">8</td>
+            <td class="stat">50%</td>
+            <td class="stat">3</td>
+            <td class="stat">4</td>
+            <td class="stat">3</td>
+          </tr>
+          <tr>
+            <td>Jan 11</td>
+            <td>Asker VBK</td>
+            <td><span class="game-result win">W 3-0</span></td>
+            <td class="stat">5</td>
+            <td class="stat">42%</td>
+            <td class="stat">2</td>
+            <td class="stat">2</td>
+            <td class="stat">2</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ============ PROGRESS PAGE ============ -->
+<div id="progress" class="page-container">
+  <div class="page-header">
+    <h1 class="page-title">My Progress</h1>
+    <p class="page-subtitle">Goals, achievements, and personal growth</p>
+  </div>
+
+  <!-- Streak Cards -->
+  <div class="streak-cards">
+    <div class="streak-card">
+      <div class="streak-card-icon" style="background: rgba(230, 57, 70, 0.15);">🔥</div>
+      <div class="streak-card-value" style="color: var(--club-primary);">7</div>
+      <div class="streak-card-label">Current Streak</div>
+      <div class="streak-card-subtitle">Best: 12 events</div>
+    </div>
+    <div class="streak-card">
+      <div class="streak-card-icon" style="background: rgba(34, 197, 94, 0.15);">🎯</div>
+      <div class="streak-card-value" style="color: var(--success);">2</div>
+      <div class="streak-card-label">Goals Achieved</div>
+      <div class="streak-card-subtitle">3 active</div>
+    </div>
+    <div class="streak-card">
+      <div class="streak-card-icon" style="background: rgba(46, 196, 182, 0.15);">💭</div>
+      <div class="streak-card-value" style="color: var(--vq-teal);">8</div>
+      <div class="streak-card-label">Self Reflections</div>
+      <div class="streak-card-subtitle">This season</div>
+    </div>
+    <div class="streak-card">
+      <div class="streak-card-icon" style="background: rgba(139, 92, 246, 0.15);">💬</div>
+      <div class="streak-card-value" style="color: #8B5CF6;">5</div>
+      <div class="streak-card-label">Coach Feedback</div>
+      <div class="streak-card-subtitle">2 new</div>
+    </div>
+  </div>
+
+  <!-- Active Goals -->
+  <div class="two-col-grid">
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Active Goals</span>
+        <button class="btn btn-primary btn-sm">+ Add Goal</button>
+      </div>
+      <div class="card-content">
+        <div class="goals-list">
+          <div class="goal-item">
+            <div class="goal-checkbox"></div>
+            <div class="goal-info">
+              <div class="goal-title">Improve serve accuracy to 85%</div>
+              <div class="goal-progress">
+                <div class="goal-progress-bar">
+                  <div class="goal-progress-fill" style="width: 72%;"></div>
+                </div>
+                <span class="goal-progress-text">72%</span>
+              </div>
+            </div>
+          </div>
+          <div class="goal-item">
+            <div class="goal-checkbox"></div>
+            <div class="goal-info">
+              <div class="goal-title">Attend 10 consecutive practices</div>
+              <div class="goal-progress">
+                <div class="goal-progress-bar">
+                  <div class="goal-progress-fill" style="width: 70%;"></div>
+                </div>
+                <span class="goal-progress-text">7/10</span>
+              </div>
+            </div>
+          </div>
+          <div class="goal-item">
+            <div class="goal-checkbox"></div>
+            <div class="goal-info">
+              <div class="goal-title">Get 5 aces in a single game</div>
+              <div class="goal-progress">
+                <div class="goal-progress-bar">
+                  <div class="goal-progress-fill" style="width: 60%;"></div>
+                </div>
+                <span class="goal-progress-text">Best: 3</span>
+              </div>
+            </div>
+          </div>
+          <div class="goal-item completed">
+            <div class="goal-checkbox checked">✓</div>
+            <div class="goal-info">
+              <div class="goal-title" style="text-decoration: line-through;">Reach 75 overall rating</div>
+              <div class="goal-progress">
+                <div class="goal-progress-bar">
+                  <div class="goal-progress-fill" style="width: 100%; background: var(--success);"></div>
+                </div>
+                <span class="goal-progress-text">Done!</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Recent Coach Feedback</span>
+      </div>
+      <div class="card-content">
+        <div class="timeline">
+          <div class="timeline-item highlight">
+            <div class="timeline-date">Feb 1, 2026</div>
+            <div class="timeline-title">Great blocking performance!</div>
+            <div class="timeline-desc">Your timing on blocks has improved significantly. Keep reading the setter's hands. — Coach Sara</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-date">Jan 28, 2026</div>
+            <div class="timeline-title">Serve technique note</div>
+            <div class="timeline-desc">Focus on your toss consistency. Try to release the ball at the same height every time.</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-date">Jan 20, 2026</div>
+            <div class="timeline-title">Leadership recognition</div>
+            <div class="timeline-desc">Great energy during practice today. Your enthusiasm lifts the whole team!</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Self Assessment Section -->
+  <div class="section-title" style="margin-top: 32px;">Self Reflection</div>
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">How did practice go?</span>
+      <span style="font-size: 12px; color: var(--text-muted);">Feb 3 Practice</span>
+    </div>
+    <div class="card-content">
+      <div class="form-group">
+        <label class="form-label">Overall Feeling</label>
+        <div class="rating-input">
+          <span class="rating-star active">★</span>
+          <span class="rating-star active">★</span>
+          <span class="rating-star active">★</span>
+          <span class="rating-star active">★</span>
+          <span class="rating-star">★</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">What went well?</label>
+        <textarea class="form-input form-textarea" placeholder="e.g., My blocking timing was on point today..."></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">What to improve?</label>
+        <textarea class="form-input form-textarea" placeholder="e.g., Need to work on my serve receive positioning..."></textarea>
+      </div>
+      <button class="btn btn-primary">Submit Reflection</button>
+    </div>
+  </div>
+
+  <!-- Progress Timeline -->
+  <div class="section-title" style="margin-top: 32px;">Progress Journey</div>
+  <div class="card">
+    <div class="card-content">
+      <div class="timeline">
+        <div class="timeline-item highlight">
+          <div class="timeline-date">Feb 1, 2026</div>
+          <div class="timeline-title">🏆 Reached 78 Overall Rating</div>
+          <div class="timeline-desc">Your highest rating yet! +3 from last month.</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-date">Jan 25, 2026</div>
+          <div class="timeline-title">✅ Goal Completed: 75 Rating</div>
+          <div class="timeline-desc">You achieved your goal of reaching 75 overall rating.</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-date">Jan 18, 2026</div>
+          <div class="timeline-title">🔥 7 Event Streak</div>
+          <div class="timeline-desc">You've attended 7 events in a row! Keep it up!</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-date">Jan 10, 2026</div>
+          <div class="timeline-title">📊 New Personal Best: 8 Kills</div>
+          <div class="timeline-desc">You scored 8 kills vs Kolbotn IL - a new season high!</div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-date">Dec 15, 2025</div>
+          <div class="timeline-title">🎯 Goal Set: Improve Serve Accuracy</div>
+          <div class="timeline-desc">Target: 85% serve accuracy by end of season.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ PROFILE PAGE ============ -->
+<div id="profile" class="page-container">
+  <div class="profile-header">
+    <div class="profile-avatar">
+      <span class="profile-avatar-initials">EH</span>
+    </div>
+    <div class="profile-info">
+      <h1 class="profile-name">Erik Hansen</h1>
+      <div class="profile-meta">
+        <span class="profile-meta-item">
+          <span class="profile-meta-label">Position:</span>Outside Hitter
+        </span>
+        <span class="profile-meta-item">
+          <span class="profile-meta-label">Jersey:</span>#12
+        </span>
+        <span class="profile-meta-item">
+          <span class="profile-meta-label">Age:</span>17
+        </span>
+      </div>
+      <div class="profile-teams">
+        <span class="team-badge">Oslo Volley U19</span>
+      </div>
+    </div>
+    <button class="btn btn-outline">Edit Profile</button>
+  </div>
+
+  <!-- Career Stats -->
+  <div class="section-title">Career Statistics</div>
+  <div class="stats-grid" style="margin-bottom: 32px;">
+    <div class="stat-card">
+      <div class="stat-card-value teal">45</div>
+      <div class="stat-card-label">Total Games</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-value gold">186</div>
+      <div class="stat-card-label">Career Kills</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-value green">52</div>
+      <div class="stat-card-label">Career Aces</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-value red">89</div>
+      <div class="stat-card-label">Career Blocks</div>
+    </div>
+  </div>
+
+  <!-- Achievements -->
+  <div class="section-title">Achievements</div>
+  <div class="two-col-grid" style="margin-bottom: 32px;">
+    <div class="card">
+      <div class="card-content" style="display: flex; align-items: center; gap: 16px;">
+        <div style="font-size: 40px;">🔥</div>
+        <div>
+          <div style="font-weight: 600; margin-bottom: 4px;">Dedication Streak</div>
+          <div style="font-size: 13px; color: var(--text-muted);">12 consecutive events attended</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-content" style="display: flex; align-items: center; gap: 16px;">
+        <div style="font-size: 40px;">⚡</div>
+        <div>
+          <div style="font-weight: 600; margin-bottom: 4px;">Rising Star</div>
+          <div style="font-size: 13px; color: var(--text-muted);">Improved rating by 10+ in a season</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-content" style="display: flex; align-items: center; gap: 16px;">
+        <div style="font-size: 40px;">🎯</div>
+        <div>
+          <div style="font-weight: 600; margin-bottom: 4px;">Goal Crusher</div>
+          <div style="font-size: 13px; color: var(--text-muted);">Completed 5+ personal goals</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-content" style="display: flex; align-items: center; gap: 16px;">
+        <div style="font-size: 40px;">💭</div>
+        <div>
+          <div style="font-weight: 600; margin-bottom: 4px;">Self-Aware</div>
+          <div style="font-size: 13px; color: var(--text-muted);">Submitted 10+ self reflections</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings / Preferences -->
+  <div class="section-title">Settings</div>
+  <div class="card">
+    <div class="card-content">
+      <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border-subtle);">
+        <div>
+          <div style="font-weight: 600; margin-bottom: 4px;">Email Notifications</div>
+          <div style="font-size: 13px; color: var(--text-muted);">Receive reminders for upcoming events</div>
+        </div>
+        <div style="width: 48px; height: 28px; background: var(--success); border-radius: 14px; position: relative; cursor: pointer;">
+          <div style="width: 24px; height: 24px; background: white; border-radius: 50%; position: absolute; right: 2px; top: 2px;"></div>
+        </div>
+      </div>
+      <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border-subtle);">
+        <div>
+          <div style="font-weight: 600; margin-bottom: 4px;">Show Stats Publicly</div>
+          <div style="font-size: 13px; color: var(--text-muted);">Let teammates see your performance stats</div>
+        </div>
+        <div style="width: 48px; height: 28px; background: var(--success); border-radius: 14px; position: relative; cursor: pointer;">
+          <div style="width: 24px; height: 24px; background: white; border-radius: 50%; position: absolute; right: 2px; top: 2px;"></div>
+        </div>
+      </div>
+      <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0;">
+        <div>
+          <div style="font-weight: 600; margin-bottom: 4px;">Push Notifications</div>
+          <div style="font-size: 13px; color: var(--text-muted);">Get instant alerts for announcements</div>
+        </div>
+        <div style="width: 48px; height: 28px; background: var(--navy-80); border-radius: 14px; position: relative; cursor: pointer; border: 1px solid var(--border-default);">
+          <div style="width: 24px; height: 24px; background: var(--text-muted); border-radius: 50%; position: absolute; left: 2px; top: 2px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Join/Leave Team -->
+  <div class="section-title" style="margin-top: 32px;">Team Membership</div>
+  <div class="card">
+    <div class="card-content">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <div style="font-weight: 600; margin-bottom: 4px;">Join Another Team</div>
+          <div style="font-size: 13px; color: var(--text-muted);">Enter a team code to request membership</div>
+        </div>
+        <button class="btn btn-outline btn-sm">Join Team</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function showPage(pageId) {
+  // Hide all pages
+  document.querySelectorAll('.page-container').forEach(page => {
+    page.classList.remove('active');
+  });
+
+  // Show selected page
+  document.getElementById(pageId).classList.add('active');
+
+  // Update nav tabs
+  document.querySelectorAll('.page-tab').forEach(tab => {
+    tab.classList.remove('active');
+    if (tab.textContent.toLowerCase().includes(pageId) ||
+        (pageId === 'dashboard' && tab.textContent === 'Dashboard')) {
+      tab.classList.add('active');
+    }
+  });
+
+  // Update mobile nav
+  document.querySelectorAll('.mobile-nav-item').forEach(item => {
+    item.classList.remove('active');
+  });
+  const mobileItems = document.querySelectorAll('.mobile-nav-item');
+  const pageIndex = ['dashboard', 'schedule', 'stats', 'progress', 'profile'].indexOf(pageId);
+  if (pageIndex >= 0 && mobileItems[pageIndex]) {
+    mobileItems[pageIndex].classList.add('active');
+  }
+
+  // Scroll to top
+  window.scrollTo(0, 0);
+}
+
+// Interactive elements
+document.querySelectorAll('.rating-star').forEach((star, index, stars) => {
+  star.addEventListener('click', () => {
+    stars.forEach((s, i) => {
+      s.classList.toggle('active', i <= index);
+    });
+  });
+});
+</script>
+
+</body>
+</html>

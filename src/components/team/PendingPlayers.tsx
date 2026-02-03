@@ -84,10 +84,10 @@ export function PendingPlayers({ pendingPlayers, onUpdate, addNotification }: Pe
   };
 
   return (
-    <Card className="border-amber-200 dark:border-amber-800 bg-amber-50/50 dark:bg-amber-900/10">
+    <Card className="border-club-secondary/30 bg-club-secondary/5">
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2 text-lg">
-          <Clock className="h-5 w-5 text-amber-600" />
+          <Clock className="h-5 w-5 text-club-secondary" />
           {t('team.pendingPlayers.title')}
           <span className="ml-1 text-sm font-normal text-muted-foreground">
             ({pendingPlayers.length})
@@ -103,7 +103,7 @@ export function PendingPlayers({ pendingPlayers, onUpdate, addNotification }: Pe
             return (
               <div
                 key={player.id}
-                className="flex items-center justify-between p-3 bg-white dark:bg-gray-800 rounded-lg border"
+                className="flex items-center justify-between p-3 bg-card rounded-lg border border-white/[0.06]"
               >
                 <div>
                   <p className="font-medium">{player.name}</p>
@@ -118,7 +118,7 @@ export function PendingPlayers({ pendingPlayers, onUpdate, addNotification }: Pe
                   <Button
                     size="sm"
                     variant="outline"
-                    className="text-green-700 border-green-300 hover:bg-green-50"
+                    className="text-emerald-400 border-emerald-400/30 hover:bg-emerald-400/10"
                     onClick={() => handleApprove(player)}
                     disabled={isProcessing}
                   >
@@ -128,7 +128,7 @@ export function PendingPlayers({ pendingPlayers, onUpdate, addNotification }: Pe
                   <Button
                     size="sm"
                     variant="outline"
-                    className="text-red-700 border-red-300 hover:bg-red-50"
+                    className="text-club-primary border-club-primary/30 hover:bg-club-primary/10"
                     onClick={() => handleReject(player)}
                     disabled={isProcessing}
                   >

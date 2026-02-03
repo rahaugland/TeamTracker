@@ -50,29 +50,29 @@ export function AttendanceOverviewWidget({ teamId, dateRange }: AttendanceOvervi
   const getTrendIcon = () => {
     switch (data.trend) {
       case 'up':
-        return <TrendingUp className="h-4 w-4 text-green-500" />;
+        return <TrendingUp className="h-4 w-4 text-emerald-400" />;
       case 'down':
-        return <TrendingDown className="h-4 w-4 text-red-500" />;
+        return <TrendingDown className="h-4 w-4 text-club-primary" />;
       default:
-        return <Minus className="h-4 w-4 text-gray-500" />;
+        return <Minus className="h-4 w-4 text-muted-foreground" />;
     }
   };
 
   const getTrendColor = () => {
     switch (data.trend) {
       case 'up':
-        return 'text-green-500';
+        return 'text-emerald-400';
       case 'down':
-        return 'text-red-500';
+        return 'text-club-primary';
       default:
-        return 'text-gray-500';
+        return 'text-muted-foreground';
     }
   };
 
   return (
-    <Card className="card-gradient-blue border-l-4 border-l-accent hover-glow">
+    <Card className="card-gradient-teal border-l-4 border-l-vq-teal hover-glow">
       <CardHeader>
-        <CardTitle className="text-accent flex items-center gap-2">
+        <CardTitle className="text-vq-teal flex items-center gap-2">
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
           </svg>
@@ -84,22 +84,22 @@ export function AttendanceOverviewWidget({ teamId, dateRange }: AttendanceOvervi
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-4xl font-bold bg-gradient-to-r from-accent to-secondary bg-clip-text text-transparent">{data.averageAttendanceRate.toFixed(1)}%</p>
+              <p className="text-4xl text-stat font-bold bg-gradient-to-r from-vq-teal to-club-secondary bg-clip-text text-transparent">{data.averageAttendanceRate.toFixed(1)}%</p>
               <p className="text-sm text-muted-foreground font-medium mt-1">
                 {t('dashboard.widgets.averageAttendance')}
               </p>
             </div>
-            <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-accent/10">
+            <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-vq-teal/10">
               {getTrendIcon()}
               <span className={`text-sm font-bold ${getTrendColor()}`}>
                 {t(`dashboard.widgets.trend.${data.trend}`)}
               </span>
             </div>
           </div>
-          <div className="pt-4 border-t border-accent/20">
+          <div className="pt-4 border-t border-vq-teal/20">
             <div className="flex items-center justify-between text-sm">
               <span className="text-muted-foreground font-medium">{t('dashboard.widgets.totalEvents')}</span>
-              <span className="font-bold text-lg text-accent">{data.totalEvents}</span>
+              <span className="text-stat font-bold text-lg text-vq-teal">{data.totalEvents}</span>
             </div>
           </div>
         </div>

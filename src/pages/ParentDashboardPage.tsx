@@ -198,10 +198,10 @@ export function ParentDashboardPage() {
     <div className="container max-w-7xl mx-auto py-8 px-4">
       {/* Welcome Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold">
+        <h1 className="text-3xl font-display font-bold uppercase tracking-wider">
           {t('auth.profile.welcome', { name: user?.name || 'Parent' })}
         </h1>
-        <p className="text-muted-foreground mt-1">Parent Dashboard</p>
+        <p className="text-muted-foreground mt-1 font-display tracking-wide">Parent Dashboard</p>
       </div>
 
       {linkedPlayers.length === 0 ? (
@@ -222,7 +222,7 @@ export function ParentDashboardPage() {
           {/* Linked Players */}
           <div className="mb-8">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-2xl font-bold">My Players</h2>
+              <h2 className="text-2xl font-display font-bold uppercase tracking-wider">My Players</h2>
               <Button variant="outline" onClick={() => setShowLinkDialog(true)}>
                 <UserPlus className="w-4 h-4 mr-2" />
                 Link Another Player
@@ -261,7 +261,7 @@ export function ParentDashboardPage() {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Upcoming Events */}
                 <div>
-                  <h2 className="text-2xl font-bold mb-4">{t('navigation.schedule')}</h2>
+                  <h2 className="text-2xl font-display font-bold uppercase tracking-wider mb-4">{t('navigation.schedule')}</h2>
                   {upcomingEvents.length > 0 ? (
                     <>
                       <PlayerScheduleView
@@ -291,7 +291,7 @@ export function ParentDashboardPage() {
 
                 {/* Attendance History */}
                 <div>
-                  <h2 className="text-2xl font-bold mb-4">{t('player.attendance')}</h2>
+                  <h2 className="text-2xl font-display font-bold uppercase tracking-wider mb-4">{t('player.attendance')}</h2>
                   <PlayerAttendanceHistory
                     attendanceRecords={attendanceRecords}
                     totalEvents={attendanceRecords.length}

@@ -7,15 +7,29 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Custom volleyball-inspired colors
-        'volleyball-orange': 'oklch(0.62 0.18 35)',
-        'electric-blue': 'oklch(0.55 0.15 240)',
-        'vibrant-teal': 'oklch(0.65 0.12 200)',
+        navy: {
+          DEFAULT: '#0A1628',
+          90: '#0f1e35',
+          80: '#162843',
+          70: '#1e3452',
+          60: '#2a4268',
+        },
+        'vq-navy': '#0A1628',
+        'navy-90': '#0f1e35',
+        'club-primary': '#E63946',
+        'club-primary-dim': '#c42d39',
+        'club-secondary': '#FFB703',
+        'vq-teal': '#2EC4B6',
+      },
+      fontFamily: {
+        display: ['Barlow Condensed', 'sans-serif'],
+        body: ['Barlow', 'sans-serif'],
+        mono: ['JetBrains Mono', 'monospace'],
       },
       boxShadow: {
-        'glow-orange': '0 4px 14px 0 oklch(0.62 0.18 35 / 0.25)',
-        'glow-blue': '0 4px 14px 0 oklch(0.55 0.15 240 / 0.25)',
-        'glow-teal': '0 4px 14px 0 oklch(0.65 0.12 200 / 0.25)',
+        'glow-red': '0 4px 14px 0 rgba(230, 57, 70, 0.25)',
+        'glow-gold': '0 4px 14px 0 rgba(255, 183, 3, 0.25)',
+        'glow-teal': '0 4px 14px 0 rgba(46, 196, 182, 0.25)',
       },
     },
   },

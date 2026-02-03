@@ -18,10 +18,10 @@ interface ToastItemProps {
 }
 
 const variantStyles = {
-  success: 'bg-green-50 border-green-500 text-green-900',
-  error: 'bg-red-50 border-red-500 text-red-900',
-  warning: 'bg-yellow-50 border-yellow-500 text-yellow-900',
-  info: 'bg-blue-50 border-blue-500 text-blue-900',
+  success: 'bg-emerald-500/10 border-emerald-500 text-emerald-400',
+  error: 'bg-club-primary/10 border-club-primary text-club-primary',
+  warning: 'bg-club-secondary/10 border-club-secondary text-club-secondary',
+  info: 'bg-vq-teal/10 border-vq-teal text-vq-teal',
 };
 
 const variantIcons = {
@@ -32,10 +32,10 @@ const variantIcons = {
 };
 
 const variantIconColors = {
-  success: 'text-green-500',
-  error: 'text-red-500',
-  warning: 'text-yellow-500',
-  info: 'text-blue-500',
+  success: 'text-emerald-400',
+  error: 'text-club-primary',
+  warning: 'text-club-secondary',
+  info: 'text-vq-teal',
 };
 
 function ToastItem({ toast, onClose }: ToastItemProps) {
@@ -53,7 +53,7 @@ function ToastItem({ toast, onClose }: ToastItemProps) {
   return (
     <div
       className={cn(
-        'pointer-events-auto w-full max-w-sm rounded-lg border-l-4 bg-white p-4 shadow-lg transition-all',
+        'pointer-events-auto w-full max-w-sm rounded-lg border-l-4 bg-card p-4 shadow-lg transition-all',
         'animate-in slide-in-from-right-full',
         variantStyles[toast.variant]
       )}

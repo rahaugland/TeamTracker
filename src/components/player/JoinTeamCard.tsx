@@ -89,8 +89,8 @@ export function JoinTeamCard({ onJoined }: JoinTeamCardProps) {
       </CardHeader>
       <CardContent className="space-y-4">
         {success && (
-          <div className="p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-md">
-            <p className="text-sm text-green-800 dark:text-green-200">{success}</p>
+          <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-md">
+            <p className="text-sm text-emerald-400">{success}</p>
           </div>
         )}
 
@@ -129,21 +129,21 @@ export function JoinTeamCard({ onJoined }: JoinTeamCardProps) {
         </div>
 
         {error && (
-          <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md">
-            <p className="text-sm text-red-800 dark:text-red-200">{error}</p>
+          <div className="p-3 bg-club-primary/10 border border-club-primary/20 rounded-md">
+            <p className="text-sm text-club-primary">{error}</p>
           </div>
         )}
 
         {validatedTeam && (
           <div className="space-y-3">
-            <div className="p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-md">
-              <p className="font-semibold text-green-900 dark:text-green-100">
+            <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-md">
+              <p className="font-semibold text-emerald-300">
                 {t('joinTeam.teamFound')}
               </p>
-              <p className="text-sm text-green-800 dark:text-green-200">
+              <p className="text-sm text-emerald-400">
                 {t('joinTeam.teamName', { teamName: validatedTeam.name })}
               </p>
-              <p className="text-sm text-green-800 dark:text-green-200">
+              <p className="text-sm text-emerald-400">
                 {t('joinTeam.seasonName', { seasonName: validatedTeam.season.name })}
               </p>
             </div>

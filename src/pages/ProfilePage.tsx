@@ -166,7 +166,7 @@ export function ProfilePage() {
       )}
 
       {success && (
-        <Alert className="mb-6 border-green-200 bg-green-50 text-green-800">
+        <Alert className="mb-6 border-emerald-500/30 bg-emerald-500/10 text-emerald-400">
           <CheckCircle2 className="h-4 w-4" />
           <AlertDescription>{success}</AlertDescription>
         </Alert>

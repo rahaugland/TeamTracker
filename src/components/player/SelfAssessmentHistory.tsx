@@ -58,8 +58,8 @@ export function SelfAssessmentHistory({ assessments }: SelfAssessmentHistoryProp
                         key={value}
                         className={`w-4 h-4 ${
                           value <= assessment.rating
-                            ? 'fill-yellow-400 text-yellow-400'
-                            : 'text-gray-300 dark:text-gray-600'
+                            ? 'fill-club-secondary text-club-secondary'
+                            : 'text-white/20'
                         }`}
                       />
                     ))}

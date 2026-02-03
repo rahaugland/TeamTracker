@@ -201,7 +201,7 @@ export function ImportPage() {
               <div
                 className={`w-10 h-10 rounded-full flex items-center justify-center font-medium ${
                   stepNumber[currentStep] > stepNumber[step]
-                    ? 'bg-green-600 text-white'
+                    ? 'bg-emerald-500 text-white'
                     : stepNumber[currentStep] === stepNumber[step]
                     ? 'bg-primary text-primary-foreground'
                     : 'bg-muted text-muted-foreground'
@@ -221,7 +221,7 @@ export function ImportPage() {
               <div
                 className={`flex-1 h-1 mx-2 ${
                   stepNumber[currentStep] > stepNumber[step]
-                    ? 'bg-green-600'
+                    ? 'bg-emerald-500'
                     : 'bg-muted'
                 }`}
               />

@@ -56,7 +56,7 @@ export function DrillExecutionsCard({
                     )}
                   </div>
                   {execution && (
-                    <span className="px-3 py-1 text-sm font-medium bg-green-100 text-green-800 rounded-full">
+                    <span className="px-3 py-1 text-sm font-medium bg-emerald-500/15 text-emerald-400 rounded-full">
                       Executed
                     </span>
                   )}
@@ -76,7 +76,7 @@ export function DrillExecutionsCard({
                             onClick={() => onMarkExecuted(block.drill_id!, rating)}
                             className={`w-10 h-10 rounded-md border transition-colors ${
                               currentRating === rating
-                                ? 'bg-yellow-500 text-white border-yellow-500'
+                                ? 'bg-club-secondary text-white border-club-secondary'
                                 : 'hover:bg-accent'
                             }`}
                           >

@@ -28,7 +28,7 @@ export function DraggablePlayerCard({
       {...listeners}
       {...attributes}
       className={cn(
-        'flex items-center gap-2 p-2 bg-white border rounded-lg shadow-sm transition-all',
+        'flex items-center gap-2 p-2 bg-card border border-white/[0.06] rounded-lg shadow-sm transition-all',
         isDraggingDisabled ? 'cursor-default' : 'cursor-grab active:cursor-grabbing',
         isDragging && 'opacity-50 shadow-lg',
         !isDraggingDisabled && 'hover:shadow-md hover:border-primary/50'

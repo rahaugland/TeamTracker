@@ -1,12 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useAuth } from '@/store';
+import { format } from 'date-fns';
+import { useAuth, useTeams } from '@/store';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { EmptyState } from '@/components/common/EmptyState';
-import { getPracticePlans, createPracticePlan, deletePracticePlan } from '@/services/practice-plans.service';
+import { getPracticePlans, createPracticePlan } from '@/services/practice-plans.service';
 import { getTeams } from '@/services/teams.service';
 import type { PracticePlan, Team } from '@/types/database.types';
 import { useForm } from 'react-hook-form';
@@ -20,7 +22,6 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
@@ -32,24 +33,27 @@ import { Textarea } from '@/components/ui/textarea';
 
 /**
  * PracticePlansPage
- * Lists all practice plans with create functionality
+ * Lists all practice plans with create functionality - VolleyQuest style
  */
 export function PracticePlansPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { activeTeamId, getActiveTeam } = useTeams();
+  const activeTeam = getActiveTeam();
 
   const [plans, setPlans] = useState<PracticePlan[]>([]);
   const [teams, setTeams] = useState<Team[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const form = useForm<PracticePlanFormData>({
     resolver: zodResolver(practicePlanSchema),
     defaultValues: {
       name: '',
-      team_id: '',
+      team_id: activeTeamId || '',
       date: '',
       notes: '',
     },
@@ -57,7 +61,7 @@ export function PracticePlansPage() {
 
   useEffect(() => {
     loadData();
-  }, []);
+  }, [activeTeamId]);
 
   const loadData = async () => {
     setLoading(true);
@@ -67,7 +71,12 @@ export function PracticePlansPage() {
         getTeams(),
       ]);
 
-      setPlans(plansData);
+      // Filter by active team if selected
+      const filteredPlans = activeTeamId
+        ? plansData.filter(p => p.team_id === activeTeamId)
+        : plansData;
+
+      setPlans(filteredPlans);
       setTeams(teamsData);
     } catch (error) {
       console.error('Error loading data:', error);
@@ -107,169 +116,223 @@ export function PracticePlansPage() {
     return team?.name || 'Unknown Team';
   };
 
+  const filteredPlans = plans.filter(plan =>
+    plan.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   if (loading) {
     return (
-      <div className="p-8">
-        <div className="max-w-7xl mx-auto">
-          <p>{t('common.messages.loading')}</p>
-        </div>
+      <div className="flex items-center justify-center h-64">
+        <p className="text-muted-foreground">{t('common.messages.loading')}</p>
       </div>
     );
   }
 
   return (
-    <div className="p-8">
-      <div className="max-w-7xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold">{t('practice.plans')}</h1>
-            <p className="text-muted-foreground mt-1">
-              Create and manage practice plans
-            </p>
-          </div>
-          <Button onClick={() => setShowCreateDialog(true)}>
-            {t('practice.createPlan')}
-          </Button>
-        </div>
-
-        {/* Practice Plans List */}
-        {plans.length === 0 ? (
-          <EmptyState
-            title={t('practice.noPracticePlans')}
-            description={t('practice.noPracticePlansDescription')}
-            action={{
-              label: t('practice.createPlan'),
-              onClick: () => setShowCreateDialog(true),
-            }}
-          />
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {plans.map((plan) => (
-              <Card
-                key={plan.id}
-                className="cursor-pointer hover:shadow-md transition-shadow"
-                onClick={() => handlePlanClick(plan.id)}
-              >
-                <CardHeader>
-                  <CardTitle className="text-lg">{plan.name}</CardTitle>
-                  <CardDescription>
-                    {getTeamName(plan.team_id)}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {plan.date && (
-                    <p className="text-sm text-muted-foreground mb-2">
-                      {new Date(plan.date).toLocaleDateString()}
-                    </p>
-                  )}
-                  {plan.notes && (
-                    <p className="text-sm text-muted-foreground line-clamp-2">
-                      {plan.notes}
-                    </p>
-                  )}
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        )}
-
-        {/* Create Plan Dialog */}
-        <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>{t('practice.createPlan')}</DialogTitle>
-            </DialogHeader>
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(handleCreatePlan)} className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('practice.planName')} *</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Weekly Practice Plan" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="team_id"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('team.selectTeam')} *</FormLabel>
-                      <Select onValueChange={field.onChange} value={field.value}>
-                        <FormControl>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a team" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          {teams.map((team) => (
-                            <SelectItem key={team.id} value={team.id}>
-                              {team.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="date"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('common.labels.date')}</FormLabel>
-                      <FormControl>
-                        <Input type="date" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="notes"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{t('common.labels.notes')}</FormLabel>
-                      <FormControl>
-                        <Textarea
-                          placeholder="Additional notes..."
-                          rows={3}
-                          {...field}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <div className="flex gap-4 justify-end">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setShowCreateDialog(false)}
-                  >
-                    {t('common.buttons.cancel')}
-                  </Button>
-                  <Button type="submit" disabled={isCreating}>
-                    {isCreating ? t('common.messages.saving') : t('common.buttons.save')}
-                  </Button>
-                </div>
-              </form>
-            </Form>
-          </DialogContent>
-        </Dialog>
+    <div className="max-w-7xl mx-auto">
+      {/* Page Header */}
+      <div className="mb-6">
+        <h1 className="font-display font-extrabold text-[32px] uppercase tracking-tight text-white mb-1">
+          Practice Plans
+        </h1>
+        <p className="text-sm text-gray-400">
+          {activeTeam?.name || 'All Teams'} • {filteredPlans.length} {filteredPlans.length === 1 ? 'plan' : 'plans'}
+        </p>
       </div>
+
+      {/* Search and Create */}
+      <div className="flex gap-4 mb-6">
+        <Input
+          placeholder="Search plans..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="flex-1 bg-navy-90 border-white/10 text-white placeholder:text-gray-400 focus:border-club-primary"
+        />
+        <Button
+          onClick={() => setShowCreateDialog(true)}
+          className="bg-club-primary hover:bg-club-primary-dim text-white font-display font-semibold uppercase tracking-wide"
+        >
+          Create Plan
+        </Button>
+      </div>
+
+      {/* Practice Plans Grid */}
+      {filteredPlans.length === 0 ? (
+        <EmptyState
+          title={plans.length === 0 ? "No Practice Plans" : "No results found"}
+          description={plans.length === 0 ? "Create your first practice plan to get started" : "Try a different search term"}
+          action={
+            plans.length === 0
+              ? {
+                  label: "Create Plan",
+                  onClick: () => setShowCreateDialog(true),
+                }
+              : undefined
+          }
+        />
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {filteredPlans.map((plan) => (
+            <Card
+              key={plan.id}
+              className="bg-navy-90 border border-white/[0.06] rounded-lg overflow-hidden cursor-pointer hover:border-white/[0.12] hover:-translate-y-0.5 transition-all duration-200"
+              onClick={() => handlePlanClick(plan.id)}
+            >
+              {/* Accent stripe */}
+              <div className="h-1 bg-gradient-to-r from-club-primary to-club-secondary" />
+
+              <div className="p-5">
+                <div className="flex items-start justify-between mb-3">
+                  <div>
+                    <h3 className="font-display font-bold text-base uppercase text-white mb-1">
+                      {plan.name}
+                    </h3>
+                    <p className="text-xs text-gray-400">
+                      {getTeamName(plan.team_id)}
+                    </p>
+                  </div>
+                  <div className="w-10 h-10 rounded-lg bg-vq-teal/10 flex items-center justify-center">
+                    <span className="text-lg">📋</span>
+                  </div>
+                </div>
+
+                {plan.date && (
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="text-xs text-gray-500">📅</span>
+                    <span className="text-xs text-gray-400">
+                      {format(new Date(plan.date), 'MMM d, yyyy')}
+                    </span>
+                  </div>
+                )}
+
+                {plan.notes && (
+                  <p className="text-xs text-gray-500 line-clamp-2 mb-3">
+                    {plan.notes}
+                  </p>
+                )}
+
+                <div className="flex items-center justify-between pt-3 border-t border-white/[0.06]">
+                  <span className="text-[10px] font-display font-semibold uppercase tracking-wide text-gray-500">
+                    Click to edit
+                  </span>
+                  <span className="text-vq-teal text-lg">→</span>
+                </div>
+              </div>
+            </Card>
+          ))}
+        </div>
+      )}
+
+      {/* Create Plan Dialog */}
+      <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
+        <DialogContent className="bg-navy-90 border-white/10">
+          <DialogHeader>
+            <DialogTitle className="font-display font-bold text-xl uppercase text-white">
+              Create Practice Plan
+            </DialogTitle>
+          </DialogHeader>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(handleCreatePlan)} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-gray-400">Plan Name *</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="e.g., Serve Reception Focus"
+                        className="bg-navy-80 border-white/10 text-white"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="team_id"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-gray-400">Team *</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger className="bg-navy-80 border-white/10 text-white">
+                          <SelectValue placeholder="Select a team" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {teams.map((team) => (
+                          <SelectItem key={team.id} value={team.id}>
+                            {team.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="date"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-gray-400">Date (optional)</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="date"
+                        className="bg-navy-80 border-white/10 text-white"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="notes"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-gray-400">Notes (optional)</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Focus areas, goals, etc..."
+                        rows={3}
+                        className="bg-navy-80 border-white/10 text-white"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="flex gap-3 justify-end pt-4">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => setShowCreateDialog(false)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={isCreating}
+                  className="bg-club-primary hover:bg-club-primary-dim"
+                >
+                  {isCreating ? 'Creating...' : 'Create & Edit'}
+                </Button>
+              </div>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

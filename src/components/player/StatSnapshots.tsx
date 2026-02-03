@@ -59,9 +59,9 @@ export function StatSnapshots({ currentMonthStats, previousMonthStats, attendanc
               <p className="text-sm font-medium text-muted-foreground mb-1">{metric.label}</p>
               {metric.current != null ? (
                 <>
-                  <div className="text-2xl font-bold">{metric.format(metric.current)}</div>
+                  <div className="text-2xl text-stat font-bold">{metric.format(metric.current)}</div>
                   {delta != null && (
-                    <div className={`flex items-center gap-1 mt-1 text-xs ${delta >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                    <div className={`flex items-center gap-1 mt-1 text-xs ${delta >= 0 ? 'text-emerald-400' : 'text-club-primary'}`}>
                       {delta >= 0 ? (
                         <TrendingUp className="h-3 w-3" />
                       ) : (

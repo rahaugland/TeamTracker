@@ -58,10 +58,10 @@ export function PendingMemberships({ refreshKey }: PendingMembershipsProps) {
   if (pendingTeams.length === 0) return null;
 
   return (
-    <Card className="border-amber-200 dark:border-amber-800 bg-amber-50/50 dark:bg-amber-900/10">
+    <Card className="border-club-secondary/20 bg-club-secondary/5">
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2 text-lg">
-          <Clock className="h-5 w-5 text-amber-600" />
+          <Clock className="h-5 w-5 text-club-secondary" />
           {t('player.pendingMemberships.title')}
         </CardTitle>
       </CardHeader>
@@ -70,7 +70,7 @@ export function PendingMemberships({ refreshKey }: PendingMembershipsProps) {
           {pendingTeams.map((pt) => (
             <div
               key={pt.id}
-              className="flex items-center justify-between p-3 bg-white dark:bg-gray-800 rounded-lg border"
+              className="flex items-center justify-between p-3 bg-card rounded-lg border border-white/[0.06]"
             >
               <div>
                 <p className="font-medium">{pt.team_name}</p>
@@ -78,7 +78,7 @@ export function PendingMemberships({ refreshKey }: PendingMembershipsProps) {
                   {t('player.pendingMemberships.waitingApproval')}
                 </p>
               </div>
-              <Clock className="h-4 w-4 text-amber-500" />
+              <Clock className="h-4 w-4 text-club-secondary" />
             </div>
           ))}
         </div>

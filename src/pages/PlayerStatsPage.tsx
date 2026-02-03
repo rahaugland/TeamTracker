@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { usePlayerStats } from '@/hooks/usePlayerStats';
@@ -114,38 +114,61 @@ export function PlayerStatsPage() {
 
   if (!id) {
     return (
-      <div className="container max-w-7xl mx-auto py-8 px-4">
-        <p className="text-center text-muted-foreground">Player ID not found</p>
+      <div className="flex items-center justify-center h-64">
+        <p className="text-muted-foreground">Player ID not found</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="container max-w-7xl mx-auto py-8 px-4">
-        <Button variant="outline" onClick={() => navigate(`/players/${id}`)} className="mb-4">
-          {t('common.buttons.back')}
-        </Button>
-        <div className="text-center">
-          <p className="text-red-600">Error loading stats: {error.message}</p>
+      <div className="max-w-7xl mx-auto">
+        <nav className="flex items-center gap-2 mb-6 text-sm">
+          <Link to="/coach-dashboard" className="text-gray-400 hover:text-vq-teal transition-colors">
+            Dashboard
+          </Link>
+          <span className="text-gray-500">/</span>
+          <Link to="/players" className="text-gray-400 hover:text-vq-teal transition-colors">
+            Players
+          </Link>
+          <span className="text-gray-500">/</span>
+          <span className="text-white">Stats</span>
+        </nav>
+        <div className="bg-navy-90 border border-white/[0.06] rounded-lg p-8 text-center">
+          <p className="text-club-primary">Error loading stats: {error.message}</p>
+          <Button
+            variant="outline"
+            onClick={() => navigate(`/players/${id}`)}
+            className="mt-4 border-white/20 text-white hover:bg-white/5"
+          >
+            {t('common.buttons.back')}
+          </Button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="container max-w-7xl mx-auto py-8 px-4">
-      <Button variant="outline" onClick={() => navigate(`/players/${id}`)} className="mb-4">
-        {t('common.buttons.back')}
-      </Button>
+    <div className="max-w-7xl mx-auto">
+      {/* Breadcrumb */}
+      <nav className="flex items-center gap-2 mb-6 text-sm">
+        <Link to="/coach-dashboard" className="text-gray-400 hover:text-vq-teal transition-colors">
+          Dashboard
+        </Link>
+        <span className="text-gray-500">/</span>
+        <Link to="/players" className="text-gray-400 hover:text-vq-teal transition-colors">
+          Players
+        </Link>
+        <span className="text-gray-500">/</span>
+        <span className="text-white">{playerName || 'Player Stats'}</span>
+      </nav>
 
-      <h1 className="text-3xl font-bold mb-6">{playerName} - Player Stats</h1>
-
-      {/* Hero Section: FIFA Card + Trend Panel */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-        <div className="lg:col-span-1">
+      {/* Hero Section: FIFA Card + Player Info Panel */}
+      <div className="flex flex-col lg:flex-row gap-8 mb-8">
+        {/* FIFA Card */}
+        <div className="flex-shrink-0">
           {isLoading ? (
-            <div className="flex items-center justify-center h-96 bg-gray-100 rounded-lg">
+            <div className="flex items-center justify-center h-96 w-full max-w-md bg-muted/30 rounded-lg">
               <p className="text-muted-foreground">{t('common.messages.loading')}</p>
             </div>
           ) : rating ? (
@@ -163,23 +186,90 @@ export function PlayerStatsPage() {
               trendDelta={overallTrend.delta}
             />
           ) : (
-            <div className="flex items-center justify-center h-96 bg-gray-100 rounded-lg">
+            <div className="flex items-center justify-center h-96 w-full max-w-md bg-muted/30 rounded-lg">
               <p className="text-muted-foreground">No stats available for this period</p>
             </div>
           )}
         </div>
-        <div className="lg:col-span-2">
-          <PlayerTrendPanel
-            gameStatLines={gameStatLines}
-            playerForm={playerForm}
-            aggregatedStats={rating?.aggregatedStats || null}
-            period={period}
-            customRange={customRange}
-            onPeriodChange={handlePeriodChange}
-            isLoading={isLoading}
-          />
+
+        {/* Player Info Panel */}
+        <div className="flex-1">
+          <h1 className="font-display font-extrabold text-5xl uppercase leading-none mb-3">
+            {playerName}
+          </h1>
+          <div className="flex items-center gap-4 mb-6 text-muted-foreground text-sm">
+            <span>{getPositionName(playerPosition)}</span>
+            <span>•</span>
+            <span>{rating?.gamesPlayed || 0} Games Played</span>
+          </div>
+
+          {/* Quick Stats Grid */}
+          {!isLoading && rating && (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="bg-navy-90 border border-white/10 rounded-lg p-4 text-center">
+                <p className="font-mono font-bold text-3xl mb-1 text-emerald-400">
+                  {attendanceStats ? Math.round(attendanceStats.attendanceRate * 100) : 0}%
+                </p>
+                <p className="text-xs text-muted-foreground uppercase tracking-wide">Attendance</p>
+              </div>
+              <div className="bg-navy-90 border border-white/10 rounded-lg p-4 text-center">
+                <p className="font-mono font-bold text-3xl mb-1">
+                  {rating.aggregatedStats.totalKills}
+                </p>
+                <p className="text-xs text-muted-foreground uppercase tracking-wide">Kills</p>
+              </div>
+              <div className="bg-navy-90 border border-white/10 rounded-lg p-4 text-center">
+                <p className="font-mono font-bold text-3xl mb-1">
+                  {rating.aggregatedStats.totalAces}
+                </p>
+                <p className="text-xs text-muted-foreground uppercase tracking-wide">Aces</p>
+              </div>
+              <div className="bg-navy-90 border border-white/10 rounded-lg p-4 text-center">
+                <p className="font-mono font-bold text-3xl mb-1">
+                  {rating.aggregatedStats.totalBlockSolos + rating.aggregatedStats.totalBlockAssists}
+                </p>
+                <p className="text-xs text-muted-foreground uppercase tracking-wide">Blocks</p>
+              </div>
+            </div>
+          )}
         </div>
       </div>
+
+      {/* Tabs */}
+      <div className="flex gap-1 mb-6 border-b border-white/10">
+        <button className="px-4 py-2 text-sm font-medium border-b-2 border-club-primary text-white">
+          Overview
+        </button>
+        <button className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-white">
+          Stats History
+        </button>
+        <button className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-white">
+          Attendance
+        </button>
+        <button className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-white">
+          Notes
+        </button>
+      </div>
+
+      {/* Performance Trends and Recent Games - Two Column Layout */}
+      {!isLoading && gameStatLines.length > 0 && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          <div>
+            <PlayerTrendPanel
+              gameStatLines={gameStatLines}
+              playerForm={playerForm}
+              aggregatedStats={rating?.aggregatedStats || null}
+              period={period}
+              customRange={customRange}
+              onPeriodChange={handlePeriodChange}
+              isLoading={isLoading}
+            />
+          </div>
+          <div>
+            <GameLogTable gameStats={gameStatLines} />
+          </div>
+        </div>
+      )}
 
       {/* Stat Summary Row */}
       {!isLoading && rating && (
@@ -209,13 +299,6 @@ export function PlayerStatsPage() {
           <div className="mb-6">
             <DefenseTrendChart gameStats={gameStatLines} />
           </div>
-        </div>
-      )}
-
-      {/* Game Log Table */}
-      {!isLoading && gameStatLines.length > 0 && (
-        <div className="mb-8">
-          <GameLogTable gameStats={gameStatLines} />
         </div>
       )}
 
@@ -257,4 +340,18 @@ export function PlayerStatsPage() {
       )}
     </div>
   );
+}
+
+// Helper function to get position name
+function getPositionName(position: VolleyballPosition): string {
+  const names: Record<VolleyballPosition, string> = {
+    setter: 'Setter',
+    outside_hitter: 'Outside Hitter',
+    middle_blocker: 'Middle Blocker',
+    opposite: 'Opposite',
+    libero: 'Libero',
+    defensive_specialist: 'Defensive Specialist',
+    all_around: 'All Around',
+  };
+  return names[position];
 }

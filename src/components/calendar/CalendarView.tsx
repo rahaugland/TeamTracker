@@ -30,11 +30,11 @@ export const CalendarView = memo(function CalendarView({ events }: CalendarViewP
 
   const getEventTypeColor = useCallback((type: EventType) => {
     const colors: Record<EventType, string> = {
-      practice: 'bg-blue-500',
-      game: 'bg-green-500',
+      practice: 'bg-vq-teal',
+      game: 'bg-emerald-500',
       tournament: 'bg-purple-500',
-      meeting: 'bg-orange-500',
-      other: 'bg-gray-500',
+      meeting: 'bg-club-secondary',
+      other: 'bg-muted-foreground',
     };
     return colors[type];
   }, []);
@@ -156,11 +156,11 @@ export const CalendarView = memo(function CalendarView({ events }: CalendarViewP
       {/* Calendar Legend */}
       <div className="flex flex-wrap gap-4 text-sm">
         <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-blue-500"></div>
+          <div className="w-3 h-3 rounded-full bg-vq-teal"></div>
           <span>{t('event.types.practice')}</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-green-500"></div>
+          <div className="w-3 h-3 rounded-full bg-emerald-500"></div>
           <span>{t('event.types.game')}</span>
         </div>
         <div className="flex items-center gap-2">
@@ -168,11 +168,11 @@ export const CalendarView = memo(function CalendarView({ events }: CalendarViewP
           <span>{t('event.types.tournament')}</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-orange-500"></div>
+          <div className="w-3 h-3 rounded-full bg-club-secondary"></div>
           <span>{t('event.types.meeting')}</span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-full bg-gray-500"></div>
+          <div className="w-3 h-3 rounded-full bg-muted-foreground"></div>
           <span>{t('event.types.other')}</span>
         </div>
       </div>

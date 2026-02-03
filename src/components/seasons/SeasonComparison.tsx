@@ -143,14 +143,14 @@ export function SeasonComparison({ teamId, seasons }: SeasonComparisonProps) {
 
               return (
                 <div key={row.label} className="grid grid-cols-[1fr_auto_1fr] gap-3 items-center rounded-lg border p-3">
-                  <div className={cn('text-right font-semibold', aBetter && 'text-green-600')}>
+                  <div className={cn('text-right font-semibold', aBetter && 'text-emerald-400')}>
                     {row.a}
                   </div>
                   <div className="text-center">
                     <p className="text-xs text-muted-foreground">{row.label}</p>
                     {d && <p className="text-xs font-medium text-muted-foreground">{t('awards.seasonComparison.delta', { value: d })}</p>}
                   </div>
-                  <div className={cn('font-semibold', bBetter && 'text-green-600')}>
+                  <div className={cn('font-semibold', bBetter && 'text-emerald-400')}>
                     {row.b}
                   </div>
                 </div>

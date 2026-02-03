@@ -13,3 +13,7 @@ export { FeedbackSpotlight } from './FeedbackSpotlight';
 export { StatSnapshots } from './StatSnapshots';
 export { ProgressJourney } from './ProgressJourney';
 export { PlayerAwardsShowcase } from './PlayerAwardsShowcase';
+export { PlayerAvatar } from './PlayerAvatar';
+export type { PlayerAvatarProps, PlayerAvatarSize } from './PlayerAvatar';
+export { FifaPlayerCard, createDefaultSkills } from './FifaPlayerCard';
+export type { FifaPlayerCardProps, SkillRating, VolleyballSkill, PlayerTier } from './FifaPlayerCard';

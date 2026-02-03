@@ -47,10 +47,10 @@ export function TeamGameLog({ gameStats, isLoading = false }: TeamGameLogProps) 
 
   const getResultBadge = (result: 'W' | 'L' | 'D') => {
     if (result === 'W') {
-      return <Badge className="bg-green-500 text-white">W</Badge>;
+      return <Badge className="bg-emerald-500 text-white">W</Badge>;
     }
     if (result === 'L') {
-      return <Badge className="bg-red-500 text-white">L</Badge>;
+      return <Badge className="bg-club-primary text-white">L</Badge>;
     }
     return <Badge variant="secondary">D</Badge>;
   };
@@ -107,8 +107,8 @@ export function TeamGameLog({ gameStats, isLoading = false }: TeamGameLogProps) 
         {h2hRecord && (
           <div className="flex items-center gap-2 mt-2 text-sm">
             <span className="text-muted-foreground">{t('team.dashboard.headToHead')}:</span>
-            <Badge className="bg-green-500 text-white">{h2hRecord.w}W</Badge>
-            <Badge className="bg-red-500 text-white">{h2hRecord.l}L</Badge>
+            <Badge className="bg-emerald-500 text-white">{h2hRecord.w}W</Badge>
+            <Badge className="bg-club-primary text-white">{h2hRecord.l}L</Badge>
             {h2hRecord.d > 0 && <Badge variant="secondary">{h2hRecord.d}D</Badge>}
           </div>
         )}

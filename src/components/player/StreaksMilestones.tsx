@@ -22,32 +22,32 @@ export function StreaksMilestones({ goals, feedback, assessments, attendanceStat
   const cards = [
     {
       icon: Flame,
-      color: 'text-orange-500',
-      bg: 'bg-orange-500/10',
+      color: 'text-club-primary',
+      bg: 'bg-club-primary/10',
       title: t('playerExperience.progress.currentStreak'),
       value: attendanceStats?.currentStreak ?? 0,
       subtitle: t('playerExperience.progress.bestStreak', { count: attendanceStats?.longestStreak ?? 0 }),
     },
     {
       icon: Target,
-      color: 'text-green-500',
-      bg: 'bg-green-500/10',
+      color: 'text-emerald-400',
+      bg: 'bg-emerald-400/10',
       title: t('playerExperience.progress.goalsAchieved'),
       value: completedGoals,
       subtitle: t('playerExperience.progress.activeGoals', { count: activeGoals }),
     },
     {
       icon: Lightbulb,
-      color: 'text-blue-500',
-      bg: 'bg-blue-500/10',
+      color: 'text-vq-teal',
+      bg: 'bg-vq-teal/10',
       title: t('playerExperience.progress.selfReflections'),
       value: assessments.length,
       subtitle: t('playerExperience.progress.totalReflections'),
     },
     {
       icon: MessageSquare,
-      color: 'text-purple-500',
-      bg: 'bg-purple-500/10',
+      color: 'text-purple-400',
+      bg: 'bg-purple-400/10',
       title: t('playerExperience.progress.feedbackReceived'),
       value: feedback.length,
       subtitle: t('playerExperience.progress.totalFeedback'),
@@ -64,7 +64,7 @@ export function StreaksMilestones({ goals, feedback, assessments, attendanceStat
                 <card.icon className={`h-5 w-5 ${card.color}`} />
               </div>
             </div>
-            <div className="text-2xl font-bold">{card.value}</div>
+            <div className="text-2xl text-stat font-bold">{card.value}</div>
             <p className="text-sm font-medium text-muted-foreground mt-1">{card.title}</p>
             <p className="text-xs text-muted-foreground">{card.subtitle}</p>
           </CardContent>

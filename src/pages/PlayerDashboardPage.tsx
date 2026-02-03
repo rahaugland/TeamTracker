@@ -119,10 +119,9 @@ export function PlayerDashboardPage() {
       const rsvpData = await getPlayerRSVPs(playerRecord.id);
       setRsvps(rsvpData);
 
-      // Load goals for first active team + refresh progress
+      // Load goals for first active team
       if (playerTeamIds.length > 0) {
         try {
-          await refreshGoalProgress(playerRecord.id, playerTeamIds[0]);
           const goalsData = await getPlayerGoals(playerRecord.id, playerTeamIds[0]);
           setGoals(goalsData);
         } catch {
@@ -190,40 +189,6 @@ export function PlayerDashboardPage() {
     }
   };
 
-  const activeTeamId = teamIds[0];
-
-  const handleCreateGoal = async (data: PlayerGoalFormData) => {
-    if (!player || !user || !activeTeamId) return;
-    await createPlayerGoal({
-      player_id: player.id,
-      team_id: activeTeamId,
-      title: data.title,
-      description: data.description,
-      metric_type: data.metric_type,
-      target_value: data.target_value,
-      deadline: data.deadline,
-      created_by: user.id,
-    });
-    const updated = await getPlayerGoals(player.id, activeTeamId);
-    setGoals(updated);
-  };
-
-  const handleToggleGoal = async (goalId: string, isCompleted: boolean) => {
-    await toggleGoalCompletion(goalId, isCompleted);
-    if (player && activeTeamId) {
-      const updated = await getPlayerGoals(player.id, activeTeamId);
-      setGoals(updated);
-    }
-  };
-
-  const handleDeleteGoal = async (goalId: string) => {
-    await deletePlayerGoal(goalId);
-    if (player && activeTeamId) {
-      const updated = await getPlayerGoals(player.id, activeTeamId);
-      setGoals(updated);
-    }
-  };
-
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -236,10 +201,10 @@ export function PlayerDashboardPage() {
     return (
       <div className="container max-w-4xl mx-auto py-8 px-4">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold">
+          <h1 className="text-3xl font-display font-bold uppercase tracking-wider">
             {t('auth.profile.welcome', { name: user?.name || '' })}
           </h1>
-          <p className="text-muted-foreground mt-1">{t('player.singular')}</p>
+          <p className="text-muted-foreground mt-1 font-display tracking-wide">{t('player.singular')}</p>
         </div>
         <div className="space-y-6">
           <JoinTeamCard onJoined={() => {
@@ -276,10 +241,10 @@ export function PlayerDashboardPage() {
     <div className="container max-w-7xl mx-auto py-8 px-4">
       {/* Welcome Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold">
+        <h1 className="text-3xl font-display font-bold uppercase tracking-wider">
           {t('auth.profile.welcome', { name: player.name })}
         </h1>
-        <p className="text-muted-foreground mt-1">{t('player.singular')}</p>
+        <p className="text-muted-foreground mt-1 font-display tracking-wide">{t('player.singular')}</p>
       </div>
 
       {/* Tabbed Dashboard */}
@@ -308,7 +273,7 @@ export function PlayerDashboardPage() {
 
           {/* Next Event Highlight */}
           {nextEvent && (
-            <Card className="bg-primary/5 border-primary/20">
+            <Card className="bg-club-primary/5 border-club-primary/20">
               <CardHeader>
                 <CardTitle>{t('playerExperience.home.nextEvent')}</CardTitle>
                 <CardDescription>{nextEvent.title}</CardDescription>
@@ -343,7 +308,7 @@ export function PlayerDashboardPage() {
 
           {/* Schedule */}
           <div>
-            <h2 className="text-2xl font-bold mb-4">{t('navigation.schedule')}</h2>
+            <h2 className="text-2xl font-display font-bold uppercase tracking-wider mb-4">{t('navigation.schedule')}</h2>
             <PlayerScheduleView
               events={upcomingEvents.slice(0, 5)}
               rsvpStatus={rsvpStatusMap}
@@ -363,7 +328,7 @@ export function PlayerDashboardPage() {
           {/* Recent Announcements */}
           {announcements.length > 0 && (
             <div>
-              <h2 className="text-2xl font-bold mb-4">
+              <h2 className="text-2xl font-display font-bold uppercase tracking-wider mb-4">
                 {t('playerExperience.announcements.title')}
               </h2>
               <AnnouncementsFeed announcements={announcements.slice(0, 5)} />
@@ -383,7 +348,7 @@ export function PlayerDashboardPage() {
                 <TrendingUp className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{attendanceRate}%</div>
+                <div className="text-2xl text-stat font-bold">{attendanceRate}%</div>
                 <p className="text-xs text-muted-foreground">
                   {presentCount} / {totalEvents} {t('dashboard.widgets.events')}
                 </p>
@@ -398,7 +363,7 @@ export function PlayerDashboardPage() {
                 <Calendar className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{upcomingEvents.length}</div>
+                <div className="text-2xl text-stat font-bold">{upcomingEvents.length}</div>
                 <p className="text-xs text-muted-foreground">
                   {t('dashboard.widgets.nextEvents', { count: upcomingEvents.length })}
                 </p>
@@ -411,7 +376,7 @@ export function PlayerDashboardPage() {
                 <Users className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">
+                <div className="text-2xl text-stat font-bold">
                   {player.team_memberships?.length || 0}
                 </div>
                 <p className="text-xs text-muted-foreground">
@@ -423,7 +388,7 @@ export function PlayerDashboardPage() {
 
           {/* Attendance History */}
           <div>
-            <h2 className="text-2xl font-bold mb-4">{t('player.attendance')}</h2>
+            <h2 className="text-2xl font-display font-bold uppercase tracking-wider mb-4">{t('player.attendance')}</h2>
             <PlayerAttendanceHistory
               attendanceRecords={attendanceRecords}
               totalEvents={totalEvents}
@@ -440,14 +405,6 @@ export function PlayerDashboardPage() {
             feedback={feedback}
             assessments={assessments}
             attendanceStats={attendanceStats}
-          />
-
-          <GoalTracker
-            goals={goals}
-            isCoach={true}
-            onCreateGoal={handleCreateGoal}
-            onToggleComplete={handleToggleGoal}
-            onDeleteGoal={handleDeleteGoal}
           />
 
           <PlayerAwardsShowcase playerId={player.id} />

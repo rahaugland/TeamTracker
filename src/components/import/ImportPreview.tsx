@@ -110,7 +110,7 @@ export function ImportPreview({
                 id="create-players"
                 checked={createMissingPlayers}
                 onChange={(e) => onCreateMissingPlayersChange(e.target.checked)}
-                className="w-4 h-4 rounded border-gray-300"
+                className="w-4 h-4 rounded border-white/20 bg-white/5"
               />
               <Label htmlFor="create-players" className="cursor-pointer">
                 {t('import.createMissingPlayers')}
@@ -126,7 +126,7 @@ export function ImportPreview({
                 id="create-events"
                 checked={createMissingEvents}
                 onChange={(e) => onCreateMissingEventsChange(e.target.checked)}
-                className="w-4 h-4 rounded border-gray-300"
+                className="w-4 h-4 rounded border-white/20 bg-white/5"
               />
               <Label htmlFor="create-events" className="cursor-pointer">
                 {t('import.createMissingEvents')}
@@ -141,8 +141,8 @@ export function ImportPreview({
 
       {validation.valid && (
         <Alert>
-          <CheckCircle2 className="h-4 w-4 text-green-600" />
-          <AlertDescription className="text-green-600">
+          <CheckCircle2 className="h-4 w-4 text-emerald-400" />
+          <AlertDescription className="text-emerald-400">
             {t('import.readyToImport')}
           </AlertDescription>
         </Alert>

@@ -31,6 +31,18 @@ export interface AttendanceRecordWithPlayer extends AttendanceRecord {
   };
 }
 
+export interface AttendanceRecordWithEvent extends AttendanceRecord {
+  event: {
+    id: string;
+    title: string;
+    type: string;
+    start_time: string;
+    end_time?: string;
+    location?: string;
+    team_id?: string;
+  };
+}
+
 /**
  * Get all attendance records for an event
  */
@@ -270,4 +282,101 @@ export async function batchMarkAttendance(
       throw error;
     }
   }
+}
+
+/**
+ * Get attendance records for a player with full event details
+ * Useful for calendar views and detailed attendance breakdown
+ */
+export async function getAttendanceWithEvents(
+  playerId: string,
+  teamId?: string
+): Promise<AttendanceRecordWithEvent[]> {
+  let query = supabase
+    .from('attendance_records')
+    .select(`
+      *,
+      event:events(
+        id,
+        title,
+        type,
+        start_time,
+        end_time,
+        location,
+        team_id
+      )
+    `)
+    .eq('player_id', playerId)
+    .order('created_at', { ascending: false });
+
+  const { data, error } = await query;
+
+  if (error) {
+    console.error('Error fetching attendance with events:', error);
+    throw error;
+  }
+
+  // Filter by team if provided (post-query since nested filter)
+  let records = (data || []) as AttendanceRecordWithEvent[];
+  if (teamId) {
+    records = records.filter(r => r.event?.team_id === teamId);
+  }
+
+  return records;
+}
+
+/**
+ * Calendar data structure for attendance display
+ */
+export interface AttendanceCalendarDay {
+  date: string;
+  dayOfMonth: number;
+  status: AttendanceStatus | null;
+  eventTitle?: string;
+  eventType?: string;
+}
+
+/**
+ * Get attendance data formatted for calendar display
+ * Returns data for a specific month
+ */
+export async function getAttendanceCalendar(
+  playerId: string,
+  year: number,
+  month: number,
+  teamId?: string
+): Promise<AttendanceCalendarDay[]> {
+  const records = await getAttendanceWithEvents(playerId, teamId);
+
+  // Filter to specific month
+  const monthStr = `${year}-${String(month).padStart(2, '0')}`;
+  const monthRecords = records.filter(r =>
+    r.event?.start_time?.startsWith(monthStr)
+  );
+
+  // Create map of dates to attendance
+  const dateMap = new Map<string, AttendanceRecordWithEvent>();
+  for (const record of monthRecords) {
+    const dateStr = record.event.start_time.split('T')[0];
+    dateMap.set(dateStr, record);
+  }
+
+  // Generate all days in the month
+  const daysInMonth = new Date(year, month, 0).getDate();
+  const days: AttendanceCalendarDay[] = [];
+
+  for (let day = 1; day <= daysInMonth; day++) {
+    const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    const record = dateMap.get(dateStr);
+
+    days.push({
+      date: dateStr,
+      dayOfMonth: day,
+      status: record?.status || null,
+      eventTitle: record?.event?.title,
+      eventType: record?.event?.type,
+    });
+  }
+
+  return days;
 }

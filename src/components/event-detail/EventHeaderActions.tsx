@@ -56,7 +56,7 @@ export function EventHeaderActions({
             </Button>
           )}
           {isFinalized && (
-            <span className="inline-flex items-center px-3 py-1 text-sm font-medium bg-green-100 text-green-800 rounded-full">
+            <span className="inline-flex items-center px-3 py-1 text-sm font-medium bg-emerald-500/15 text-emerald-400 rounded-full">
               {t('awards.finalized')}
             </span>
           )}

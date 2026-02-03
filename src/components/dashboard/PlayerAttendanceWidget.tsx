@@ -45,15 +45,15 @@ export function PlayerAttendanceWidget({ teamId, limit = 10, dateRange }: Player
   }
 
   const getAttendanceColor = (rate: number) => {
-    if (rate >= 90) return 'text-green-600';
-    if (rate >= 75) return 'text-yellow-600';
-    return 'text-red-600';
+    if (rate >= 90) return 'text-emerald-400';
+    if (rate >= 75) return 'text-club-secondary';
+    return 'text-club-primary';
   };
 
   const getProgressBarColor = (rate: number) => {
-    if (rate >= 90) return 'bg-green-500';
-    if (rate >= 75) return 'bg-yellow-500';
-    return 'bg-red-500';
+    if (rate >= 90) return 'bg-emerald-400';
+    if (rate >= 75) return 'bg-club-secondary';
+    return 'bg-club-primary';
   };
 
   return (
@@ -96,7 +96,7 @@ export function PlayerAttendanceWidget({ teamId, limit = 10, dateRange }: Player
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className={`text-sm font-bold ${getAttendanceColor(player.attendanceRate)}`}>
+                    <p className={`text-sm text-stat font-bold ${getAttendanceColor(player.attendanceRate)}`}>
                       {player.attendanceRate.toFixed(1)}%
                     </p>
                   </div>

@@ -1,0 +1,2868 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VolleyQuest — Coach User Flows</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800;900&family=Barlow:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --vq-navy: #0A1628;
+  --vq-navy-90: #0f1e35;
+  --vq-navy-80: #162843;
+  --vq-navy-70: #1e3452;
+  --vq-navy-60: #2a4268;
+  --vq-white: #FFFFFF;
+  --vq-off-white: #F0F2F5;
+  --vq-light-gray: #E1E5EB;
+  --vq-mid-gray: #8B95A5;
+  --vq-teal: #2EC4B6;
+  --vq-teal-dim: #1a7a70;
+  --club-primary: #E63946;
+  --club-primary-dim: #c42d39;
+  --club-primary-glow: rgba(230, 57, 70, 0.25);
+  --club-secondary: #FFB703;
+  --club-secondary-dim: #e0a003;
+  --color-success: #22C55E;
+  --color-warning: #F59E0B;
+  --color-error: #EF4444;
+  --color-info: #3B82F6;
+  --font-display: 'Barlow Condensed', sans-serif;
+  --font-body: 'Barlow', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-full: 999px;
+  --sidebar-width: 220px;
+  --topbar-height: 60px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-body);
+  background: var(--vq-navy);
+  color: var(--vq-white);
+  line-height: 1.5;
+  overflow-x: hidden;
+}
+
+/* App Layout */
+.app-container {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* Sidebar */
+.sidebar {
+  width: var(--sidebar-width);
+  background: var(--vq-navy-90);
+  border-right: 1px solid rgba(255,255,255,0.06);
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  z-index: 100;
+}
+
+.sidebar-logo {
+  padding: var(--space-lg);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.logo-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, var(--vq-teal), var(--vq-teal-dim));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 16px;
+}
+
+.logo-text {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 18px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: var(--space-md);
+  overflow-y: auto;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: 12px var(--space-md);
+  border-radius: var(--radius-sm);
+  color: var(--vq-mid-gray);
+  text-decoration: none;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: 4px;
+}
+
+.nav-item:hover {
+  background: rgba(255,255,255,0.04);
+  color: var(--vq-white);
+}
+
+.nav-item.active {
+  background: var(--club-primary);
+  color: var(--vq-white);
+  box-shadow: 0 2px 12px rgba(230, 57, 70, 0.3);
+}
+
+.nav-item svg {
+  width: 18px;
+  height: 18px;
+  opacity: 0.7;
+}
+
+.nav-item.active svg { opacity: 1; }
+
+/* Top Bar */
+.topbar {
+  height: var(--topbar-height);
+  background: var(--vq-navy-90);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  position: fixed;
+  top: 0;
+  left: var(--sidebar-width);
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--space-lg);
+  z-index: 99;
+}
+
+.team-selector {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  background: var(--vq-navy-80);
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(255,255,255,0.1);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.team-selector:hover {
+  border-color: var(--club-primary);
+}
+
+.team-badge {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  background: var(--club-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 11px;
+}
+
+.team-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.team-name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.team-league {
+  font-size: 11px;
+  color: var(--vq-mid-gray);
+}
+
+.team-selector-arrow {
+  color: var(--vq-mid-gray);
+  margin-left: var(--space-sm);
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.sync-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: 8px 12px;
+  background: rgba(46, 196, 182, 0.1);
+  border: 1px solid rgba(46, 196, 182, 0.2);
+  border-radius: var(--radius-sm);
+  color: var(--vq-teal);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+}
+
+.user-menu {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  cursor: pointer;
+}
+
+.user-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-full);
+  background: var(--vq-navy-70);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--vq-teal);
+}
+
+/* Main Content */
+.main-content {
+  margin-left: var(--sidebar-width);
+  margin-top: var(--topbar-height);
+  padding: var(--space-lg);
+  flex: 1;
+}
+
+/* Page Views */
+.page-view {
+  display: none;
+  animation: fadeUp 0.4s ease;
+}
+
+.page-view.active { display: block; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Page Header */
+.page-header {
+  margin-bottom: var(--space-lg);
+}
+
+.page-title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 32px;
+  text-transform: uppercase;
+  letter-spacing: -0.5px;
+}
+
+.page-subtitle {
+  color: var(--vq-mid-gray);
+  font-size: 14px;
+  margin-top: var(--space-xs);
+}
+
+/* Stats Row */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+}
+
+.stat-card {
+  background: var(--vq-navy-90);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--radius-md);
+  padding: var(--space-lg);
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.stat-card:hover {
+  border-color: rgba(255,255,255,0.12);
+  transform: translateY(-2px);
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--accent, var(--vq-mid-gray));
+}
+
+.stat-label {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--vq-mid-gray);
+  margin-bottom: var(--space-sm);
+}
+
+.stat-value {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 32px;
+  letter-spacing: -1px;
+}
+
+.stat-delta {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  margin-top: var(--space-xs);
+}
+
+.stat-delta.positive { color: var(--color-success); }
+.stat-delta.negative { color: var(--color-error); }
+
+/* Dashboard Grid */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: var(--space-lg);
+}
+
+/* Cards */
+.card {
+  background: var(--vq-navy-90);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.card-header {
+  padding: var(--space-md) var(--space-lg);
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.card-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.card-body { padding: var(--space-lg); }
+
+/* Today's Practice Card */
+.today-practice {
+  background: linear-gradient(135deg, var(--club-primary), var(--club-primary-dim));
+  border: none;
+  margin-bottom: var(--space-lg);
+}
+
+.today-practice .card-header {
+  border-bottom-color: rgba(255,255,255,0.1);
+}
+
+.today-label {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: rgba(255,255,255,0.7);
+}
+
+.today-title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 24px;
+  text-transform: uppercase;
+  margin-top: var(--space-xs);
+}
+
+.today-meta {
+  display: flex;
+  gap: var(--space-lg);
+  margin-top: var(--space-md);
+  font-size: 14px;
+  color: rgba(255,255,255,0.8);
+}
+
+.today-meta span {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.rsvp-summary {
+  display: flex;
+  gap: var(--space-md);
+  margin-top: var(--space-lg);
+  padding-top: var(--space-md);
+  border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+.rsvp-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.rsvp-count {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 20px;
+}
+
+.rsvp-label {
+  font-size: 12px;
+  color: rgba(255,255,255,0.7);
+}
+
+.btn {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  border: none;
+  cursor: pointer;
+  padding: 10px 20px;
+  border-radius: var(--radius-sm);
+  transition: all 0.2s;
+}
+
+.btn-white {
+  background: var(--vq-white);
+  color: var(--club-primary);
+}
+
+.btn-white:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.btn-primary {
+  background: var(--club-primary);
+  color: var(--vq-white);
+  box-shadow: 0 2px 12px rgba(230, 57, 70, 0.3);
+}
+
+.btn-primary:hover {
+  background: var(--club-primary-dim);
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--vq-white);
+  border: 1px solid rgba(255,255,255,0.2);
+}
+
+.btn-secondary:hover {
+  border-color: var(--vq-white);
+  background: rgba(255,255,255,0.05);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--vq-teal);
+  padding: 10px 16px;
+}
+
+.btn-ghost:hover {
+  background: rgba(46, 196, 182, 0.1);
+}
+
+.btn-sm {
+  font-size: 10px;
+  padding: 6px 12px;
+}
+
+/* RSVP List */
+.rsvp-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.rsvp-player {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-sm) var(--space-md);
+  background: var(--vq-navy-80);
+  border-radius: var(--radius-sm);
+}
+
+.rsvp-player .player-avatar {
+  margin-right: 0;
+}
+
+.rsvp-player-info {
+  flex: 1;
+}
+
+.rsvp-player-name {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.rsvp-player-pos {
+  font-size: 11px;
+  color: var(--vq-mid-gray);
+}
+
+.rsvp-status {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+}
+
+.rsvp-status.coming {
+  background: rgba(34, 197, 94, 0.15);
+  color: var(--color-success);
+}
+
+.rsvp-status.not-coming {
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--color-error);
+}
+
+.rsvp-status.pending {
+  background: rgba(245, 158, 11, 0.15);
+  color: var(--color-warning);
+}
+
+/* Attendance Alert */
+.attendance-alert {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--space-md);
+}
+
+.alert-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-full);
+  background: rgba(245, 158, 11, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-warning);
+  font-size: 16px;
+}
+
+.alert-text {
+  flex: 1;
+  font-size: 13px;
+}
+
+.alert-text strong {
+  color: var(--color-warning);
+}
+
+/* Schedule Items */
+.schedule-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.schedule-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  background: var(--vq-navy-80);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1px solid transparent;
+}
+
+.schedule-item:hover {
+  border-color: rgba(255,255,255,0.1);
+}
+
+.schedule-item.today {
+  border-color: var(--club-primary);
+  background: rgba(230, 57, 70, 0.08);
+}
+
+.schedule-date {
+  min-width: 48px;
+  text-align: center;
+}
+
+.schedule-date .day {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 22px;
+  line-height: 1;
+}
+
+.schedule-date .month {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--vq-mid-gray);
+}
+
+.schedule-info {
+  flex: 1;
+}
+
+.schedule-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.schedule-meta {
+  font-size: 12px;
+  color: var(--vq-mid-gray);
+}
+
+.schedule-type {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 9px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 4px 8px;
+  border-radius: var(--radius-full);
+}
+
+.schedule-type.match {
+  background: rgba(230, 57, 70, 0.15);
+  color: var(--club-primary);
+}
+
+.schedule-type.practice {
+  background: rgba(46, 196, 182, 0.12);
+  color: var(--vq-teal);
+}
+
+/* Player Avatar */
+.player-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-full);
+  background: var(--vq-navy-70);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 11px;
+  color: var(--vq-teal);
+  flex-shrink: 0;
+}
+
+/* Position Tag */
+.position-tag {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 9px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  background: rgba(46, 196, 182, 0.1);
+  color: var(--vq-teal);
+  padding: 3px 8px;
+  border-radius: var(--radius-full);
+}
+
+/* Data Table */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.data-table thead {
+  background: rgba(255,255,255,0.02);
+}
+
+.data-table th {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--vq-mid-gray);
+  padding: var(--space-md);
+  text-align: left;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.data-table td {
+  padding: var(--space-md);
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+}
+
+.data-table tbody tr {
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.data-table tbody tr:hover {
+  background: rgba(255,255,255,0.02);
+}
+
+/* Attendance Bar */
+.attendance-bar {
+  width: 50px;
+  height: 5px;
+  background: rgba(255,255,255,0.1);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: var(--space-sm);
+}
+
+.attendance-bar-fill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  background: var(--color-success);
+}
+
+/* Flow indicator */
+.flow-indicator {
+  position: fixed;
+  bottom: var(--space-lg);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--vq-navy-80);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: var(--radius-full);
+  padding: var(--space-sm) var(--space-lg);
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  z-index: 1000;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+}
+
+.flow-step {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--vq-mid-gray);
+  cursor: pointer;
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-full);
+  transition: all 0.2s;
+}
+
+.flow-step.active {
+  background: var(--club-primary);
+  color: var(--vq-white);
+}
+
+.flow-step:hover:not(.active) {
+  color: var(--vq-white);
+}
+
+.flow-arrow {
+  color: var(--vq-mid-gray);
+  font-size: 14px;
+}
+
+/* Event Detail Page */
+.event-hero {
+  background: linear-gradient(135deg, var(--vq-teal), var(--vq-teal-dim));
+  border-radius: var(--radius-lg);
+  padding: var(--space-2xl);
+  margin-bottom: var(--space-lg);
+  position: relative;
+  overflow: hidden;
+}
+
+.event-hero::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -10%;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.1);
+  filter: blur(60px);
+}
+
+.event-type-badge {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  background: rgba(255,255,255,0.2);
+  padding: 6px 14px;
+  border-radius: var(--radius-full);
+  display: inline-block;
+  margin-bottom: var(--space-md);
+}
+
+.event-title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 36px;
+  text-transform: uppercase;
+  margin-bottom: var(--space-sm);
+}
+
+.event-datetime {
+  font-size: 16px;
+  color: rgba(255,255,255,0.8);
+  margin-bottom: var(--space-lg);
+}
+
+.event-actions {
+  display: flex;
+  gap: var(--space-md);
+}
+
+/* Two Column Layout */
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-lg);
+}
+
+/* RSVP Grid */
+.rsvp-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+}
+
+.rsvp-stat {
+  background: var(--vq-navy-80);
+  border-radius: var(--radius-md);
+  padding: var(--space-lg);
+  text-align: center;
+}
+
+.rsvp-stat-value {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 36px;
+}
+
+.rsvp-stat-label {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--vq-mid-gray);
+  margin-top: var(--space-xs);
+}
+
+.rsvp-stat.coming .rsvp-stat-value { color: var(--color-success); }
+.rsvp-stat.not-coming .rsvp-stat-value { color: var(--color-error); }
+.rsvp-stat.pending .rsvp-stat-value { color: var(--color-warning); }
+
+/* Practice Plan Link */
+.practice-plan-link {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  background: rgba(46, 196, 182, 0.08);
+  border: 1px solid rgba(46, 196, 182, 0.2);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.practice-plan-link:hover {
+  border-color: var(--vq-teal);
+  background: rgba(46, 196, 182, 0.12);
+}
+
+.plan-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  background: var(--vq-teal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+}
+
+.plan-info {
+  flex: 1;
+}
+
+.plan-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 14px;
+  text-transform: uppercase;
+}
+
+.plan-meta {
+  font-size: 12px;
+  color: var(--vq-mid-gray);
+}
+
+/* Breadcrumb */
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+  font-size: 13px;
+}
+
+.breadcrumb a {
+  color: var(--vq-mid-gray);
+  text-decoration: none;
+}
+
+.breadcrumb a:hover {
+  color: var(--vq-teal);
+}
+
+.breadcrumb span {
+  color: var(--vq-mid-gray);
+}
+
+.breadcrumb .current {
+  color: var(--vq-white);
+}
+
+/* Practice Plan Builder */
+.plan-builder {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: var(--space-lg);
+  height: calc(100vh - var(--topbar-height) - 140px);
+}
+
+.drill-library {
+  background: var(--vq-navy-90);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.library-header {
+  padding: var(--space-md);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.library-search {
+  width: 100%;
+  background: var(--vq-navy-80);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: var(--radius-sm);
+  padding: var(--space-sm) var(--space-md);
+  color: var(--vq-white);
+  font-family: var(--font-body);
+  font-size: 13px;
+}
+
+.library-search::placeholder {
+  color: var(--vq-mid-gray);
+}
+
+.library-filters {
+  display: flex;
+  gap: var(--space-xs);
+  margin-top: var(--space-sm);
+  flex-wrap: wrap;
+}
+
+.filter-tag {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  background: var(--vq-navy-80);
+  color: var(--vq-mid-gray);
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1px solid transparent;
+}
+
+.filter-tag:hover {
+  color: var(--vq-white);
+  border-color: rgba(255,255,255,0.1);
+}
+
+.filter-tag.active {
+  background: var(--vq-teal);
+  color: var(--vq-navy);
+}
+
+.library-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-md);
+}
+
+.drill-item {
+  padding: var(--space-md);
+  background: var(--vq-navy-80);
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--space-sm);
+  cursor: grab;
+  transition: all 0.2s;
+  border: 1px solid transparent;
+}
+
+.drill-item:hover {
+  border-color: var(--vq-teal);
+}
+
+.drill-item-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-xs);
+}
+
+.drill-name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 13px;
+  text-transform: uppercase;
+}
+
+.drill-duration {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--vq-teal);
+}
+
+.drill-tags {
+  display: flex;
+  gap: var(--space-xs);
+}
+
+.drill-tag {
+  font-size: 9px;
+  padding: 2px 6px;
+  border-radius: var(--radius-full);
+  background: rgba(255,255,255,0.06);
+  color: var(--vq-mid-gray);
+}
+
+.plan-canvas {
+  background: var(--vq-navy-90);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.canvas-header {
+  padding: var(--space-md) var(--space-lg);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.plan-title-input {
+  background: transparent;
+  border: none;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 20px;
+  text-transform: uppercase;
+  color: var(--vq-white);
+  width: 300px;
+}
+
+.plan-title-input::placeholder {
+  color: var(--vq-mid-gray);
+}
+
+.plan-meta-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+}
+
+.plan-total {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: var(--vq-teal);
+}
+
+.canvas-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-lg);
+}
+
+.plan-section {
+  margin-bottom: var(--space-lg);
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-md);
+}
+
+.section-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--vq-mid-gray);
+}
+
+.section-duration {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--vq-mid-gray);
+}
+
+.plan-drill {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  background: var(--vq-navy-80);
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--space-sm);
+  border-left: 3px solid var(--vq-teal);
+}
+
+.drill-order {
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-full);
+  background: var(--vq-teal);
+  color: var(--vq-navy);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 12px;
+}
+
+.drill-info {
+  flex: 1;
+}
+
+.drill-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.time-input {
+  width: 60px;
+  background: var(--vq-navy-70);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: var(--radius-sm);
+  padding: 4px 8px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--vq-white);
+  text-align: center;
+}
+
+.remove-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  border: none;
+  color: var(--vq-mid-gray);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.remove-btn:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--color-error);
+}
+
+.drop-zone {
+  border: 2px dashed rgba(255,255,255,0.1);
+  border-radius: var(--radius-md);
+  padding: var(--space-xl);
+  text-align: center;
+  color: var(--vq-mid-gray);
+  font-size: 13px;
+}
+
+/* Player Stats Page */
+.player-hero {
+  display: flex;
+  gap: var(--space-2xl);
+  margin-bottom: var(--space-lg);
+}
+
+.player-card-container {
+  flex-shrink: 0;
+}
+
+.fifa-card {
+  width: 240px;
+  height: 360px;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(170deg, #2a1f0a 0%, #1a1508 40%, #2a1a05 100%);
+  border: 1px solid rgba(255, 183, 3, 0.35);
+  box-shadow: 0 8px 32px rgba(255, 183, 3, 0.15);
+  position: relative;
+  overflow: hidden;
+  padding: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+}
+
+.card-tier {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--club-secondary);
+  margin-bottom: var(--space-sm);
+}
+
+.card-rating {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 56px;
+  line-height: 1;
+  background: linear-gradient(135deg, var(--club-secondary), #FFD166);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.card-position {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 14px;
+  color: rgba(255, 183, 3, 0.6);
+  letter-spacing: 2px;
+}
+
+.card-avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: var(--radius-lg);
+  background: rgba(255, 183, 3, 0.1);
+  border: 2px solid rgba(255, 183, 3, 0.3);
+  margin: var(--space-lg) auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 32px;
+  color: var(--club-secondary);
+}
+
+.card-name {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 18px;
+  text-transform: uppercase;
+  text-align: center;
+  letter-spacing: 1px;
+}
+
+.card-club {
+  font-size: 11px;
+  color: var(--vq-mid-gray);
+  text-align: center;
+  margin-top: var(--space-xs);
+}
+
+.card-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-sm);
+  margin-top: auto;
+}
+
+.card-stat {
+  text-align: center;
+}
+
+.card-stat-value {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--club-secondary);
+}
+
+.card-stat-label {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 8px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--vq-mid-gray);
+}
+
+.player-info-panel {
+  flex: 1;
+}
+
+.player-name-lg {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 42px;
+  text-transform: uppercase;
+  line-height: 1;
+  margin-bottom: var(--space-sm);
+}
+
+.player-meta-row {
+  display: flex;
+  gap: var(--space-lg);
+  margin-bottom: var(--space-lg);
+  color: var(--vq-mid-gray);
+  font-size: 14px;
+}
+
+.player-quick-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-md);
+}
+
+.quick-stat {
+  background: var(--vq-navy-90);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  text-align: center;
+}
+
+.quick-stat-value {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 28px;
+}
+
+.quick-stat-label {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--vq-mid-gray);
+  margin-top: var(--space-xs);
+}
+
+/* Charts placeholder */
+.chart-placeholder {
+  background: var(--vq-navy-80);
+  border-radius: var(--radius-md);
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--vq-mid-gray);
+  font-size: 13px;
+}
+
+/* Match Team Selection */
+.match-hero {
+  background: linear-gradient(135deg, var(--club-primary), var(--club-primary-dim));
+  border-radius: var(--radius-lg);
+  padding: var(--space-2xl);
+  margin-bottom: var(--space-lg);
+}
+
+.match-vs {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2xl);
+}
+
+.match-team {
+  text-align: center;
+}
+
+.match-team-badge {
+  width: 72px;
+  height: 72px;
+  border-radius: var(--radius-lg);
+  background: rgba(255,255,255,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 24px;
+  margin: 0 auto var(--space-sm);
+}
+
+.match-team-name {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 24px;
+  text-transform: uppercase;
+}
+
+.match-vs-text {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 20px;
+  color: rgba(255,255,255,0.5);
+  letter-spacing: 4px;
+}
+
+.match-datetime {
+  text-align: center;
+  margin-top: var(--space-lg);
+  font-size: 14px;
+  color: rgba(255,255,255,0.7);
+}
+
+.team-selection-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-lg);
+}
+
+.selection-panel {
+  background: var(--vq-navy-90);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.panel-header {
+  padding: var(--space-md) var(--space-lg);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.panel-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.panel-count {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--vq-teal);
+}
+
+.player-select-list {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.player-select-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-lg);
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.player-select-item:hover {
+  background: rgba(255,255,255,0.02);
+}
+
+.player-select-item.selected {
+  background: rgba(46, 196, 182, 0.08);
+  border-left: 3px solid var(--vq-teal);
+}
+
+.player-select-item.unavailable {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.select-checkbox {
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255,255,255,0.2);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: transparent;
+  transition: all 0.15s;
+}
+
+.player-select-item.selected .select-checkbox {
+  background: var(--vq-teal);
+  border-color: var(--vq-teal);
+  color: var(--vq-navy);
+}
+
+.player-select-info {
+  flex: 1;
+}
+
+.player-select-name {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.player-select-stats {
+  font-size: 11px;
+  color: var(--vq-mid-gray);
+}
+
+.form-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.form-indicator.good { background: var(--color-success); }
+.form-indicator.average { background: var(--color-warning); }
+.form-indicator.poor { background: var(--color-error); }
+
+/* Players list page */
+.players-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--space-md);
+}
+
+.player-card-mini {
+  background: var(--vq-navy-90);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--radius-md);
+  padding: var(--space-lg);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.player-card-mini:hover {
+  border-color: rgba(255,255,255,0.12);
+  transform: translateY(-2px);
+}
+
+.player-card-top {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  margin-bottom: var(--space-md);
+}
+
+.player-avatar-md {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  background: var(--vq-navy-70);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--vq-teal);
+}
+
+.player-card-name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 16px;
+  text-transform: uppercase;
+}
+
+.player-card-pos {
+  font-size: 12px;
+  color: var(--vq-mid-gray);
+}
+
+.player-card-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-sm);
+  padding-top: var(--space-md);
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+
+.mini-stat {
+  text-align: center;
+}
+
+.mini-stat-value {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 18px;
+}
+
+.mini-stat-label {
+  font-size: 9px;
+  color: var(--vq-mid-gray);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Search and filters */
+.search-bar {
+  display: flex;
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+}
+
+.search-input {
+  flex: 1;
+  background: var(--vq-navy-90);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: var(--radius-sm);
+  padding: var(--space-sm) var(--space-md);
+  color: var(--vq-white);
+  font-size: 14px;
+}
+
+.search-input::placeholder {
+  color: var(--vq-mid-gray);
+}
+
+/* Tabs */
+.tabs {
+  display: flex;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-lg);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  padding-bottom: var(--space-sm);
+}
+
+.tab {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: var(--space-sm) var(--space-md);
+  color: var(--vq-mid-gray);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: all 0.2s;
+}
+
+.tab:hover {
+  color: var(--vq-white);
+}
+
+.tab.active {
+  background: var(--club-primary);
+  color: var(--vq-white);
+}
+</style>
+</head>
+<body>
+
+<div class="app-container">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">VQ</div>
+      <span class="logo-text">VolleyQuest</span>
+    </div>
+    <nav class="sidebar-nav">
+      <a class="nav-item active" onclick="showPage('dashboard')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </a>
+      <a class="nav-item" onclick="showPage('schedule')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Schedule
+      </a>
+      <a class="nav-item" onclick="showPage('players')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Players
+      </a>
+      <a class="nav-item" onclick="showPage('practice-plans')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        Practice Plans
+      </a>
+      <a class="nav-item" onclick="showPage('drills')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+        Drills
+      </a>
+      <a class="nav-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        Settings
+      </a>
+    </nav>
+  </aside>
+
+  <!-- Top Bar -->
+  <header class="topbar">
+    <div class="team-selector" onclick="toggleTeamDropdown()">
+      <div class="team-badge">OV</div>
+      <div class="team-info">
+        <span class="team-name">Oslo Volley U19</span>
+        <span class="team-league">1. Division</span>
+      </div>
+      <span class="team-selector-arrow">▼</span>
+    </div>
+    <div class="topbar-right">
+      <button class="sync-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+        Synced
+      </button>
+      <div class="user-menu">
+        <div class="user-avatar">MK</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-content">
+
+    <!-- PAGE: Dashboard -->
+    <div class="page-view active" id="page-dashboard">
+      <div class="page-header">
+        <h1 class="page-title">Dashboard</h1>
+        <p class="page-subtitle">Oslo Volley U19 • Season 2025/26</p>
+      </div>
+
+      <!-- Today's Practice Highlight -->
+      <div class="today-practice">
+        <div class="card-body">
+          <p class="today-label">Today's Practice</p>
+          <h2 class="today-title">Team Practice</h2>
+          <div class="today-meta">
+            <span>📍 Lambertseter Hall</span>
+            <span>🕐 18:00 - 20:00</span>
+          </div>
+          <div class="rsvp-summary">
+            <div class="rsvp-item">
+              <span class="rsvp-count" style="color: var(--color-success)">12</span>
+              <span class="rsvp-label">Coming</span>
+            </div>
+            <div class="rsvp-item">
+              <span class="rsvp-count" style="color: var(--color-error)">2</span>
+              <span class="rsvp-label">Not Coming</span>
+            </div>
+            <div class="rsvp-item">
+              <span class="rsvp-count" style="color: var(--color-warning)">2</span>
+              <span class="rsvp-label">No Response</span>
+            </div>
+            <button class="btn btn-white" onclick="showPage('event-detail')" style="margin-left: auto;">View Details</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats Row -->
+      <div class="stats-row">
+        <div class="stat-card" style="--accent: var(--color-success)">
+          <p class="stat-label">Attendance Rate</p>
+          <p class="stat-value">87%</p>
+          <p class="stat-delta positive">+3.2% vs last month</p>
+        </div>
+        <div class="stat-card" style="--accent: var(--club-primary)">
+          <p class="stat-label">Win Rate</p>
+          <p class="stat-value">72%</p>
+          <p class="stat-delta positive">+8% vs last season</p>
+        </div>
+        <div class="stat-card" style="--accent: var(--club-secondary)">
+          <p class="stat-label">Active Players</p>
+          <p class="stat-value">16</p>
+          <p class="stat-delta" style="color: var(--vq-mid-gray)">of 18 registered</p>
+        </div>
+        <div class="stat-card" style="--accent: var(--vq-teal)">
+          <p class="stat-label">Next Match</p>
+          <p class="stat-value" style="font-size: 24px">3 days</p>
+          <p class="stat-delta" style="color: var(--vq-mid-gray)">vs Bergen VBK</p>
+        </div>
+      </div>
+
+      <!-- Attendance Alert -->
+      <div class="attendance-alert">
+        <div class="alert-icon">⚠️</div>
+        <div class="alert-text">
+          <strong>Kristian Larsen</strong> has missed 3 of the last 5 practices. Consider reaching out.
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="showPage('player-stats')">View Player</button>
+      </div>
+
+      <!-- Dashboard Grid -->
+      <div class="dashboard-grid">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Roster Overview</span>
+            <button class="btn btn-ghost btn-sm" onclick="showPage('players')">View All</button>
+          </div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Player</th>
+                <th>Pos</th>
+                <th>Attendance</th>
+                <th>Form</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr onclick="showPage('player-stats')">
+                <td><span class="player-avatar">EH</span>Erik Hansen</td>
+                <td><span class="position-tag">OH</span></td>
+                <td><span class="attendance-bar"><span class="attendance-bar-fill" style="width:95%"></span></span>95%</td>
+                <td><span class="form-indicator good"></span></td>
+              </tr>
+              <tr onclick="showPage('player-stats')">
+                <td><span class="player-avatar">SN</span>Sofia Nilsen</td>
+                <td><span class="position-tag">S</span></td>
+                <td><span class="attendance-bar"><span class="attendance-bar-fill" style="width:100%"></span></span>100%</td>
+                <td><span class="form-indicator good"></span></td>
+              </tr>
+              <tr onclick="showPage('player-stats')">
+                <td><span class="player-avatar">KL</span>Kristian Larsen</td>
+                <td><span class="position-tag">MB</span></td>
+                <td><span class="attendance-bar"><span class="attendance-bar-fill" style="width:60%; background: var(--color-warning)"></span></span>60%</td>
+                <td><span class="form-indicator poor"></span></td>
+              </tr>
+              <tr onclick="showPage('player-stats')">
+                <td><span class="player-avatar">IJ</span>Ingrid Johansen</td>
+                <td><span class="position-tag">OPP</span></td>
+                <td><span class="attendance-bar"><span class="attendance-bar-fill" style="width:91%"></span></span>91%</td>
+                <td><span class="form-indicator good"></span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div>
+          <div class="card" style="margin-bottom: var(--space-lg)">
+            <div class="card-header">
+              <span class="card-title">Upcoming</span>
+              <button class="btn btn-ghost btn-sm" onclick="showPage('schedule')">View All</button>
+            </div>
+            <div class="card-body">
+              <div class="schedule-list">
+                <div class="schedule-item today" onclick="showPage('event-detail')">
+                  <div class="schedule-date">
+                    <span class="day">03</span>
+                    <span class="month">Feb</span>
+                  </div>
+                  <div class="schedule-info">
+                    <p class="schedule-title">Team Practice</p>
+                    <p class="schedule-meta">Lambertseter Hall, 18:00</p>
+                  </div>
+                  <span class="schedule-type practice">Today</span>
+                </div>
+                <div class="schedule-item" onclick="showPage('match-selection')">
+                  <div class="schedule-date">
+                    <span class="day">06</span>
+                    <span class="month">Feb</span>
+                  </div>
+                  <div class="schedule-info">
+                    <p class="schedule-title">vs Bergen VBK</p>
+                    <p class="schedule-meta">Ekeberg Hallen, 19:00</p>
+                  </div>
+                  <span class="schedule-type match">Match</span>
+                </div>
+                <div class="schedule-item">
+                  <div class="schedule-date">
+                    <span class="day">08</span>
+                    <span class="month">Feb</span>
+                  </div>
+                  <div class="schedule-info">
+                    <p class="schedule-title">Team Practice</p>
+                    <p class="schedule-meta">Lambertseter Hall, 18:00</p>
+                  </div>
+                  <span class="schedule-type practice">Practice</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="practice-plan-link" onclick="showPage('practice-plan-builder')">
+            <div class="plan-icon">📋</div>
+            <div class="plan-info">
+              <p class="plan-title">Today's Practice Plan</p>
+              <p class="plan-meta">Serve Reception Focus • 6 drills • 90 min</p>
+            </div>
+            <span style="color: var(--vq-teal)">→</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE: Event Detail -->
+    <div class="page-view" id="page-event-detail">
+      <div class="breadcrumb">
+        <a onclick="showPage('dashboard')">Dashboard</a>
+        <span>/</span>
+        <a onclick="showPage('schedule')">Schedule</a>
+        <span>/</span>
+        <span class="current">Team Practice</span>
+      </div>
+
+      <div class="event-hero">
+        <span class="event-type-badge">Practice</span>
+        <h1 class="event-title">Team Practice</h1>
+        <p class="event-datetime">📅 Monday, February 3, 2026 • 🕐 18:00 - 20:00 • 📍 Lambertseter Hall</p>
+        <div class="event-actions">
+          <button class="btn btn-white" onclick="showPage('practice-plan-builder')">View Practice Plan</button>
+          <button class="btn btn-secondary">Edit Event</button>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div>
+          <h3 style="font-family: var(--font-display); font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: var(--space-md);">RSVP Status</h3>
+
+          <div class="rsvp-grid">
+            <div class="rsvp-stat coming">
+              <p class="rsvp-stat-value">12</p>
+              <p class="rsvp-stat-label">Coming</p>
+            </div>
+            <div class="rsvp-stat not-coming">
+              <p class="rsvp-stat-value">2</p>
+              <p class="rsvp-stat-label">Not Coming</p>
+            </div>
+            <div class="rsvp-stat pending">
+              <p class="rsvp-stat-value">2</p>
+              <p class="rsvp-stat-label">Pending</p>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Player Responses</span>
+            </div>
+            <div class="card-body">
+              <div class="rsvp-list">
+                <div class="rsvp-player">
+                  <span class="player-avatar">EH</span>
+                  <div class="rsvp-player-info">
+                    <p class="rsvp-player-name">Erik Hansen</p>
+                    <p class="rsvp-player-pos">Outside Hitter</p>
+                  </div>
+                  <span class="rsvp-status coming">Coming</span>
+                </div>
+                <div class="rsvp-player">
+                  <span class="player-avatar">SN</span>
+                  <div class="rsvp-player-info">
+                    <p class="rsvp-player-name">Sofia Nilsen</p>
+                    <p class="rsvp-player-pos">Setter</p>
+                  </div>
+                  <span class="rsvp-status coming">Coming</span>
+                </div>
+                <div class="rsvp-player">
+                  <span class="player-avatar">KL</span>
+                  <div class="rsvp-player-info">
+                    <p class="rsvp-player-name">Kristian Larsen</p>
+                    <p class="rsvp-player-pos">Middle Blocker</p>
+                  </div>
+                  <span class="rsvp-status not-coming">Not Coming</span>
+                </div>
+                <div class="rsvp-player">
+                  <span class="player-avatar">IJ</span>
+                  <div class="rsvp-player-info">
+                    <p class="rsvp-player-name">Ingrid Johansen</p>
+                    <p class="rsvp-player-pos">Opposite</p>
+                  </div>
+                  <span class="rsvp-status pending">Pending</span>
+                </div>
+                <div class="rsvp-player">
+                  <span class="player-avatar">OB</span>
+                  <div class="rsvp-player-info">
+                    <p class="rsvp-player-name">Ole Berg</p>
+                    <p class="rsvp-player-pos">Libero</p>
+                  </div>
+                  <span class="rsvp-status coming">Coming</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <h3 style="font-family: var(--font-display); font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: var(--space-md);">Practice Plan</h3>
+
+          <div class="practice-plan-link" onclick="showPage('practice-plan-builder')">
+            <div class="plan-icon">📋</div>
+            <div class="plan-info">
+              <p class="plan-title">Serve Reception Focus</p>
+              <p class="plan-meta">6 drills • 90 minutes total</p>
+            </div>
+            <span style="color: var(--vq-teal)">→</span>
+          </div>
+
+          <div class="card" style="margin-top: var(--space-lg)">
+            <div class="card-header">
+              <span class="card-title">Mark Attendance</span>
+            </div>
+            <div class="card-body">
+              <p style="color: var(--vq-mid-gray); font-size: 13px; margin-bottom: var(--space-md);">
+                Mark actual attendance after practice ends
+              </p>
+              <button class="btn btn-primary" style="width: 100%">Start Attendance</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE: Practice Plan Builder -->
+    <div class="page-view" id="page-practice-plan-builder">
+      <div class="breadcrumb">
+        <a onclick="showPage('dashboard')">Dashboard</a>
+        <span>/</span>
+        <a>Practice Plans</a>
+        <span>/</span>
+        <span class="current">Edit Plan</span>
+      </div>
+
+      <div class="plan-builder">
+        <div class="drill-library">
+          <div class="library-header">
+            <input type="text" class="library-search" placeholder="Search drills...">
+            <div class="library-filters">
+              <span class="filter-tag active">All</span>
+              <span class="filter-tag">Serve</span>
+              <span class="filter-tag">Attack</span>
+              <span class="filter-tag">Defense</span>
+              <span class="filter-tag">Setting</span>
+            </div>
+          </div>
+          <div class="library-list">
+            <div class="drill-item">
+              <div class="drill-item-header">
+                <span class="drill-name">Pepper Warmup</span>
+                <span class="drill-duration">10 min</span>
+              </div>
+              <div class="drill-tags">
+                <span class="drill-tag">Warmup</span>
+                <span class="drill-tag">All Levels</span>
+              </div>
+            </div>
+            <div class="drill-item">
+              <div class="drill-item-header">
+                <span class="drill-name">3-Player Serve Receive</span>
+                <span class="drill-duration">15 min</span>
+              </div>
+              <div class="drill-tags">
+                <span class="drill-tag">Serve Receive</span>
+                <span class="drill-tag">Defense</span>
+              </div>
+            </div>
+            <div class="drill-item">
+              <div class="drill-item-header">
+                <span class="drill-name">Target Serving</span>
+                <span class="drill-duration">10 min</span>
+              </div>
+              <div class="drill-tags">
+                <span class="drill-tag">Serve</span>
+                <span class="drill-tag">Accuracy</span>
+              </div>
+            </div>
+            <div class="drill-item">
+              <div class="drill-item-header">
+                <span class="drill-name">Queen of the Court</span>
+                <span class="drill-duration">20 min</span>
+              </div>
+              <div class="drill-tags">
+                <span class="drill-tag">Game</span>
+                <span class="drill-tag">Competition</span>
+              </div>
+            </div>
+            <div class="drill-item">
+              <div class="drill-item-header">
+                <span class="drill-name">Hit & Cover</span>
+                <span class="drill-duration">15 min</span>
+              </div>
+              <div class="drill-tags">
+                <span class="drill-tag">Attack</span>
+                <span class="drill-tag">Transition</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="plan-canvas">
+          <div class="canvas-header">
+            <input type="text" class="plan-title-input" value="SERVE RECEPTION FOCUS" placeholder="Plan name...">
+            <div class="plan-meta-row">
+              <span class="plan-total">Total: 90 min</span>
+              <button class="btn btn-primary btn-sm">Save Plan</button>
+            </div>
+          </div>
+          <div class="canvas-body">
+            <div class="plan-section">
+              <div class="section-header">
+                <span class="section-title">Warmup</span>
+                <span class="section-duration">15 min</span>
+              </div>
+              <div class="plan-drill">
+                <span class="drill-order">1</span>
+                <div class="drill-info">
+                  <p class="drill-name">Pepper Warmup</p>
+                  <p style="font-size: 11px; color: var(--vq-mid-gray)">Partner passing warmup</p>
+                </div>
+                <div class="drill-controls">
+                  <input type="text" class="time-input" value="10 min">
+                  <button class="remove-btn">×</button>
+                </div>
+              </div>
+              <div class="plan-drill">
+                <span class="drill-order">2</span>
+                <div class="drill-info">
+                  <p class="drill-name">Dynamic Stretching</p>
+                  <p style="font-size: 11px; color: var(--vq-mid-gray)">Movement preparation</p>
+                </div>
+                <div class="drill-controls">
+                  <input type="text" class="time-input" value="5 min">
+                  <button class="remove-btn">×</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="plan-section">
+              <div class="section-header">
+                <span class="section-title">Main Focus</span>
+                <span class="section-duration">55 min</span>
+              </div>
+              <div class="plan-drill">
+                <span class="drill-order">3</span>
+                <div class="drill-info">
+                  <p class="drill-name">3-Player Serve Receive</p>
+                  <p style="font-size: 11px; color: var(--vq-mid-gray)">Reception pattern work</p>
+                </div>
+                <div class="drill-controls">
+                  <input type="text" class="time-input" value="20 min">
+                  <button class="remove-btn">×</button>
+                </div>
+              </div>
+              <div class="plan-drill">
+                <span class="drill-order">4</span>
+                <div class="drill-info">
+                  <p class="drill-name">Target Serving</p>
+                  <p style="font-size: 11px; color: var(--vq-mid-gray)">Zone serving accuracy</p>
+                </div>
+                <div class="drill-controls">
+                  <input type="text" class="time-input" value="15 min">
+                  <button class="remove-btn">×</button>
+                </div>
+              </div>
+              <div class="plan-drill">
+                <span class="drill-order">5</span>
+                <div class="drill-info">
+                  <p class="drill-name">Receive to Attack</p>
+                  <p style="font-size: 11px; color: var(--vq-mid-gray)">Full transition sequence</p>
+                </div>
+                <div class="drill-controls">
+                  <input type="text" class="time-input" value="20 min">
+                  <button class="remove-btn">×</button>
+                </div>
+              </div>
+              <div class="drop-zone">
+                <p>Drag drills here to add</p>
+              </div>
+            </div>
+
+            <div class="plan-section">
+              <div class="section-header">
+                <span class="section-title">Game Play</span>
+                <span class="section-duration">20 min</span>
+              </div>
+              <div class="plan-drill">
+                <span class="drill-order">6</span>
+                <div class="drill-info">
+                  <p class="drill-name">Queen of the Court</p>
+                  <p style="font-size: 11px; color: var(--vq-mid-gray)">Competitive game</p>
+                </div>
+                <div class="drill-controls">
+                  <input type="text" class="time-input" value="20 min">
+                  <button class="remove-btn">×</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE: Players List -->
+    <div class="page-view" id="page-players">
+      <div class="page-header">
+        <h1 class="page-title">Players</h1>
+        <p class="page-subtitle">Oslo Volley U19 • 16 active players</p>
+      </div>
+
+      <div class="search-bar">
+        <input type="text" class="search-input" placeholder="Search players...">
+        <button class="btn btn-primary">Add Player</button>
+      </div>
+
+      <div class="tabs">
+        <span class="tab active">All Players</span>
+        <span class="tab">By Position</span>
+        <span class="tab">Attendance</span>
+      </div>
+
+      <div class="players-grid">
+        <div class="player-card-mini" onclick="showPage('player-stats')">
+          <div class="player-card-top">
+            <div class="player-avatar-md">EH</div>
+            <div>
+              <p class="player-card-name">Erik Hansen</p>
+              <p class="player-card-pos">Outside Hitter • #7</p>
+            </div>
+          </div>
+          <div class="player-card-stats">
+            <div class="mini-stat">
+              <p class="mini-stat-value" style="color: var(--color-success)">95%</p>
+              <p class="mini-stat-label">Attendance</p>
+            </div>
+            <div class="mini-stat">
+              <p class="mini-stat-value">187</p>
+              <p class="mini-stat-label">Kills</p>
+            </div>
+            <div class="mini-stat">
+              <p class="mini-stat-value">82</p>
+              <p class="mini-stat-label">Rating</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="player-card-mini" onclick="showPage('player-stats')">
+          <div class="player-card-top">
+            <div class="player-avatar-md">SN</div>
+            <div>
+              <p class="player-card-name">Sofia Nilsen</p>
+              <p class="player-card-pos">Setter • #3</p>
+            </div>
+          </div>
+          <div class="player-card-stats">
+            <div class="mini-stat">
+              <p class="mini-stat-value" style="color: var(--color-success)">100%</p>
+              <p class="mini-stat-label">Attendance</p>
+            </div>
+            <div class="mini-stat">
+              <p class="mini-stat-value">423</p>
+              <p class="mini-stat-label">Assists</p>
+            </div>
+            <div class="mini-stat">
+              <p class="mini-stat-value">88</p>
+              <p class="mini-stat-label">Rating</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="player-card-mini" onclick="showPage('player-stats')">
+          <div class="player-card-top">
+            <div class="player-avatar-md">KL</div>
+            <div>
+              <p class="player-card-name">Kristian Larsen</p>
+              <p class="player-card-pos">Middle Blocker • #12</p>
+            </div>
+          </div>
+          <div class="player-card-stats">
+            <div class="mini-stat">
+              <p class="mini-stat-value" style="color: var(--color-warning)">60%</p>
+              <p class="mini-stat-label">Attendance</p>
+            </div>
+            <div class="mini-stat">
+              <p class="mini-stat-value">67</p>
+              <p class="mini-stat-label">Blocks</p>
+            </div>
+            <div class="mini-stat">
+              <p class="mini-stat-value">74</p>
+              <p class="mini-stat-label">Rating</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="player-card-mini" onclick="showPage('player-stats')">
+          <div class="player-card-top">
+            <div class="player-avatar-md">IJ</div>
+            <div>
+              <p class="player-card-name">Ingrid Johansen</p>
+              <p class="player-card-pos">Opposite • #9</p>
+            </div>
+          </div>
+          <div class="player-card-stats">
+            <div class="mini-stat">
+              <p class="mini-stat-value" style="color: var(--color-success)">91%</p>
+              <p class="mini-stat-label">Attendance</p>
+            </div>
+            <div class="mini-stat">
+              <p class="mini-stat-value">156</p>
+              <p class="mini-stat-label">Kills</p>
+            </div>
+            <div class="mini-stat">
+              <p class="mini-stat-value">79</p>
+              <p class="mini-stat-label">Rating</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="player-card-mini" onclick="showPage('player-stats')">
+          <div class="player-card-top">
+            <div class="player-avatar-md">OB</div>
+            <div>
+              <p class="player-card-name">Ole Berg</p>
+              <p class="player-card-pos">Libero • #1</p>
+            </div>
+          </div>
+          <div class="player-card-stats">
+            <div class="mini-stat">
+              <p class="mini-stat-value" style="color: var(--color-warning)">75%</p>
+              <p class="mini-stat-label">Attendance</p>
+            </div>
+            <div class="mini-stat">
+              <p class="mini-stat-value">89</p>
+              <p class="mini-stat-label">Digs</p>
+            </div>
+            <div class="mini-stat">
+              <p class="mini-stat-value">81</p>
+              <p class="mini-stat-label">Rating</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="player-card-mini" onclick="showPage('player-stats')">
+          <div class="player-card-top">
+            <div class="player-avatar-md">AK</div>
+            <div>
+              <p class="player-card-name">Anna Kristiansen</p>
+              <p class="player-card-pos">Outside Hitter • #14</p>
+            </div>
+          </div>
+          <div class="player-card-stats">
+            <div class="mini-stat">
+              <p class="mini-stat-value" style="color: var(--color-success)">88%</p>
+              <p class="mini-stat-label">Attendance</p>
+            </div>
+            <div class="mini-stat">
+              <p class="mini-stat-value">142</p>
+              <p class="mini-stat-label">Kills</p>
+            </div>
+            <div class="mini-stat">
+              <p class="mini-stat-value">77</p>
+              <p class="mini-stat-label">Rating</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE: Player Stats -->
+    <div class="page-view" id="page-player-stats">
+      <div class="breadcrumb">
+        <a onclick="showPage('dashboard')">Dashboard</a>
+        <span>/</span>
+        <a onclick="showPage('players')">Players</a>
+        <span>/</span>
+        <span class="current">Erik Hansen</span>
+      </div>
+
+      <div class="player-hero">
+        <div class="player-card-container">
+          <div class="fifa-card">
+            <span class="card-tier">Gold</span>
+            <div style="display: flex; align-items: baseline; gap: var(--space-sm);">
+              <span class="card-rating">82</span>
+              <span class="card-position">OH</span>
+            </div>
+            <div class="card-avatar">EH</div>
+            <p class="card-name">Erik Hansen</p>
+            <p class="card-club">Oslo Volley U19</p>
+            <div class="card-stats">
+              <div class="card-stat">
+                <p class="card-stat-value">85</p>
+                <p class="card-stat-label">ATK</p>
+              </div>
+              <div class="card-stat">
+                <p class="card-stat-value">78</p>
+                <p class="card-stat-label">SRV</p>
+              </div>
+              <div class="card-stat">
+                <p class="card-stat-value">80</p>
+                <p class="card-stat-label">DEF</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="player-info-panel">
+          <h1 class="player-name-lg">Erik Hansen</h1>
+          <div class="player-meta-row">
+            <span>Outside Hitter • #7</span>
+            <span>•</span>
+            <span>Age 17</span>
+            <span>•</span>
+            <span>Height 186cm</span>
+          </div>
+
+          <div class="player-quick-stats">
+            <div class="quick-stat">
+              <p class="quick-stat-value" style="color: var(--color-success)">95%</p>
+              <p class="quick-stat-label">Attendance</p>
+            </div>
+            <div class="quick-stat">
+              <p class="quick-stat-value">187</p>
+              <p class="quick-stat-label">Kills</p>
+            </div>
+            <div class="quick-stat">
+              <p class="quick-stat-value">42</p>
+              <p class="quick-stat-label">Aces</p>
+            </div>
+            <div class="quick-stat">
+              <p class="quick-stat-value">28</p>
+              <p class="quick-stat-label">Blocks</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tabs">
+        <span class="tab active">Overview</span>
+        <span class="tab">Stats History</span>
+        <span class="tab">Attendance</span>
+        <span class="tab">Notes</span>
+      </div>
+
+      <div class="two-col">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Performance Trends</span>
+          </div>
+          <div class="card-body">
+            <div class="chart-placeholder">
+              📈 Attack efficiency chart over last 10 matches
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Recent Games</span>
+          </div>
+          <div class="card-body">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Match</th>
+                  <th>Kills</th>
+                  <th>Eff%</th>
+                  <th>Aces</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>vs Trondheim</td>
+                  <td style="font-family: var(--font-mono)">18</td>
+                  <td style="font-family: var(--font-mono); color: var(--color-success)">42%</td>
+                  <td style="font-family: var(--font-mono)">3</td>
+                </tr>
+                <tr>
+                  <td>vs Stavanger</td>
+                  <td style="font-family: var(--font-mono)">22</td>
+                  <td style="font-family: var(--font-mono); color: var(--color-success)">38%</td>
+                  <td style="font-family: var(--font-mono)">5</td>
+                </tr>
+                <tr>
+                  <td>vs Kristiansand</td>
+                  <td style="font-family: var(--font-mono)">15</td>
+                  <td style="font-family: var(--font-mono); color: var(--color-warning)">28%</td>
+                  <td style="font-family: var(--font-mono)">2</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE: Match Team Selection -->
+    <div class="page-view" id="page-match-selection">
+      <div class="breadcrumb">
+        <a onclick="showPage('dashboard')">Dashboard</a>
+        <span>/</span>
+        <a onclick="showPage('schedule')">Schedule</a>
+        <span>/</span>
+        <span class="current">vs Bergen VBK</span>
+      </div>
+
+      <div class="match-hero">
+        <div class="match-vs">
+          <div class="match-team">
+            <div class="match-team-badge">OV</div>
+            <p class="match-team-name">Oslo Volley</p>
+          </div>
+          <span class="match-vs-text">VS</span>
+          <div class="match-team">
+            <div class="match-team-badge" style="background: rgba(59, 130, 246, 0.3)">BV</div>
+            <p class="match-team-name">Bergen VBK</p>
+          </div>
+        </div>
+        <p class="match-datetime">📅 Thursday, February 6, 2026 • 🕐 19:00 • 📍 Ekeberg Hallen</p>
+      </div>
+
+      <h3 style="font-family: var(--font-display); font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: var(--space-md);">Select Match Roster</h3>
+
+      <div class="team-selection-grid">
+        <div class="selection-panel">
+          <div class="panel-header">
+            <span class="panel-title">Available Players</span>
+            <span class="panel-count">14 players</span>
+          </div>
+          <div class="player-select-list">
+            <div class="player-select-item selected">
+              <span class="select-checkbox">✓</span>
+              <span class="player-avatar">EH</span>
+              <div class="player-select-info">
+                <p class="player-select-name">Erik Hansen</p>
+                <p class="player-select-stats">OH • 95% att • 187 kills</p>
+              </div>
+              <span class="position-tag">OH</span>
+              <span class="form-indicator good"></span>
+            </div>
+            <div class="player-select-item selected">
+              <span class="select-checkbox">✓</span>
+              <span class="player-avatar">SN</span>
+              <div class="player-select-info">
+                <p class="player-select-name">Sofia Nilsen</p>
+                <p class="player-select-stats">S • 100% att • 423 assists</p>
+              </div>
+              <span class="position-tag">S</span>
+              <span class="form-indicator good"></span>
+            </div>
+            <div class="player-select-item unavailable">
+              <span class="select-checkbox"></span>
+              <span class="player-avatar">KL</span>
+              <div class="player-select-info">
+                <p class="player-select-name">Kristian Larsen</p>
+                <p class="player-select-stats">MB • Not available</p>
+              </div>
+              <span class="position-tag">MB</span>
+              <span class="form-indicator poor"></span>
+            </div>
+            <div class="player-select-item selected">
+              <span class="select-checkbox">✓</span>
+              <span class="player-avatar">IJ</span>
+              <div class="player-select-info">
+                <p class="player-select-name">Ingrid Johansen</p>
+                <p class="player-select-stats">OPP • 91% att • 156 kills</p>
+              </div>
+              <span class="position-tag">OPP</span>
+              <span class="form-indicator good"></span>
+            </div>
+            <div class="player-select-item selected">
+              <span class="select-checkbox">✓</span>
+              <span class="player-avatar">OB</span>
+              <div class="player-select-info">
+                <p class="player-select-name">Ole Berg</p>
+                <p class="player-select-stats">L • 75% att • 89 digs</p>
+              </div>
+              <span class="position-tag">L</span>
+              <span class="form-indicator average"></span>
+            </div>
+            <div class="player-select-item">
+              <span class="select-checkbox"></span>
+              <span class="player-avatar">AK</span>
+              <div class="player-select-info">
+                <p class="player-select-name">Anna Kristiansen</p>
+                <p class="player-select-stats">OH • 88% att • 142 kills</p>
+              </div>
+              <span class="position-tag">OH</span>
+              <span class="form-indicator good"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="selection-panel">
+          <div class="panel-header">
+            <span class="panel-title">Match Roster</span>
+            <span class="panel-count" style="color: var(--color-success)">4 selected</span>
+          </div>
+          <div class="player-select-list">
+            <div class="player-select-item selected">
+              <span class="select-checkbox">✓</span>
+              <span class="player-avatar">EH</span>
+              <div class="player-select-info">
+                <p class="player-select-name">Erik Hansen</p>
+                <p class="player-select-stats">Outside Hitter</p>
+              </div>
+              <span class="position-tag">OH</span>
+            </div>
+            <div class="player-select-item selected">
+              <span class="select-checkbox">✓</span>
+              <span class="player-avatar">SN</span>
+              <div class="player-select-info">
+                <p class="player-select-name">Sofia Nilsen</p>
+                <p class="player-select-stats">Setter</p>
+              </div>
+              <span class="position-tag">S</span>
+            </div>
+            <div class="player-select-item selected">
+              <span class="select-checkbox">✓</span>
+              <span class="player-avatar">IJ</span>
+              <div class="player-select-info">
+                <p class="player-select-name">Ingrid Johansen</p>
+                <p class="player-select-stats">Opposite</p>
+              </div>
+              <span class="position-tag">OPP</span>
+            </div>
+            <div class="player-select-item selected">
+              <span class="select-checkbox">✓</span>
+              <span class="player-avatar">OB</span>
+              <div class="player-select-info">
+                <p class="player-select-name">Ole Berg</p>
+                <p class="player-select-stats">Libero</p>
+              </div>
+              <span class="position-tag">L</span>
+            </div>
+          </div>
+          <div style="padding: var(--space-lg); border-top: 1px solid rgba(255,255,255,0.06);">
+            <button class="btn btn-primary" style="width: 100%">Save Match Roster</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE: Schedule -->
+    <div class="page-view" id="page-schedule">
+      <div class="page-header">
+        <h1 class="page-title">Schedule</h1>
+        <p class="page-subtitle">Oslo Volley U19 • February 2026</p>
+      </div>
+
+      <div class="tabs">
+        <span class="tab active">List View</span>
+        <span class="tab">Calendar</span>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">February 2026</span>
+          <button class="btn btn-primary btn-sm">Add Event</button>
+        </div>
+        <div class="card-body">
+          <div class="schedule-list">
+            <div class="schedule-item today" onclick="showPage('event-detail')">
+              <div class="schedule-date">
+                <span class="day">03</span>
+                <span class="month">Feb</span>
+              </div>
+              <div class="schedule-info">
+                <p class="schedule-title">Team Practice</p>
+                <p class="schedule-meta">Lambertseter Hall, 18:00 - 20:00</p>
+              </div>
+              <span class="schedule-type practice">Today</span>
+            </div>
+            <div class="schedule-item" onclick="showPage('match-selection')">
+              <div class="schedule-date">
+                <span class="day">06</span>
+                <span class="month">Feb</span>
+              </div>
+              <div class="schedule-info">
+                <p class="schedule-title">vs Bergen VBK</p>
+                <p class="schedule-meta">Ekeberg Hallen, 19:00</p>
+              </div>
+              <span class="schedule-type match">Match</span>
+            </div>
+            <div class="schedule-item">
+              <div class="schedule-date">
+                <span class="day">08</span>
+                <span class="month">Feb</span>
+              </div>
+              <div class="schedule-info">
+                <p class="schedule-title">Team Practice</p>
+                <p class="schedule-meta">Lambertseter Hall, 18:00 - 20:00</p>
+              </div>
+              <span class="schedule-type practice">Practice</span>
+            </div>
+            <div class="schedule-item">
+              <div class="schedule-date">
+                <span class="day">10</span>
+                <span class="month">Feb</span>
+              </div>
+              <div class="schedule-info">
+                <p class="schedule-title">Team Practice</p>
+                <p class="schedule-meta">Lambertseter Hall, 18:00 - 20:00</p>
+              </div>
+              <span class="schedule-type practice">Practice</span>
+            </div>
+            <div class="schedule-item">
+              <div class="schedule-date">
+                <span class="day">13</span>
+                <span class="month">Feb</span>
+              </div>
+              <div class="schedule-info">
+                <p class="schedule-title">vs Trondheim VBK</p>
+                <p class="schedule-meta">Away - Trondheim Arena, 18:30</p>
+              </div>
+              <span class="schedule-type match">Match</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- Flow Indicator -->
+<div class="flow-indicator" id="flowIndicator">
+  <span class="flow-step active" onclick="showPage('dashboard')">1. Dashboard</span>
+  <span class="flow-arrow">→</span>
+  <span class="flow-step" onclick="showPage('event-detail')">2. Event</span>
+  <span class="flow-arrow">→</span>
+  <span class="flow-step" onclick="showPage('practice-plan-builder')">3. Plan</span>
+  <span class="flow-arrow">→</span>
+  <span class="flow-step" onclick="showPage('players')">4. Players</span>
+  <span class="flow-arrow">→</span>
+  <span class="flow-step" onclick="showPage('match-selection')">5. Match</span>
+</div>
+
+<script>
+function showPage(pageId) {
+  // Hide all pages
+  document.querySelectorAll('.page-view').forEach(page => {
+    page.classList.remove('active');
+  });
+
+  // Show target page
+  const targetPage = document.getElementById('page-' + pageId);
+  if (targetPage) {
+    targetPage.classList.add('active');
+  }
+
+  // Update sidebar nav
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.classList.remove('active');
+  });
+
+  // Map pages to nav items
+  const navMap = {
+    'dashboard': 0,
+    'schedule': 1,
+    'event-detail': 1,
+    'players': 2,
+    'player-stats': 2,
+    'practice-plan-builder': 3,
+    'practice-plans': 3,
+    'drills': 4,
+    'match-selection': 1
+  };
+
+  const navIndex = navMap[pageId];
+  if (navIndex !== undefined) {
+    document.querySelectorAll('.nav-item')[navIndex].classList.add('active');
+  }
+
+  // Update flow indicator
+  const flowMap = {
+    'dashboard': 0,
+    'event-detail': 1,
+    'practice-plan-builder': 2,
+    'players': 3,
+    'player-stats': 3,
+    'match-selection': 4,
+    'schedule': 1
+  };
+
+  document.querySelectorAll('.flow-step').forEach((step, i) => {
+    step.classList.remove('active');
+    if (flowMap[pageId] === i) {
+      step.classList.add('active');
+    }
+  });
+}
+
+function toggleTeamDropdown() {
+  alert('Team selector dropdown - Switch between:\n\n• Oslo Volley U19 (current)\n• Oslo Volley U17\n• Oslo Volley Senior');
+}
+
+// Add click handlers for player selection
+document.querySelectorAll('.player-select-item:not(.unavailable)').forEach(item => {
+  item.addEventListener('click', function() {
+    this.classList.toggle('selected');
+  });
+});
+</script>
+
+</body>
+</html>

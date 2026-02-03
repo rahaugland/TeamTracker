@@ -26,12 +26,12 @@ interface TimelineEntry {
 }
 
 const ENTRY_CONFIG: Record<EntryType, { icon: typeof Target; color: string; bg: string }> = {
-  goal_created: { icon: Target, color: 'text-blue-500', bg: 'bg-blue-500' },
-  goal_completed: { icon: CheckCircle2, color: 'text-green-500', bg: 'bg-green-500' },
-  feedback: { icon: MessageSquare, color: 'text-purple-500', bg: 'bg-purple-500' },
-  assessment: { icon: Star, color: 'text-yellow-500', bg: 'bg-yellow-500' },
-  game_award: { icon: Trophy, color: 'text-yellow-500', bg: 'bg-yellow-500' },
-  season_award: { icon: Trophy, color: 'text-amber-600', bg: 'bg-amber-600' },
+  goal_created: { icon: Target, color: 'text-vq-teal', bg: 'bg-vq-teal' },
+  goal_completed: { icon: CheckCircle2, color: 'text-emerald-400', bg: 'bg-emerald-400' },
+  feedback: { icon: MessageSquare, color: 'text-purple-400', bg: 'bg-purple-400' },
+  assessment: { icon: Star, color: 'text-club-secondary', bg: 'bg-club-secondary' },
+  game_award: { icon: Trophy, color: 'text-club-secondary', bg: 'bg-club-secondary' },
+  season_award: { icon: Trophy, color: 'text-club-primary', bg: 'bg-club-primary' },
 };
 
 const PAGE_SIZE = 15;

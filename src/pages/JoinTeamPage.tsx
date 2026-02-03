@@ -122,7 +122,7 @@ export function JoinTeamPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <div className="w-full max-w-md">
         <Card>
           <CardHeader>
@@ -158,21 +158,21 @@ export function JoinTeamPage() {
               )}
 
               {error && (
-                <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md">
-                  <p className="text-sm text-red-800 dark:text-red-200">{error}</p>
+                <div className="p-3 bg-club-primary/10 border border-club-primary/30 rounded-md">
+                  <p className="text-sm text-club-primary">{error}</p>
                 </div>
               )}
 
               {validatedTeam && (
                 <div className="space-y-4">
-                  <div className="p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-md space-y-2">
-                    <p className="font-semibold text-green-900 dark:text-green-100">
+                  <div className="p-4 bg-emerald-500/10 border border-emerald-500/30 rounded-md space-y-2">
+                    <p className="font-semibold text-emerald-400">
                       {t('joinTeam.teamFound')}
                     </p>
-                    <p className="text-sm text-green-800 dark:text-green-200">
+                    <p className="text-sm text-emerald-400/80">
                       {t('joinTeam.teamName', { teamName: validatedTeam.name })}
                     </p>
-                    <p className="text-sm text-green-800 dark:text-green-200">
+                    <p className="text-sm text-emerald-400/80">
                       {t('joinTeam.seasonName', { seasonName: validatedTeam.season.name })}
                     </p>
                   </div>

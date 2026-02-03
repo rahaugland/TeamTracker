@@ -71,24 +71,24 @@ export function TeamRatingRadar({ teamRating, isLoading = false }: TeamRatingRad
         <CardDescription>
           {t('team.dashboard.subRatings')}
           {teamRating.isProvisional && (
-            <span className="text-orange-500 ml-2">({t('team.dashboard.provisional')})</span>
+            <span className="text-club-secondary ml-2">({t('team.dashboard.provisional')})</span>
           )}
         </CardDescription>
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={300}>
           <RadarChart data={chartData}>
-            <PolarGrid />
-            <PolarAngleAxis dataKey="category" />
-            <PolarRadiusAxis angle={90} domain={[0, 99]} />
+            <PolarGrid stroke="rgba(255,255,255,0.2)" />
+            <PolarAngleAxis dataKey="category" tick={{ fill: '#8B95A5' }} />
+            <PolarRadiusAxis angle={90} domain={[0, 99]} tick={{ fill: '#8B95A5' }} />
             <Radar
               name={t('team.dashboard.teamRating')}
               dataKey="value"
-              stroke="#3b82f6"
-              fill="#3b82f6"
+              stroke="#2EC4B6"
+              fill="#2EC4B6"
               fillOpacity={0.6}
             />
-            <Legend />
+            <Legend wrapperStyle={{ color: '#8B95A5' }} />
           </RadarChart>
         </ResponsiveContainer>
 

@@ -68,9 +68,9 @@ export const UpcomingEventsWidget = memo(function UpcomingEventsWidget({ teamId,
   }
 
   return (
-    <Card className="card-gradient-teal border-l-4 border-l-secondary hover-glow">
+    <Card className="card-gradient-teal border-l-4 border-l-club-secondary hover-glow">
       <CardHeader>
-        <CardTitle className="text-secondary flex items-center gap-2">
+        <CardTitle className="text-club-secondary flex items-center gap-2">
           <Calendar className="w-5 h-5" />
           {t('dashboard.widgets.upcomingEvents')}
         </CardTitle>
@@ -90,10 +90,10 @@ export const UpcomingEventsWidget = memo(function UpcomingEventsWidget({ teamId,
             {events.map((event) => (
               <div
                 key={event.id}
-                className="flex items-start gap-3 p-3 rounded-lg border border-secondary/20 bg-secondary/5 hover:bg-secondary/10 hover:shadow-md transition-all"
+                className="flex items-start gap-3 p-3 rounded-lg border border-club-secondary/20 bg-club-secondary/5 hover:bg-club-secondary/10 hover:shadow-md transition-all"
               >
-                <div className="flex-shrink-0 mt-1 p-2 rounded-lg bg-secondary/10">
-                  <Calendar className="h-4 w-4 text-secondary" />
+                <div className="flex-shrink-0 mt-1 p-2 rounded-lg bg-club-secondary/10">
+                  <Calendar className="h-4 w-4 text-club-secondary" />
                 </div>
                 <div className="flex-1 min-w-0 space-y-1">
                   <div className="flex items-center gap-2 flex-wrap">

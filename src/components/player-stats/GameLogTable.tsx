@@ -227,9 +227,9 @@ export function GameLogTable({ gameStats }: GameLogTableProps) {
                   <TableCell className="text-right font-medium">
                     {(game.killPercentage * 100).toFixed(1)}%
                   </TableCell>
-                  <TableCell className="text-right font-semibold text-green-600">{game.aces}</TableCell>
+                  <TableCell className="text-right font-semibold text-stat text-emerald-400">{game.aces}</TableCell>
                   <TableCell className="text-right text-muted-foreground">{game.service_errors}</TableCell>
-                  <TableCell className="text-right font-semibold text-blue-600">{game.digs}</TableCell>
+                  <TableCell className="text-right font-semibold text-stat text-vq-teal">{game.digs}</TableCell>
                   <TableCell className="text-right font-medium">{game.totalBlocks.toFixed(1)}</TableCell>
                   <TableCell className="text-right text-muted-foreground">{game.block_touches}</TableCell>
                   <TableCell className="text-right font-medium">

@@ -7,12 +7,12 @@ interface SkillRatingsChartProps {
 }
 
 const SKILL_COLORS: Record<SkillRatingType, string> = {
-  serve: 'bg-blue-500',
-  pass: 'bg-green-500',
-  attack: 'bg-red-500',
-  block: 'bg-purple-500',
-  set: 'bg-yellow-500',
-  defense: 'bg-orange-500',
+  serve: 'bg-vq-teal',
+  pass: 'bg-emerald-400',
+  attack: 'bg-club-primary',
+  block: 'bg-purple-400',
+  set: 'bg-club-secondary',
+  defense: 'bg-sky-400',
 };
 
 const SKILLS: SkillRatingType[] = ['serve', 'pass', 'attack', 'block', 'set', 'defense'];
@@ -68,7 +68,7 @@ export function SkillRatingsChart({ ratings }: SkillRatingsChartProps) {
                   {hasRating ? `${rating}/10` : '-'}
                 </span>
               </div>
-              <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+              <div className="h-2 bg-muted rounded-full overflow-hidden">
                 {hasRating && (
                   <div
                     className={`h-full ${SKILL_COLORS[skill]} transition-all duration-500`}

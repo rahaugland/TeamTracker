@@ -1,0 +1,5064 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VolleyQuest — Design Reference</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800;900&family=Barlow:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================
+   VOLLEYQUEST DESIGN SYSTEM — CSS VARIABLES
+   ============================================ */
+:root {
+  /* Brand Core */
+  --vq-navy: #0A1628;
+  --vq-navy-90: #0f1e35;
+  --vq-navy-80: #162843;
+  --vq-navy-70: #1e3452;
+  --vq-navy-60: #2a4268;
+  --vq-white: #FFFFFF;
+  --vq-off-white: #F0F2F5;
+  --vq-light-gray: #E1E5EB;
+  --vq-mid-gray: #8B95A5;
+  --vq-teal: #2EC4B6;
+  --vq-teal-dim: #1a7a70;
+
+  /* Club Theme — Oslo Volley (sample) */
+  --club-primary: #E63946;
+  --club-primary-dim: #c42d39;
+  --club-primary-glow: rgba(230, 57, 70, 0.25);
+  --club-secondary: #FFB703;
+  --club-secondary-dim: #e0a003;
+
+  /* Semantic */
+  --color-success: #22C55E;
+  --color-warning: #F59E0B;
+  --color-error: #EF4444;
+  --color-info: #3B82F6;
+
+  /* Typography */
+  --font-display: 'Barlow Condensed', sans-serif;
+  --font-body: 'Barlow', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* Spacing */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+  --space-3xl: 64px;
+
+  /* Radius */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-full: 999px;
+}
+
+/* ============================================
+   RESET & BASE
+   ============================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--vq-navy);
+  color: var(--vq-white);
+  line-height: 1.5;
+  overflow-x: hidden;
+}
+
+/* ============================================
+   HERO / HEADER
+   ============================================ */
+.hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--space-2xl);
+  overflow: hidden;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 40%, rgba(46, 196, 182, 0.08) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 50% at 20% 80%, rgba(230, 57, 70, 0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 80% 20%, rgba(255, 183, 3, 0.05) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+/* Grid overlay */
+.hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(46, 196, 182, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(46, 196, 182, 0.03) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none;
+  mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, black, transparent);
+}
+
+.logo-mark {
+  width: 120px;
+  height: 120px;
+  border-radius: var(--radius-xl);
+  background: linear-gradient(135deg, var(--vq-navy-80), var(--vq-navy-60));
+  border: 2px solid rgba(46, 196, 182, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: var(--space-xl);
+  position: relative;
+  animation: logoFloat 6s ease-in-out infinite;
+  box-shadow:
+    0 0 40px rgba(46, 196, 182, 0.1),
+    inset 0 1px 0 rgba(255,255,255,0.05);
+}
+
+@keyframes logoFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+.logo-mark .vq-monogram {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 48px;
+  letter-spacing: -2px;
+  background: linear-gradient(135deg, var(--vq-teal), var(--vq-white));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero h1 {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(48px, 8vw, 96px);
+  letter-spacing: -1px;
+  text-transform: uppercase;
+  line-height: 0.95;
+  margin-bottom: var(--space-md);
+  position: relative;
+}
+
+.hero h1 .accent { color: var(--vq-teal); }
+
+.hero .subtitle {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(16px, 2.5vw, 22px);
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--vq-mid-gray);
+  margin-bottom: var(--space-2xl);
+}
+
+.hero .tagline {
+  font-size: 18px;
+  color: var(--vq-mid-gray);
+  max-width: 500px;
+  line-height: 1.6;
+}
+
+/* ============================================
+   SECTION STRUCTURE
+   ============================================ */
+.section {
+  padding: var(--space-3xl) var(--space-xl);
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.section-label {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--vq-teal);
+  margin-bottom: var(--space-sm);
+}
+
+.section-title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(32px, 5vw, 56px);
+  text-transform: uppercase;
+  letter-spacing: -0.5px;
+  line-height: 1;
+  margin-bottom: var(--space-lg);
+}
+
+.section-desc {
+  color: var(--vq-mid-gray);
+  font-size: 16px;
+  max-width: 600px;
+  margin-bottom: var(--space-2xl);
+  line-height: 1.7;
+}
+
+.divider {
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(46, 196, 182, 0.2), transparent);
+  margin: var(--space-3xl) 0;
+}
+
+/* ============================================
+   COLOR PALETTE
+   ============================================ */
+.palette-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: var(--space-md);
+}
+
+.swatch {
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--vq-navy-90);
+  border: 1px solid rgba(255,255,255,0.06);
+  transition: transform 0.2s ease;
+}
+.swatch:hover { transform: translateY(-4px); }
+
+.swatch-color {
+  height: 100px;
+  position: relative;
+}
+
+.swatch-info {
+  padding: var(--space-sm) var(--space-md);
+}
+
+.swatch-name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.swatch-hex {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--vq-mid-gray);
+}
+
+/* ============================================
+   TYPOGRAPHY SHOWCASE
+   ============================================ */
+.type-row {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-xl);
+  padding: var(--space-lg) 0;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+
+.type-meta {
+  min-width: 180px;
+  flex-shrink: 0;
+}
+
+.type-meta .label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--vq-teal);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.type-meta .spec {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--vq-mid-gray);
+  margin-top: 2px;
+}
+
+.type-sample {
+  flex: 1;
+}
+
+.type-display-xl {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 64px;
+  text-transform: uppercase;
+  letter-spacing: -1px;
+  line-height: 1;
+}
+
+.type-display-lg {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 42px;
+  text-transform: uppercase;
+  line-height: 1.1;
+}
+
+.type-display-md {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 28px;
+  text-transform: uppercase;
+  line-height: 1.2;
+}
+
+.type-heading {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.type-body {
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--vq-light-gray);
+}
+
+.type-body-sm {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--vq-mid-gray);
+  line-height: 1.5;
+}
+
+.type-stat {
+  font-family: var(--font-mono);
+  font-size: 36px;
+  font-weight: 700;
+  letter-spacing: -1px;
+  font-variant-numeric: tabular-nums;
+}
+
+.type-label {
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--vq-teal);
+}
+
+/* ============================================
+   BUTTONS
+   ============================================ */
+.button-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+  align-items: center;
+}
+
+.btn {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  border: none;
+  cursor: pointer;
+  padding: 14px 28px;
+  border-radius: var(--radius-sm);
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary {
+  background: var(--club-primary);
+  color: var(--vq-white);
+  box-shadow: 0 4px 16px rgba(230, 57, 70, 0.3);
+}
+.btn-primary:hover {
+  background: var(--club-primary-dim);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(230, 57, 70, 0.4);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--vq-white);
+  border: 2px solid rgba(255,255,255,0.2);
+}
+.btn-secondary:hover {
+  border-color: var(--vq-white);
+  background: rgba(255,255,255,0.05);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--vq-teal);
+  padding: 14px 20px;
+}
+.btn-ghost:hover {
+  background: rgba(46, 196, 182, 0.08);
+}
+
+.btn-club-secondary {
+  background: var(--club-secondary);
+  color: var(--vq-navy);
+  box-shadow: 0 4px 16px rgba(255, 183, 3, 0.3);
+}
+.btn-club-secondary:hover {
+  background: var(--club-secondary-dim);
+  transform: translateY(-2px);
+}
+
+.btn-sm {
+  font-size: 11px;
+  padding: 8px 16px;
+  letter-spacing: 1px;
+}
+
+/* ============================================
+   CARDS
+   ============================================ */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: var(--space-lg);
+}
+
+.card {
+  background: var(--vq-navy-90);
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(255,255,255,0.06);
+  overflow: hidden;
+  transition: all 0.25s ease;
+}
+.card:hover {
+  border-color: rgba(255,255,255,0.12);
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+}
+
+.card-header {
+  padding: var(--space-md) var(--space-lg);
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.card-body { padding: var(--space-lg); }
+
+.card-accent-top {
+  height: 3px;
+  background: linear-gradient(90deg, var(--club-primary), var(--club-secondary));
+}
+
+/* ============================================
+   VIEW TOGGLE (Coach / Player tabs)
+   ============================================ */
+.view-toggle-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: var(--space-2xl);
+}
+
+.view-toggle {
+  display: inline-flex;
+  background: var(--vq-navy-90);
+  border-radius: var(--radius-full);
+  padding: 4px;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+.view-toggle-btn {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  border: none;
+  background: transparent;
+  color: var(--vq-mid-gray);
+  padding: 12px 32px;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.view-toggle-btn.active {
+  background: var(--club-primary);
+  color: white;
+  box-shadow: 0 2px 12px rgba(230, 57, 70, 0.4);
+}
+
+/* ============================================
+   COACH VIEW
+   ============================================ */
+.coach-view, .player-view {
+  display: none;
+  animation: fadeUp 0.5s ease;
+}
+.coach-view.active, .player-view.active { display: block; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Coach nav bar */
+.coach-nav {
+  background: var(--club-primary);
+  border-radius: var(--radius-md);
+  padding: var(--space-md) var(--space-lg);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-lg);
+  box-shadow: 0 4px 24px rgba(230, 57, 70, 0.25);
+}
+
+.coach-nav .club-badge {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.coach-nav .club-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  background: rgba(255,255,255,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 16px;
+}
+
+.coach-nav .club-name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 18px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.coach-nav-links {
+  display: flex;
+  gap: var(--space-lg);
+}
+
+.coach-nav-links a {
+  color: rgba(255,255,255,0.7);
+  text-decoration: none;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  transition: color 0.2s;
+}
+.coach-nav-links a:hover, .coach-nav-links a.active-link { color: white; }
+
+/* Coach stats row */
+.coach-stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+}
+
+.coach-stat-card {
+  background: var(--vq-navy-90);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--radius-md);
+  padding: var(--space-lg);
+  position: relative;
+  overflow: hidden;
+}
+
+.coach-stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--accent, var(--vq-mid-gray));
+  opacity: 0.6;
+}
+
+.coach-stat-label {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--vq-mid-gray);
+  margin-bottom: var(--space-sm);
+}
+
+.coach-stat-value {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 32px;
+  letter-spacing: -1px;
+  font-variant-numeric: tabular-nums;
+}
+
+.coach-stat-delta {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  margin-top: var(--space-xs);
+}
+.coach-stat-delta.positive { color: var(--color-success); }
+.coach-stat-delta.negative { color: var(--color-error); }
+
+/* Coach table */
+.data-table-wrap {
+  background: var(--vq-navy-90);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.data-table thead {
+  background: rgba(255,255,255,0.03);
+}
+
+.data-table th {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--vq-mid-gray);
+  padding: var(--space-md) var(--space-lg);
+  text-align: left;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.data-table td {
+  padding: var(--space-md) var(--space-lg);
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+  font-variant-numeric: tabular-nums;
+}
+
+.data-table tbody tr {
+  transition: background 0.15s;
+}
+.data-table tbody tr:hover {
+  background: rgba(255,255,255,0.02);
+}
+
+.player-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-full);
+  background: var(--vq-navy-70);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 12px;
+  color: var(--vq-teal);
+  margin-right: var(--space-sm);
+  vertical-align: middle;
+}
+
+.position-tag {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  background: rgba(46, 196, 182, 0.1);
+  color: var(--vq-teal);
+  padding: 3px 8px;
+  border-radius: var(--radius-full);
+}
+
+.attendance-bar {
+  width: 60px;
+  height: 6px;
+  background: rgba(255,255,255,0.06);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: var(--space-sm);
+}
+.attendance-bar-fill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  background: var(--color-success);
+}
+
+/* Coach schedule */
+.schedule-mini {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.schedule-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  background: var(--vq-navy-90);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--radius-sm);
+  transition: border-color 0.2s;
+}
+.schedule-item:hover { border-color: rgba(255,255,255,0.12); }
+
+.schedule-date {
+  min-width: 48px;
+  text-align: center;
+}
+
+.schedule-date .day {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 24px;
+  line-height: 1;
+}
+.schedule-date .month {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--vq-mid-gray);
+}
+
+.schedule-info .schedule-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.schedule-info .schedule-meta {
+  font-size: 12px;
+  color: var(--vq-mid-gray);
+}
+
+.schedule-type {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  margin-left: auto;
+}
+.schedule-type.match {
+  background: rgba(230, 57, 70, 0.15);
+  color: var(--club-primary);
+}
+.schedule-type.practice {
+  background: rgba(46, 196, 182, 0.12);
+  color: var(--vq-teal);
+}
+
+/* Coach layout grid */
+.coach-grid {
+  display: grid;
+  grid-template-columns: 1fr 360px;
+  gap: var(--space-lg);
+}
+
+/* ============================================
+   PLAYER VIEW
+   ============================================ */
+.player-header {
+  background: linear-gradient(135deg, var(--club-primary), var(--club-primary-dim));
+  border-radius: var(--radius-lg);
+  padding: var(--space-2xl) var(--space-xl);
+  margin-bottom: var(--space-lg);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(230, 57, 70, 0.3);
+}
+
+.player-header::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -20%;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  background: rgba(255, 183, 3, 0.15);
+  filter: blur(60px);
+}
+
+.player-header::after {
+  content: '';
+  position: absolute;
+  bottom: -40%;
+  left: 10%;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.05);
+  filter: blur(40px);
+}
+
+.player-profile {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+  position: relative;
+  z-index: 1;
+}
+
+.player-avatar-lg {
+  width: 72px;
+  height: 72px;
+  border-radius: var(--radius-lg);
+  background: rgba(255,255,255,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 28px;
+  border: 2px solid rgba(255,255,255,0.3);
+}
+
+.player-profile-info h2 {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 28px;
+  text-transform: uppercase;
+  line-height: 1.1;
+}
+
+.player-profile-info .player-sub {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 14px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.7);
+}
+
+/* XP Bar */
+.xp-container {
+  position: relative;
+  z-index: 1;
+  margin-top: var(--space-lg);
+}
+
+.xp-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: var(--space-sm);
+}
+
+.xp-level {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.xp-amount {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: rgba(255,255,255,0.7);
+}
+
+.xp-bar {
+  height: 8px;
+  background: rgba(0,0,0,0.3);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.xp-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--club-secondary), #FFD166);
+  border-radius: var(--radius-full);
+  width: 68%;
+  animation: xpGrow 1.5s ease-out;
+  box-shadow: 0 0 12px rgba(255, 183, 3, 0.4);
+}
+
+@keyframes xpGrow {
+  from { width: 0%; }
+}
+
+/* Streak */
+.streak-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  background: rgba(255, 183, 3, 0.12);
+  border: 1px solid rgba(255, 183, 3, 0.25);
+  border-radius: var(--radius-full);
+  padding: 8px 16px;
+  margin-top: var(--space-md);
+  position: relative;
+  z-index: 1;
+}
+
+.streak-flame {
+  font-size: 20px;
+  filter: drop-shadow(0 0 4px rgba(255, 183, 3, 0.5));
+  animation: flamePulse 2s ease-in-out infinite;
+}
+
+@keyframes flamePulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}
+
+.streak-count {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 18px;
+  color: var(--club-secondary);
+}
+
+.streak-label {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: rgba(255, 183, 3, 0.8);
+}
+
+/* Player cards */
+.player-card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--space-lg);
+}
+
+/* Next match card */
+.next-match-card {
+  background: var(--vq-navy-90);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  transition: all 0.25s ease;
+}
+.next-match-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+}
+
+.next-match-accent {
+  height: 3px;
+  background: linear-gradient(90deg, var(--club-primary), var(--club-secondary));
+}
+
+.next-match-body {
+  padding: var(--space-lg);
+}
+
+.next-match-label {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--vq-mid-gray);
+  margin-bottom: var(--space-md);
+}
+
+.match-versus {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-lg);
+}
+
+.match-team {
+  text-align: center;
+}
+
+.match-team-name {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 18px;
+  text-transform: uppercase;
+}
+
+.match-vs {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 14px;
+  color: var(--vq-mid-gray);
+  letter-spacing: 2px;
+}
+
+.match-details {
+  display: flex;
+  gap: var(--space-lg);
+  font-size: 13px;
+  color: var(--vq-mid-gray);
+}
+
+.match-details span {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+/* My stats card */
+.my-stats-card {
+  background: var(--vq-navy-90);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  transition: all 0.25s ease;
+}
+.my-stats-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+}
+
+.stats-grid-mini {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: rgba(255,255,255,0.04);
+}
+
+.stat-cell {
+  background: var(--vq-navy-90);
+  padding: var(--space-lg);
+  text-align: center;
+}
+
+.stat-cell-value {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 28px;
+  letter-spacing: -1px;
+  color: var(--vq-white);
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-cell-label {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--vq-mid-gray);
+  margin-top: var(--space-xs);
+}
+
+/* Achievements */
+.achievements-row {
+  display: flex;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+  margin-top: var(--space-lg);
+}
+
+.achievement {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  background: var(--vq-navy-90);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--radius-md);
+  padding: var(--space-md) var(--space-lg);
+  transition: all 0.25s ease;
+  flex: 1;
+  min-width: 220px;
+}
+.achievement:hover {
+  border-color: var(--club-secondary);
+  box-shadow: 0 0 20px rgba(255, 183, 3, 0.1);
+}
+
+.achievement-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.achievement-icon.gold {
+  background: linear-gradient(135deg, rgba(255, 183, 3, 0.2), rgba(255, 183, 3, 0.05));
+  border: 1px solid rgba(255, 183, 3, 0.3);
+}
+
+.achievement-icon.silver {
+  background: linear-gradient(135deg, rgba(192, 192, 192, 0.2), rgba(192, 192, 192, 0.05));
+  border: 1px solid rgba(192, 192, 192, 0.3);
+}
+
+.achievement-icon.bronze {
+  background: linear-gradient(135deg, rgba(205, 127, 50, 0.2), rgba(205, 127, 50, 0.05));
+  border: 1px solid rgba(205, 127, 50, 0.3);
+}
+
+.achievement-info .achievement-name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.achievement-info .achievement-desc {
+  font-size: 12px;
+  color: var(--vq-mid-gray);
+  margin-top: 2px;
+}
+
+.achievement-info .achievement-progress {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--club-secondary);
+  margin-top: 4px;
+}
+
+/* Leaderboard */
+.leaderboard {
+  background: var(--vq-navy-90);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.leaderboard-header {
+  padding: var(--space-md) var(--space-lg);
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.leaderboard-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.leaderboard-filter {
+  font-family: var(--font-display);
+  font-size: 11px;
+  color: var(--vq-teal);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.leaderboard-list { list-style: none; }
+
+.leaderboard-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-lg);
+  border-bottom: 1px solid rgba(255,255,255,0.02);
+  transition: background 0.15s;
+}
+.leaderboard-item:hover { background: rgba(255,255,255,0.02); }
+.leaderboard-item:last-child { border-bottom: none; }
+
+.leaderboard-rank {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 18px;
+  min-width: 32px;
+  text-align: center;
+  color: var(--vq-mid-gray);
+}
+.leaderboard-item:nth-child(1) .leaderboard-rank { color: var(--club-secondary); }
+.leaderboard-item:nth-child(2) .leaderboard-rank { color: #C0C0C0; }
+.leaderboard-item:nth-child(3) .leaderboard-rank { color: #CD7F32; }
+
+.leaderboard-name {
+  font-family: var(--font-body);
+  font-weight: 600;
+  flex: 1;
+}
+
+.leaderboard-xp {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--club-secondary);
+  font-weight: 600;
+}
+
+.leaderboard-item.is-me {
+  background: rgba(230, 57, 70, 0.06);
+  border-left: 3px solid var(--club-primary);
+}
+
+/* ============================================
+   CLUB THEME DEMO SECTION
+   ============================================ */
+.theme-demo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--space-lg);
+}
+
+.theme-demo-card {
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+.theme-demo-header {
+  padding: var(--space-md) var(--space-lg);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.theme-demo-header .dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.theme-demo-header .club-n {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.theme-demo-body {
+  padding: var(--space-lg);
+  background: var(--vq-navy-90);
+}
+
+.theme-demo-btn {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  border: none;
+  padding: 10px 20px;
+  border-radius: var(--radius-sm);
+  color: white;
+  cursor: pointer;
+  margin-right: var(--space-sm);
+  margin-top: var(--space-sm);
+}
+
+.theme-demo-xp {
+  height: 6px;
+  background: rgba(255,255,255,0.06);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  margin-top: var(--space-md);
+}
+
+.theme-demo-xp-fill {
+  height: 100%;
+  width: 55%;
+  border-radius: var(--radius-full);
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 900px) {
+  .coach-grid { grid-template-columns: 1fr; }
+  .coach-stats-row { grid-template-columns: repeat(2, 1fr); }
+  .coach-nav { flex-direction: column; gap: var(--space-md); text-align: center; }
+  .coach-nav-links { flex-wrap: wrap; justify-content: center; }
+  .type-row { flex-direction: column; gap: var(--space-sm); }
+  .type-meta { min-width: auto; }
+  .match-versus { flex-direction: column; gap: var(--space-md); }
+  .player-profile { flex-direction: column; text-align: center; }
+  .stats-grid-mini { grid-template-columns: repeat(3, 1fr); }
+  .achievements-row { flex-direction: column; }
+}
+
+@media (max-width: 600px) {
+  .section { padding: var(--space-xl) var(--space-md); }
+  .coach-stats-row { grid-template-columns: 1fr; }
+  .palette-grid { grid-template-columns: repeat(2, 1fr); }
+  .data-table { font-size: 12px; }
+  .data-table th, .data-table td { padding: var(--space-sm); }
+}
+
+/* ============================================
+   PLAYER CARD (FIFA-STYLE)
+   ============================================ */
+.player-cards-showcase {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2xl);
+  justify-content: center;
+  align-items: flex-start;
+  perspective: 1200px;
+}
+
+.fifa-card {
+  width: 280px;
+  height: 420px;
+  border-radius: var(--radius-lg);
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+  cursor: default;
+}
+
+.fifa-card:hover {
+  transform: translateY(-12px) rotateY(-3deg) rotateX(2deg);
+}
+
+/* Card tier backgrounds */
+/* Diamond */
+.fifa-card.tier-diamond {
+  background: linear-gradient(170deg, #0a1a2a 0%, #081220 40%, #0a1828 100%);
+  border: 1px solid rgba(56, 189, 248, 0.45);
+  box-shadow:
+    0 4px 24px rgba(56, 189, 248, 0.2),
+    0 0 60px rgba(56, 189, 248, 0.08),
+    0 0 120px rgba(56, 189, 248, 0.03),
+    inset 0 1px 0 rgba(255,255,255,0.1);
+}
+.fifa-card.tier-diamond:hover {
+  box-shadow:
+    0 16px 48px rgba(56, 189, 248, 0.4),
+    0 0 100px rgba(56, 189, 248, 0.12),
+    inset 0 1px 0 rgba(255,255,255,0.1);
+}
+
+.fifa-card.tier-diamond::before {
+  background:
+    radial-gradient(ellipse 80% 50% at 70% 20%, rgba(56, 189, 248, 0.07) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 20% 80%, rgba(147, 197, 253, 0.04) 0%, transparent 50%),
+    radial-gradient(ellipse 30% 30% at 50% 50%, rgba(255,255,255,0.02) 0%, transparent 40%);
+}
+
+.tier-diamond .card-overall {
+  background: linear-gradient(135deg, #38bdf8, #e0f2fe, #7dd3fc);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 8px rgba(56, 189, 248, 0.3));
+}
+.tier-diamond .card-position { color: rgba(56, 189, 248, 0.7); }
+.tier-diamond .card-tier-label {
+  background: linear-gradient(90deg, #38bdf8, #e0f2fe, #7dd3fc);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.tier-diamond .card-avatar-ring {
+  background: linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(56, 189, 248, 0.05));
+  border: 2px solid rgba(56, 189, 248, 0.5);
+  box-shadow: 0 0 40px rgba(56, 189, 248, 0.2), inset 0 0 20px rgba(56, 189, 248, 0.05);
+}
+
+.fifa-card.tier-elite {
+  background: linear-gradient(170deg, #1a1a2e 0%, #0f0f23 40%, #1a0a20 100%);
+  border: 1px solid rgba(168, 85, 247, 0.4);
+  box-shadow:
+    0 4px 24px rgba(168, 85, 247, 0.2),
+    0 0 60px rgba(168, 85, 247, 0.06),
+    inset 0 1px 0 rgba(255,255,255,0.08);
+}
+.fifa-card.tier-elite:hover {
+  box-shadow:
+    0 16px 48px rgba(168, 85, 247, 0.35),
+    0 0 80px rgba(168, 85, 247, 0.1),
+    inset 0 1px 0 rgba(255,255,255,0.08);
+}
+
+.fifa-card.tier-gold {
+  background: linear-gradient(170deg, #2a1f0a 0%, #1a1508 40%, #2a1a05 100%);
+  border: 1px solid rgba(255, 183, 3, 0.35);
+  box-shadow:
+    0 4px 24px rgba(255, 183, 3, 0.15),
+    0 0 60px rgba(255, 183, 3, 0.04),
+    inset 0 1px 0 rgba(255,255,255,0.06);
+}
+.fifa-card.tier-gold:hover {
+  box-shadow:
+    0 16px 48px rgba(255, 183, 3, 0.3),
+    0 0 80px rgba(255, 183, 3, 0.08),
+    inset 0 1px 0 rgba(255,255,255,0.06);
+}
+
+.fifa-card.tier-silver {
+  background: linear-gradient(170deg, #1a1e24 0%, #12151a 40%, #1a1d22 100%);
+  border: 1px solid rgba(192, 192, 210, 0.25);
+  box-shadow:
+    0 4px 24px rgba(192, 192, 210, 0.1),
+    inset 0 1px 0 rgba(255,255,255,0.05);
+}
+.fifa-card.tier-silver:hover {
+  box-shadow:
+    0 16px 48px rgba(192, 192, 210, 0.2),
+    inset 0 1px 0 rgba(255,255,255,0.05);
+}
+
+.fifa-card.tier-bronze {
+  background: linear-gradient(170deg, #1e1610 0%, #14100b 40%, #1e150e 100%);
+  border: 1px solid rgba(205, 127, 50, 0.25);
+  box-shadow:
+    0 4px 24px rgba(205, 127, 50, 0.1),
+    inset 0 1px 0 rgba(255,255,255,0.04);
+}
+.fifa-card.tier-bronze:hover {
+  box-shadow:
+    0 16px 48px rgba(205, 127, 50, 0.2),
+    inset 0 1px 0 rgba(255,255,255,0.04);
+}
+
+/* Iron */
+.fifa-card.tier-iron {
+  background: linear-gradient(170deg, #141416 0%, #0e0e10 40%, #141414 100%);
+  border: 1px solid rgba(100, 100, 110, 0.2);
+  box-shadow:
+    0 4px 24px rgba(0,0,0,0.3),
+    inset 0 1px 0 rgba(255,255,255,0.03);
+}
+.fifa-card.tier-iron:hover {
+  box-shadow:
+    0 16px 48px rgba(0,0,0,0.4),
+    inset 0 1px 0 rgba(255,255,255,0.03);
+}
+
+.tier-iron .card-overall { color: #6b6b78; }
+.tier-iron .card-position { color: rgba(107, 107, 120, 0.6); }
+.tier-iron .card-tier-label { color: #55555f; }
+.tier-iron .card-avatar-ring {
+  background: linear-gradient(135deg, rgba(100, 100, 110, 0.1), rgba(100, 100, 110, 0.03));
+  border: 2px solid rgba(100, 100, 110, 0.2);
+}
+
+/* Card internal pattern overlay */
+.fifa-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 50% at 70% 20%, rgba(255,255,255,0.04) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 20% 80%, rgba(255,255,255,0.02) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Diagonal line pattern */
+.fifa-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    135deg,
+    transparent,
+    transparent 20px,
+    rgba(255,255,255,0.008) 20px,
+    rgba(255,255,255,0.008) 21px
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+.fifa-card-inner {
+  position: relative;
+  z-index: 2;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-lg);
+}
+
+/* Card top: rating + position + club stripe */
+.card-top {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+  margin-bottom: var(--space-md);
+}
+
+.card-rating-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.card-overall {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 52px;
+  line-height: 1;
+  letter-spacing: -2px;
+}
+
+.tier-elite .card-overall { color: #c084fc; }
+.tier-gold .card-overall { color: var(--club-secondary); }
+.tier-silver .card-overall { color: #C0C0D2; }
+.tier-bronze .card-overall { color: #CD7F32; }
+
+.card-position {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-top: 2px;
+}
+
+.tier-elite .card-position { color: rgba(192, 132, 252, 0.7); }
+.tier-gold .card-position { color: rgba(255, 183, 3, 0.6); }
+.tier-silver .card-position { color: rgba(192, 192, 210, 0.6); }
+.tier-bronze .card-position { color: rgba(205, 127, 50, 0.6); }
+
+.card-club-stripe {
+  margin-left: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.card-club-dot {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  background: var(--club-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 11px;
+  box-shadow: 0 2px 8px rgba(230, 57, 70, 0.3);
+}
+
+.card-club-name {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--vq-mid-gray);
+}
+
+/* Card avatar area */
+.card-avatar-area {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  margin: var(--space-sm) 0;
+}
+
+.card-avatar-ring {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.tier-elite .card-avatar-ring {
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(168, 85, 247, 0.05));
+  border: 2px solid rgba(168, 85, 247, 0.4);
+  box-shadow: 0 0 30px rgba(168, 85, 247, 0.15);
+}
+.tier-gold .card-avatar-ring {
+  background: linear-gradient(135deg, rgba(255, 183, 3, 0.15), rgba(255, 183, 3, 0.03));
+  border: 2px solid rgba(255, 183, 3, 0.35);
+  box-shadow: 0 0 30px rgba(255, 183, 3, 0.1);
+}
+.tier-silver .card-avatar-ring {
+  background: linear-gradient(135deg, rgba(192, 192, 210, 0.12), rgba(192, 192, 210, 0.03));
+  border: 2px solid rgba(192, 192, 210, 0.25);
+}
+.tier-bronze .card-avatar-ring {
+  background: linear-gradient(135deg, rgba(205, 127, 50, 0.12), rgba(205, 127, 50, 0.03));
+  border: 2px solid rgba(205, 127, 50, 0.25);
+}
+
+.card-avatar-initials {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 36px;
+  color: rgba(255,255,255,0.7);
+}
+
+/* Player name on card */
+.card-player-name {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 22px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-align: center;
+  line-height: 1.1;
+  margin-bottom: var(--space-md);
+}
+
+/* Tier label */
+.card-tier-label {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  text-align: center;
+  margin-bottom: var(--space-md);
+}
+
+.tier-elite .card-tier-label { color: #c084fc; }
+.tier-gold .card-tier-label { color: var(--club-secondary); }
+.tier-silver .card-tier-label { color: #9898aa; }
+.tier-bronze .card-tier-label { color: #a07030; }
+
+/* Stat hexagon area — using 2-column grid for the 6 stats */
+.card-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+  background: rgba(255,255,255,0.03);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  margin-top: auto;
+}
+
+.card-stat {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 12px;
+  background: rgba(0,0,0,0.2);
+}
+
+.card-stat-label {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--vq-mid-gray);
+}
+
+.card-stat-value {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 16px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Stat value coloring by tier context */
+.card-stat-value.high { color: var(--color-success); }
+.card-stat-value.mid { color: var(--vq-white); }
+.card-stat-value.low { color: var(--vq-mid-gray); }
+
+/* VQ watermark on card */
+.card-watermark {
+  position: absolute;
+  bottom: 8px;
+  right: 12px;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: rgba(255,255,255,0.06);
+  z-index: 2;
+}
+
+/* Radar chart (SVG-based) */
+.radar-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 180px;
+  height: 180px;
+  opacity: 0.12;
+}
+
+/* Share button on card hover */
+.card-share-btn {
+  position: absolute;
+  top: var(--space-md);
+  right: var(--space-md);
+  z-index: 5;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-full);
+  background: rgba(0,0,0,0.5);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: var(--vq-white);
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  backdrop-filter: blur(8px);
+}
+.fifa-card:hover .card-share-btn { opacity: 1; }
+
+/* Tier badge row */
+.tier-badges {
+  display: flex;
+  gap: var(--space-lg);
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: var(--space-2xl);
+}
+
+.tier-badge {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: 8px 16px;
+  border-radius: var(--radius-full);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.tier-badge.diamond {
+  background: rgba(56, 189, 248, 0.1);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  color: #7dd3fc;
+}
+.tier-badge.elite {
+  background: rgba(168, 85, 247, 0.1);
+  border: 1px solid rgba(168, 85, 247, 0.3);
+  color: #c084fc;
+}
+.tier-badge.gold {
+  background: rgba(255, 183, 3, 0.1);
+  border: 1px solid rgba(255, 183, 3, 0.25);
+  color: var(--club-secondary);
+}
+.tier-badge.silver {
+  background: rgba(192, 192, 210, 0.08);
+  border: 1px solid rgba(192, 192, 210, 0.2);
+  color: #9898aa;
+}
+.tier-badge.bronze {
+  background: rgba(205, 127, 50, 0.08);
+  border: 1px solid rgba(205, 127, 50, 0.2);
+  color: #a07030;
+}
+
+.tier-badge-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.tier-badge.elite .tier-badge-dot { background: #a855f7; box-shadow: 0 0 8px rgba(168, 85, 247, 0.5); }
+.tier-badge.gold .tier-badge-dot { background: var(--club-secondary); box-shadow: 0 0 8px rgba(255, 183, 3, 0.5); }
+.tier-badge.silver .tier-badge-dot { background: #C0C0D2; }
+.tier-badge.bronze .tier-badge-dot { background: #CD7F32; }
+
+.tier-badge.iron {
+  background: rgba(100, 100, 110, 0.08);
+  border: 1px solid rgba(100, 100, 110, 0.2);
+  color: #6b6b78;
+}
+.tier-badge.diamond .tier-badge-dot { background: #38bdf8; box-shadow: 0 0 8px rgba(56, 189, 248, 0.5); }
+.tier-badge.iron .tier-badge-dot { background: #6b6b78; }
+
+/* ============================================
+   PROGRESS GRAPHS
+   ============================================ */
+.graphs-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-lg);
+}
+
+@media (max-width: 900px) {
+  .graphs-grid { grid-template-columns: 1fr; }
+}
+
+.graph-card {
+  background: var(--vq-navy-90);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  transition: all 0.25s ease;
+}
+.graph-card:hover {
+  border-color: rgba(255,255,255,0.12);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+}
+
+.graph-card-header {
+  padding: var(--space-md) var(--space-lg);
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.graph-card-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.graph-period-toggle {
+  display: flex;
+  gap: 2px;
+  background: rgba(255,255,255,0.04);
+  border-radius: var(--radius-full);
+  padding: 2px;
+}
+
+.graph-period-btn {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  border: none;
+  background: transparent;
+  color: var(--vq-mid-gray);
+  padding: 5px 12px;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.graph-period-btn.active {
+  background: rgba(255,255,255,0.08);
+  color: var(--vq-white);
+}
+
+.graph-body {
+  padding: var(--space-lg);
+  position: relative;
+}
+
+/* SVG chart styling */
+.chart-svg {
+  width: 100%;
+  overflow: visible;
+}
+
+.chart-grid-line {
+  stroke: rgba(255,255,255,0.04);
+  stroke-width: 1;
+}
+
+.chart-axis-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  fill: var(--vq-mid-gray);
+}
+
+.chart-x-label {
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 600;
+  fill: var(--vq-mid-gray);
+  letter-spacing: 0.5px;
+}
+
+.chart-line {
+  fill: none;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.chart-line-shadow {
+  fill: none;
+  stroke-width: 6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.15;
+  filter: blur(4px);
+}
+
+.chart-area {
+  opacity: 0.08;
+}
+
+.chart-dot {
+  stroke-width: 2;
+  transition: r 0.2s ease;
+  cursor: pointer;
+}
+.chart-dot:hover {
+  r: 6;
+}
+
+.chart-dot-ring {
+  fill: none;
+  stroke-width: 1;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.chart-dot:hover + .chart-dot-ring {
+  opacity: 1;
+}
+
+/* Tooltip */
+.chart-tooltip {
+  position: absolute;
+  background: var(--vq-navy-80);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s;
+  z-index: 10;
+  backdrop-filter: blur(8px);
+}
+
+.chart-tooltip.visible { opacity: 1; }
+
+.chart-tooltip-value {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.chart-tooltip-label {
+  font-family: var(--font-display);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--vq-mid-gray);
+}
+
+/* Radar chart */
+.radar-chart-full {
+  width: 100%;
+  max-width: 340px;
+  margin: 0 auto;
+  display: block;
+}
+
+.radar-ring {
+  fill: none;
+  stroke: rgba(255,255,255,0.06);
+  stroke-width: 1;
+}
+
+.radar-spoke {
+  stroke: rgba(255,255,255,0.04);
+  stroke-width: 1;
+}
+
+.radar-area-current {
+  fill: rgba(230, 57, 70, 0.15);
+  stroke: var(--club-primary);
+  stroke-width: 2;
+}
+
+.radar-area-prev {
+  fill: rgba(255,255,255,0.03);
+  stroke: rgba(255,255,255,0.2);
+  stroke-width: 1.5;
+  stroke-dasharray: 4 3;
+}
+
+.radar-dot {
+  fill: var(--club-primary);
+  stroke: var(--vq-navy-90);
+  stroke-width: 2;
+}
+
+.radar-label {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  fill: var(--vq-mid-gray);
+}
+
+.radar-value {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 12px;
+  fill: var(--vq-white);
+}
+
+/* Legend */
+.chart-legend {
+  display: flex;
+  gap: var(--space-lg);
+  margin-top: var(--space-md);
+  justify-content: center;
+}
+
+.chart-legend-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--vq-mid-gray);
+}
+
+.chart-legend-line {
+  width: 16px;
+  height: 3px;
+  border-radius: 2px;
+}
+
+.chart-legend-line-dashed {
+  width: 16px;
+  height: 0;
+  border-top: 2px dashed;
+}
+
+/* Stat delta row below graph */
+.graph-deltas {
+  display: flex;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-lg);
+  border-top: 1px solid rgba(255,255,255,0.04);
+}
+
+.graph-delta {
+  flex: 1;
+  text-align: center;
+}
+
+.graph-delta-value {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 18px;
+  font-variant-numeric: tabular-nums;
+}
+.graph-delta-value.up { color: var(--color-success); }
+.graph-delta-value.down { color: var(--color-error); }
+.graph-delta-value.flat { color: var(--vq-mid-gray); }
+
+.graph-delta-label {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--vq-mid-gray);
+  margin-top: 2px;
+}
+
+/* Full-width graph card variant */
+.graph-card-full {
+  grid-column: 1 / -1;
+}
+
+/* Bar chart */
+.bar-chart-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  margin-bottom: var(--space-sm);
+}
+
+.bar-chart-label {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--vq-mid-gray);
+  min-width: 40px;
+  text-align: right;
+}
+
+.bar-chart-track {
+  flex: 1;
+  height: 24px;
+  background: rgba(255,255,255,0.04);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  position: relative;
+}
+
+.bar-chart-fill {
+  height: 100%;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  padding-left: var(--space-sm);
+  transition: width 1s ease-out;
+}
+
+.bar-chart-fill-value {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 11px;
+  color: rgba(255,255,255,0.9);
+}
+
+/* ============================================
+   POST-GAME ANALYTICS
+   ============================================ */
+.postgame-wrapper {
+  background: var(--vq-navy);
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(255,255,255,0.06);
+  overflow: hidden;
+}
+
+/* Match result banner */
+.match-result-banner {
+  position: relative;
+  padding: var(--space-2xl) var(--space-xl);
+  text-align: center;
+  overflow: hidden;
+}
+
+.match-result-banner.win {
+  background: linear-gradient(180deg, rgba(34,197,94,0.12) 0%, transparent 100%);
+}
+.match-result-banner.loss {
+  background: linear-gradient(180deg, rgba(239,68,68,0.12) 0%, transparent 100%);
+}
+
+.match-result-banner::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent,
+    transparent 40px,
+    rgba(255,255,255,0.008) 40px,
+    rgba(255,255,255,0.008) 41px
+  );
+  pointer-events: none;
+}
+
+.result-outcome {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 14px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  margin-bottom: var(--space-md);
+}
+.result-outcome.win { color: var(--color-success); }
+.result-outcome.loss { color: var(--color-error); }
+
+.result-teams {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xl);
+}
+
+.result-team {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.result-team-logo {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 18px;
+}
+
+.result-team-name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 16px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.result-score-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.result-score {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 56px;
+  letter-spacing: 4px;
+  line-height: 1;
+}
+
+.result-sets {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--vq-mid-gray);
+  letter-spacing: 2px;
+}
+
+.result-meta {
+  display: flex;
+  gap: var(--space-lg);
+  justify-content: center;
+  margin-top: var(--space-lg);
+  font-size: 13px;
+  color: var(--vq-mid-gray);
+}
+
+/* Set-by-set breakdown */
+.sets-breakdown {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-xl);
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+
+.set-pill {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-sm);
+  background: rgba(255,255,255,0.03);
+  min-width: 70px;
+}
+
+.set-pill-label {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--vq-mid-gray);
+  margin-bottom: 4px;
+}
+
+.set-pill-score {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: 1px;
+}
+
+.set-pill.won .set-pill-score { color: var(--color-success); }
+.set-pill.lost .set-pill-score { color: var(--color-error); }
+
+/* Awards section */
+.awards-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1px;
+  background: rgba(255,255,255,0.03);
+}
+
+.award-card {
+  background: var(--vq-navy);
+  padding: var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  transition: background 0.3s;
+}
+.award-card:hover {
+  background: var(--vq-navy-90);
+}
+
+.award-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 2px;
+  border-radius: 0 0 2px 2px;
+}
+
+.award-card.mvp::before { background: var(--club-secondary); box-shadow: 0 0 16px rgba(255,183,3,0.4); }
+.award-card.defender::before { background: var(--vq-teal); box-shadow: 0 0 16px rgba(46,196,182,0.4); }
+.award-card.attacker::before { background: var(--club-primary); box-shadow: 0 0 16px rgba(230,57,70,0.4); }
+.award-card.server::before { background: #a855f7; box-shadow: 0 0 16px rgba(168,85,247,0.4); }
+.award-card.playmaker::before { background: var(--color-info); box-shadow: 0 0 16px rgba(59,130,246,0.4); }
+
+.award-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  margin-bottom: var(--space-sm);
+  position: relative;
+}
+
+.award-card.mvp .award-icon {
+  background: radial-gradient(circle, rgba(255,183,3,0.15), transparent 70%);
+  animation: awardPulse 3s ease-in-out infinite;
+}
+.award-card.defender .award-icon { background: radial-gradient(circle, rgba(46,196,182,0.12), transparent 70%); }
+.award-card.attacker .award-icon { background: radial-gradient(circle, rgba(230,57,70,0.12), transparent 70%); }
+.award-card.server .award-icon { background: radial-gradient(circle, rgba(168,85,247,0.12), transparent 70%); }
+.award-card.playmaker .award-icon { background: radial-gradient(circle, rgba(59,130,246,0.12), transparent 70%); }
+
+@keyframes awardPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255,183,3,0.2); }
+  50% { box-shadow: 0 0 0 12px rgba(255,183,3,0); }
+}
+
+.award-title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 2px;
+}
+
+.award-card.mvp .award-title { color: var(--club-secondary); }
+.award-card.defender .award-title { color: var(--vq-teal); }
+.award-card.attacker .award-title { color: var(--club-primary); }
+.award-card.server .award-title { color: #a855f7; }
+.award-card.playmaker .award-title { color: var(--color-info); }
+
+.award-player {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 16px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.award-stat {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--vq-mid-gray);
+  margin-top: 4px;
+}
+
+/* Team stats comparison bars */
+.team-compare {
+  padding: var(--space-lg) var(--space-xl);
+}
+
+.team-compare-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+}
+
+.tc-label {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--vq-mid-gray);
+  width: 80px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.tc-bar-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  height: 28px;
+}
+
+.tc-bar-left {
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+  height: 100%;
+}
+
+.tc-bar-right {
+  flex: 1;
+  display: flex;
+  justify-content: flex-start;
+  height: 100%;
+}
+
+.tc-fill {
+  height: 100%;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+  min-width: 36px;
+  transition: width 1s ease-out;
+}
+
+.tc-fill-left {
+  justify-content: flex-start;
+  border-radius: var(--radius-sm) 2px 2px var(--radius-sm);
+  background: linear-gradient(90deg, rgba(230,57,70,0.5), var(--club-primary));
+}
+
+.tc-fill-right {
+  justify-content: flex-end;
+  border-radius: 2px var(--radius-sm) var(--radius-sm) 2px;
+  background: linear-gradient(90deg, rgba(255,255,255,0.3), rgba(255,255,255,0.15));
+}
+
+.tc-fill-value {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.tc-vs-dot {
+  width: 2px;
+  height: 16px;
+  background: rgba(255,255,255,0.15);
+  flex-shrink: 0;
+  border-radius: 1px;
+}
+
+/* Individual player stats table */
+.postgame-table-wrap {
+  border-top: 1px solid rgba(255,255,255,0.04);
+}
+
+.postgame-table-header {
+  padding: var(--space-md) var(--space-xl);
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.postgame-table-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.postgame-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.postgame-table thead {
+  background: rgba(255,255,255,0.02);
+}
+
+.postgame-table th {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--vq-mid-gray);
+  padding: var(--space-sm) var(--space-md);
+  text-align: center;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.postgame-table th:first-child { text-align: left; padding-left: var(--space-xl); }
+
+.postgame-table td {
+  padding: var(--space-sm) var(--space-md);
+  text-align: center;
+  border-bottom: 1px solid rgba(255,255,255,0.02);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+.postgame-table td:first-child {
+  text-align: left;
+  padding-left: var(--space-xl);
+  font-family: var(--font-body);
+  font-weight: 600;
+}
+
+.postgame-table tbody tr {
+  transition: background 0.15s;
+}
+.postgame-table tbody tr:hover {
+  background: rgba(255,255,255,0.02);
+}
+
+.postgame-table tbody tr.mvp-row {
+  background: rgba(255,183,3,0.04);
+}
+.postgame-table tbody tr.mvp-row:hover {
+  background: rgba(255,183,3,0.07);
+}
+
+.mvp-badge-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--club-secondary);
+  background: rgba(255,183,3,0.1);
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  margin-left: var(--space-sm);
+}
+
+.stat-highlight {
+  color: var(--color-success);
+  font-weight: 700;
+}
+
+/* Player rating change pill */
+.rating-change {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: var(--radius-full);
+}
+.rating-change.up {
+  color: var(--color-success);
+  background: rgba(34,197,94,0.1);
+}
+.rating-change.down {
+  color: var(--color-error);
+  background: rgba(239,68,68,0.1);
+}
+.rating-change.flat {
+  color: var(--vq-mid-gray);
+  background: rgba(255,255,255,0.04);
+}
+
+/* XP earned summary */
+.xp-earned-bar {
+  padding: var(--space-md) var(--space-xl);
+  border-top: 1px solid rgba(255,255,255,0.04);
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+}
+
+.xp-earned-label {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--vq-mid-gray);
+  white-space: nowrap;
+}
+
+.xp-earned-amount {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 20px;
+  color: var(--club-secondary);
+  white-space: nowrap;
+}
+
+.xp-earned-breakdown {
+  display: flex;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+  flex: 1;
+}
+
+.xp-tag {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--vq-mid-gray);
+  background: rgba(255,255,255,0.04);
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+}
+.xp-tag span { color: var(--club-secondary); font-weight: 600; }
+
+@media (max-width: 900px) {
+  .result-teams { flex-direction: column; gap: var(--space-md); }
+  .result-score { font-size: 40px; }
+  .awards-strip { grid-template-columns: repeat(2, 1fr); }
+  .team-compare-row { flex-direction: column; }
+  .tc-label { width: auto; }
+  .tc-bar-container { width: 100%; }
+  .postgame-table { font-size: 11px; }
+  .postgame-table th, .postgame-table td { padding: var(--space-xs) var(--space-sm); }
+  .xp-earned-bar { flex-direction: column; align-items: flex-start; }
+}
+
+/* ============================================
+   ONBOARDING
+   ============================================ */
+.onboarding-flow {
+  display: flex;
+  gap: var(--space-lg);
+  overflow-x: auto;
+  padding-bottom: var(--space-md);
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+
+.onboarding-flow::-webkit-scrollbar { height: 4px; }
+.onboarding-flow::-webkit-scrollbar-track { background: rgba(255,255,255,0.02); border-radius: 2px; }
+.onboarding-flow::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 2px; }
+
+.ob-screen {
+  min-width: 320px;
+  max-width: 360px;
+  flex-shrink: 0;
+  scroll-snap-align: center;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(255,255,255,0.06);
+  overflow: hidden;
+  background: var(--vq-navy-90);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.ob-screen:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+}
+
+/* Phone frame feel */
+.ob-status-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 20px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--vq-mid-gray);
+}
+
+.ob-screen-body {
+  flex: 1;
+  padding: var(--space-lg) var(--space-xl) var(--space-xl);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Progress dots */
+.ob-progress {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  padding: var(--space-sm) 0 var(--space-md);
+}
+
+.ob-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.08);
+  transition: all 0.3s;
+}
+.ob-dot.active {
+  background: var(--vq-teal);
+  box-shadow: 0 0 8px rgba(46, 196, 182, 0.4);
+}
+.ob-dot.done {
+  background: var(--vq-teal);
+  opacity: 0.4;
+}
+
+/* Screen step label */
+.ob-step-label {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  color: var(--vq-teal);
+  margin-bottom: var(--space-sm);
+}
+
+.ob-title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 26px;
+  text-transform: uppercase;
+  letter-spacing: -0.5px;
+  line-height: 1.1;
+  margin-bottom: var(--space-sm);
+}
+
+.ob-subtitle {
+  font-size: 14px;
+  color: var(--vq-mid-gray);
+  line-height: 1.5;
+  margin-bottom: var(--space-lg);
+}
+
+/* Form elements */
+.ob-input-group {
+  margin-bottom: var(--space-md);
+}
+
+.ob-label {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--vq-mid-gray);
+  margin-bottom: 6px;
+  display: block;
+}
+
+.ob-input {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.04);
+  color: var(--vq-white);
+  font-family: var(--font-body);
+  font-size: 15px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.ob-input:focus { border-color: var(--vq-teal); }
+.ob-input::placeholder { color: rgba(255,255,255,0.2); }
+
+.ob-input.filled {
+  border-color: rgba(255,255,255,0.15);
+  color: var(--vq-white);
+}
+
+/* Color picker row */
+.ob-color-row {
+  display: flex;
+  gap: var(--space-sm);
+  margin-top: var(--space-sm);
+}
+
+.ob-color-swatch-pick {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: border-color 0.2s, transform 0.2s;
+}
+.ob-color-swatch-pick:hover { transform: scale(1.1); }
+.ob-color-swatch-pick.selected {
+  border-color: var(--vq-white);
+  box-shadow: 0 0 12px rgba(255,255,255,0.15);
+}
+
+/* Logo upload area */
+.ob-logo-upload {
+  width: 80px;
+  height: 80px;
+  border-radius: var(--radius-md);
+  border: 2px dashed rgba(255,255,255,0.12);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+  margin-bottom: var(--space-md);
+}
+.ob-logo-upload:hover {
+  border-color: var(--vq-teal);
+  background: rgba(46, 196, 182, 0.04);
+}
+
+.ob-logo-upload .upload-icon {
+  font-size: 24px;
+  margin-bottom: 4px;
+  opacity: 0.3;
+}
+.ob-logo-upload .upload-text {
+  font-family: var(--font-display);
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--vq-mid-gray);
+}
+
+.ob-logo-upload.has-logo {
+  border-style: solid;
+  border-color: var(--club-primary);
+  background: var(--club-primary);
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 28px;
+}
+
+/* Position selector grid */
+.ob-position-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+}
+
+.ob-position-btn {
+  padding: 12px 8px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.02);
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.ob-position-btn:hover {
+  border-color: rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.04);
+}
+.ob-position-btn.selected {
+  border-color: var(--vq-teal);
+  background: rgba(46, 196, 182, 0.08);
+}
+
+.ob-position-btn .pos-abbr {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 18px;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 2px;
+}
+.ob-position-btn.selected .pos-abbr { color: var(--vq-teal); }
+
+.ob-position-btn .pos-name {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--vq-mid-gray);
+}
+
+/* Skip link */
+.ob-skip {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--vq-mid-gray);
+  text-align: center;
+  cursor: pointer;
+  transition: color 0.2s;
+  padding: var(--space-sm) 0;
+}
+.ob-skip:hover { color: var(--vq-white); }
+
+/* Invite code display */
+.ob-invite-code {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: var(--radius-md);
+  padding: var(--space-md) var(--space-lg);
+  margin-bottom: var(--space-md);
+}
+
+.ob-code {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 28px;
+  letter-spacing: 6px;
+  color: var(--vq-teal);
+}
+
+.ob-copy-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  background: rgba(46, 196, 182, 0.1);
+  border: 1px solid rgba(46, 196, 182, 0.2);
+  color: var(--vq-teal);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background 0.2s;
+}
+.ob-copy-btn:hover { background: rgba(46, 196, 182, 0.2); }
+
+/* Avatar upload circle */
+.ob-avatar-upload {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  border: 2px dashed rgba(255,255,255,0.12);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  margin: 0 auto var(--space-lg);
+  transition: border-color 0.2s;
+}
+.ob-avatar-upload:hover { border-color: var(--vq-teal); }
+
+.ob-avatar-upload.has-photo {
+  border-style: solid;
+  border-color: var(--club-primary);
+  background: var(--vq-navy-70);
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 32px;
+  color: var(--vq-teal);
+}
+
+/* Team list for player joining */
+.ob-team-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md);
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(255,255,255,0.06);
+  margin-bottom: var(--space-sm);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.ob-team-item:hover {
+  border-color: rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.02);
+}
+
+.ob-team-badge {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.ob-team-info {
+  flex: 1;
+}
+
+.ob-team-name {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 15px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.ob-team-meta {
+  font-size: 12px;
+  color: var(--vq-mid-gray);
+}
+
+.ob-team-arrow {
+  color: var(--vq-mid-gray);
+  font-size: 18px;
+}
+
+/* CTA button at bottom of screen */
+.ob-cta {
+  margin-top: auto;
+}
+
+.ob-btn-primary {
+  width: 100%;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  border: none;
+  padding: 16px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+
+.ob-btn-primary.teal {
+  background: var(--vq-teal);
+  color: var(--vq-navy);
+  box-shadow: 0 4px 16px rgba(46, 196, 182, 0.3);
+}
+.ob-btn-primary.teal:hover {
+  box-shadow: 0 6px 24px rgba(46, 196, 182, 0.4);
+  transform: translateY(-1px);
+}
+
+.ob-btn-primary.club {
+  background: var(--club-primary);
+  color: var(--vq-white);
+  box-shadow: 0 4px 16px rgba(230, 57, 70, 0.3);
+}
+
+/* Social login buttons */
+.ob-social-btns {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-lg);
+}
+
+.ob-social-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  width: 100%;
+  padding: 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.04);
+  color: var(--vq-white);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.ob-social-btn:hover {
+  background: rgba(255,255,255,0.06);
+  border-color: rgba(255,255,255,0.15);
+}
+
+.ob-divider {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  margin: var(--space-md) 0;
+  font-family: var(--font-display);
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--vq-mid-gray);
+}
+.ob-divider::before, .ob-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: rgba(255,255,255,0.06);
+}
+
+/* Flow label */
+.ob-flow-label {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 16px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  text-align: center;
+  margin-bottom: var(--space-lg);
+  padding: var(--space-md);
+  border-radius: var(--radius-sm);
+}
+
+.ob-flow-label.coach-flow {
+  color: var(--vq-teal);
+  background: rgba(46, 196, 182, 0.06);
+  border: 1px solid rgba(46, 196, 182, 0.15);
+}
+
+.ob-flow-label.player-flow {
+  color: var(--club-primary);
+  background: rgba(230, 57, 70, 0.06);
+  border: 1px solid rgba(230, 57, 70, 0.15);
+}
+
+/* Arrow connector between screens */
+.ob-arrow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255,255,255,0.1);
+  font-size: 24px;
+  flex-shrink: 0;
+  align-self: center;
+}
+
+/* ============================================
+   SCROLL ANIMATIONS
+   ============================================ */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+</style>
+</head>
+<body>
+
+<!-- ============================================
+     HERO
+     ============================================ -->
+<section class="hero">
+  <div class="logo-mark">
+    <span class="vq-monogram">VQ</span>
+  </div>
+  <h1>Volley<span class="accent">Quest</span></h1>
+  <p class="subtitle">Design Reference</p>
+  <p class="tagline">A volleyball management &amp; gamification platform. Spond's utility meets Duolingo's engagement — built for coaches and players alike.</p>
+</section>
+
+<!-- ============================================
+     COLOR PALETTE
+     ============================================ -->
+<section class="section reveal">
+  <p class="section-label">Foundation</p>
+  <h2 class="section-title">Color Palette</h2>
+  <p class="section-desc">A deep navy base that recedes behind club branding. Each club's primary and secondary colors take over navigation and accents, making the app feel like theirs.</p>
+
+  <div class="palette-grid">
+    <div class="swatch">
+      <div class="swatch-color" style="background: #0A1628;"></div>
+      <div class="swatch-info"><p class="swatch-name">Navy</p><p class="swatch-hex">#0A1628</p></div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-color" style="background: #FFFFFF; border-bottom: 1px solid rgba(255,255,255,0.06);"></div>
+      <div class="swatch-info"><p class="swatch-name">White</p><p class="swatch-hex">#FFFFFF</p></div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-color" style="background: #2EC4B6;"></div>
+      <div class="swatch-info"><p class="swatch-name">Teal Accent</p><p class="swatch-hex">#2EC4B6</p></div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-color" style="background: linear-gradient(135deg, #E63946, #c42d39);"></div>
+      <div class="swatch-info"><p class="swatch-name">Club Primary</p><p class="swatch-hex">#E63946</p></div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-color" style="background: linear-gradient(135deg, #FFB703, #e0a003);"></div>
+      <div class="swatch-info"><p class="swatch-name">Club Secondary</p><p class="swatch-hex">#FFB703</p></div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-color" style="background: #22C55E;"></div>
+      <div class="swatch-info"><p class="swatch-name">Success</p><p class="swatch-hex">#22C55E</p></div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-color" style="background: #F59E0B;"></div>
+      <div class="swatch-info"><p class="swatch-name">Warning</p><p class="swatch-hex">#F59E0B</p></div>
+    </div>
+    <div class="swatch">
+      <div class="swatch-color" style="background: #EF4444;"></div>
+      <div class="swatch-info"><p class="swatch-name">Error</p><p class="swatch-hex">#EF4444</p></div>
+    </div>
+  </div>
+</section>
+
+<div class="divider" style="max-width: 1400px; margin-left: auto; margin-right: auto;"></div>
+
+<!-- ============================================
+     TYPOGRAPHY
+     ============================================ -->
+<section class="section reveal">
+  <p class="section-label">Type System</p>
+  <h2 class="section-title">Typography</h2>
+  <p class="section-desc">Barlow Condensed for headers and labels delivers an athletic, condensed energy. Barlow for body text. JetBrains Mono for stats and data.</p>
+
+  <div class="type-row">
+    <div class="type-meta"><p class="label">Display XL</p><p class="spec">Barlow Condensed 800 / 64px</p></div>
+    <div class="type-sample"><p class="type-display-xl">Game Day</p></div>
+  </div>
+  <div class="type-row">
+    <div class="type-meta"><p class="label">Display LG</p><p class="spec">Barlow Condensed 800 / 42px</p></div>
+    <div class="type-sample"><p class="type-display-lg">Season Overview</p></div>
+  </div>
+  <div class="type-row">
+    <div class="type-meta"><p class="label">Display MD</p><p class="spec">Barlow Condensed 700 / 28px</p></div>
+    <div class="type-sample"><p class="type-display-md">Team Statistics</p></div>
+  </div>
+  <div class="type-row">
+    <div class="type-meta"><p class="label">Heading</p><p class="spec">Barlow Condensed 600 / 20px</p></div>
+    <div class="type-sample"><p class="type-heading">Upcoming Schedule</p></div>
+  </div>
+  <div class="type-row">
+    <div class="type-meta"><p class="label">Body</p><p class="spec">Barlow 400 / 16px</p></div>
+    <div class="type-sample"><p class="type-body">Track attendance, manage rosters, and review performance stats across the entire season. Each player's progress is recorded and rewarded.</p></div>
+  </div>
+  <div class="type-row">
+    <div class="type-meta"><p class="label">Body Small</p><p class="spec">Barlow 400 / 14px</p></div>
+    <div class="type-sample"><p class="type-body-sm">Last updated 2 hours ago. Next sync at 18:00.</p></div>
+  </div>
+  <div class="type-row">
+    <div class="type-meta"><p class="label">Stat Number</p><p class="spec">JetBrains Mono 700 / 36px</p></div>
+    <div class="type-sample"><p class="type-stat">2,847 <span style="font-size:16px;color:var(--color-success);">+12.4%</span></p></div>
+  </div>
+  <div class="type-row">
+    <div class="type-meta"><p class="label">Label</p><p class="spec">Barlow Condensed 700 / 12px</p></div>
+    <div class="type-sample"><p class="type-label">Total Kills This Season</p></div>
+  </div>
+</section>
+
+<div class="divider" style="max-width: 1400px; margin-left: auto; margin-right: auto;"></div>
+
+<!-- ============================================
+     BUTTONS
+     ============================================ -->
+<section class="section reveal">
+  <p class="section-label">Components</p>
+  <h2 class="section-title">Buttons</h2>
+  <p class="section-desc">Primary buttons use the club color. Secondary and ghost variants ensure the club branding stays dominant without overwhelming the interface.</p>
+
+  <div class="button-grid" style="margin-bottom: var(--space-xl);">
+    <button class="btn btn-primary">Club Primary</button>
+    <button class="btn btn-club-secondary">Club Secondary</button>
+    <button class="btn btn-secondary">Secondary</button>
+    <button class="btn btn-ghost">Ghost Action</button>
+  </div>
+  <div class="button-grid">
+    <button class="btn btn-primary btn-sm">Small Primary</button>
+    <button class="btn btn-secondary btn-sm">Small Secondary</button>
+    <button class="btn btn-ghost btn-sm">Small Ghost</button>
+  </div>
+</section>
+
+<div class="divider" style="max-width: 1400px; margin-left: auto; margin-right: auto;"></div>
+
+<!-- ============================================
+     CLUB THEMING DEMO
+     ============================================ -->
+<section class="section reveal">
+  <p class="section-label">Theming</p>
+  <h2 class="section-title">Club Colors</h2>
+  <p class="section-desc">Each club's branding takes over the UI. The navy shell stays neutral while club colors own navigation, buttons, and accent elements — making every team feel at home.</p>
+
+  <div class="theme-demo-grid">
+    <!-- Oslo Volley -->
+    <div class="theme-demo-card">
+      <div class="theme-demo-header" style="background: #E63946;">
+        <div class="dot" style="background: rgba(255,255,255,0.3);"></div>
+        <span class="club-n">Oslo Volley</span>
+      </div>
+      <div class="theme-demo-body">
+        <p style="font-family: var(--font-display); font-weight: 700; font-size: 16px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">Dashboard</p>
+        <p style="font-size: 13px; color: var(--vq-mid-gray); margin-bottom: 12px;">Next match: vs Bergen VBK</p>
+        <button class="theme-demo-btn" style="background: #E63946;">RSVP</button>
+        <button class="theme-demo-btn" style="background: #FFB703; color: #0A1628;">Stats</button>
+        <div class="theme-demo-xp"><div class="theme-demo-xp-fill" style="background: linear-gradient(90deg, #FFB703, #FFD166);"></div></div>
+      </div>
+    </div>
+    <!-- Stavanger VK -->
+    <div class="theme-demo-card">
+      <div class="theme-demo-header" style="background: #2563EB;">
+        <div class="dot" style="background: rgba(255,255,255,0.3);"></div>
+        <span class="club-n">Stavanger VK</span>
+      </div>
+      <div class="theme-demo-body">
+        <p style="font-family: var(--font-display); font-weight: 700; font-size: 16px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">Dashboard</p>
+        <p style="font-size: 13px; color: var(--vq-mid-gray); margin-bottom: 12px;">Next match: vs Trondheim VBK</p>
+        <button class="theme-demo-btn" style="background: #2563EB;">RSVP</button>
+        <button class="theme-demo-btn" style="background: #60A5FA; color: #0A1628;">Stats</button>
+        <div class="theme-demo-xp"><div class="theme-demo-xp-fill" style="background: linear-gradient(90deg, #60A5FA, #93C5FD);"></div></div>
+      </div>
+    </div>
+    <!-- Asker VBK -->
+    <div class="theme-demo-card">
+      <div class="theme-demo-header" style="background: #059669;">
+        <div class="dot" style="background: rgba(255,255,255,0.3);"></div>
+        <span class="club-n">Asker VBK</span>
+      </div>
+      <div class="theme-demo-body">
+        <p style="font-family: var(--font-display); font-weight: 700; font-size: 16px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px;">Dashboard</p>
+        <p style="font-size: 13px; color: var(--vq-mid-gray); margin-bottom: 12px;">Next match: vs Sandnes VBK</p>
+        <button class="theme-demo-btn" style="background: #059669;">RSVP</button>
+        <button class="theme-demo-btn" style="background: #34D399; color: #0A1628;">Stats</button>
+        <div class="theme-demo-xp"><div class="theme-demo-xp-fill" style="background: linear-gradient(90deg, #34D399, #6EE7B7);"></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider" style="max-width: 1400px; margin-left: auto; margin-right: auto;"></div>
+
+<!-- ============================================
+     EXPERIENCE VIEWS
+     ============================================ -->
+<section class="section">
+  <div class="reveal">
+    <p class="section-label">Experiences</p>
+    <h2 class="section-title">Two Views, One App</h2>
+    <p class="section-desc">The coach sees a command center. The player sees a gamified journey. Both share the same club branding and data — presented for their context.</p>
+  </div>
+
+  <div class="view-toggle-container reveal">
+    <div class="view-toggle">
+      <button class="view-toggle-btn active" onclick="switchView('coach')">Coach View</button>
+      <button class="view-toggle-btn" onclick="switchView('player')">Player View</button>
+    </div>
+  </div>
+
+  <!-- ===== COACH VIEW ===== -->
+  <div class="coach-view active" id="coachView">
+    <nav class="coach-nav">
+      <div class="club-badge">
+        <div class="club-icon">OV</div>
+        <span class="club-name">Oslo Volley</span>
+      </div>
+      <div class="coach-nav-links">
+        <a href="#" class="active-link">Dashboard</a>
+        <a href="#">Roster</a>
+        <a href="#">Schedule</a>
+        <a href="#">Stats</a>
+        <a href="#">Settings</a>
+      </div>
+    </nav>
+
+    <!-- Coach stat cards -->
+    <div class="coach-stats-row">
+      <div class="coach-stat-card" style="--accent: var(--color-success);">
+        <p class="coach-stat-label">Attendance Rate</p>
+        <p class="coach-stat-value">87%</p>
+        <p class="coach-stat-delta positive">+3.2% vs last month</p>
+      </div>
+      <div class="coach-stat-card" style="--accent: var(--club-primary);">
+        <p class="coach-stat-label">Win Rate</p>
+        <p class="coach-stat-value">72%</p>
+        <p class="coach-stat-delta positive">+8% vs last season</p>
+      </div>
+      <div class="coach-stat-card" style="--accent: var(--club-secondary);">
+        <p class="coach-stat-label">Active Players</p>
+        <p class="coach-stat-value">16</p>
+        <p class="coach-stat-delta" style="color: var(--vq-mid-gray);">of 18 registered</p>
+      </div>
+      <div class="coach-stat-card" style="--accent: var(--vq-teal);">
+        <p class="coach-stat-label">Next Match</p>
+        <p class="coach-stat-value" style="font-size: 24px;">3d</p>
+        <p class="coach-stat-delta" style="color: var(--vq-mid-gray);">vs Bergen VBK</p>
+      </div>
+    </div>
+
+    <div class="coach-grid">
+      <!-- Roster table -->
+      <div class="data-table-wrap">
+        <div class="card-header">
+          <span style="font-family: var(--font-display); font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">Roster</span>
+          <button class="btn btn-ghost btn-sm">Export</button>
+        </div>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Player</th>
+              <th>Pos</th>
+              <th>Attendance</th>
+              <th>Kills</th>
+              <th>Aces</th>
+              <th>Blocks</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="player-avatar">EH</span>Erik Hansen</td>
+              <td><span class="position-tag">OH</span></td>
+              <td><span class="attendance-bar"><span class="attendance-bar-fill" style="width:95%"></span></span>95%</td>
+              <td style="font-family: var(--font-mono);">187</td>
+              <td style="font-family: var(--font-mono);">42</td>
+              <td style="font-family: var(--font-mono);">28</td>
+            </tr>
+            <tr>
+              <td><span class="player-avatar">SN</span>Sofia Nilsen</td>
+              <td><span class="position-tag">S</span></td>
+              <td><span class="attendance-bar"><span class="attendance-bar-fill" style="width:100%"></span></span>100%</td>
+              <td style="font-family: var(--font-mono);">34</td>
+              <td style="font-family: var(--font-mono);">56</td>
+              <td style="font-family: var(--font-mono);">12</td>
+            </tr>
+            <tr>
+              <td><span class="player-avatar">KL</span>Kristian Larsen</td>
+              <td><span class="position-tag">MB</span></td>
+              <td><span class="attendance-bar"><span class="attendance-bar-fill" style="width:82%"></span></span>82%</td>
+              <td style="font-family: var(--font-mono);">98</td>
+              <td style="font-family: var(--font-mono);">15</td>
+              <td style="font-family: var(--font-mono);">67</td>
+            </tr>
+            <tr>
+              <td><span class="player-avatar">IJ</span>Ingrid Johansen</td>
+              <td><span class="position-tag">OPP</span></td>
+              <td><span class="attendance-bar"><span class="attendance-bar-fill" style="width:91%"></span></span>91%</td>
+              <td style="font-family: var(--font-mono);">156</td>
+              <td style="font-family: var(--font-mono);">38</td>
+              <td style="font-family: var(--font-mono);">19</td>
+            </tr>
+            <tr>
+              <td><span class="player-avatar">OB</span>Ole Berg</td>
+              <td><span class="position-tag">L</span></td>
+              <td><span class="attendance-bar"><span class="attendance-bar-fill" style="width:75%; background: var(--color-warning);"></span></span>75%</td>
+              <td style="font-family: var(--font-mono);">—</td>
+              <td style="font-family: var(--font-mono);">3</td>
+              <td style="font-family: var(--font-mono);">—</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Sidebar: Schedule -->
+      <div>
+        <div style="font-family: var(--font-display); font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: var(--space-md);">Upcoming</div>
+        <div class="schedule-mini">
+          <div class="schedule-item">
+            <div class="schedule-date"><span class="day">05</span><span class="month">Feb</span></div>
+            <div class="schedule-info">
+              <p class="schedule-title">vs Bergen VBK</p>
+              <p class="schedule-meta">Ekeberg Hallen, 19:00</p>
+            </div>
+            <span class="schedule-type match">Match</span>
+          </div>
+          <div class="schedule-item">
+            <div class="schedule-date"><span class="day">07</span><span class="month">Feb</span></div>
+            <div class="schedule-info">
+              <p class="schedule-title">Team Practice</p>
+              <p class="schedule-meta">Lambertseter Hall, 18:00</p>
+            </div>
+            <span class="schedule-type practice">Practice</span>
+          </div>
+          <div class="schedule-item">
+            <div class="schedule-date"><span class="day">09</span><span class="month">Feb</span></div>
+            <div class="schedule-info">
+              <p class="schedule-title">Team Practice</p>
+              <p class="schedule-meta">Lambertseter Hall, 18:00</p>
+            </div>
+            <span class="schedule-type practice">Practice</span>
+          </div>
+          <div class="schedule-item">
+            <div class="schedule-date"><span class="day">12</span><span class="month">Feb</span></div>
+            <div class="schedule-info">
+              <p class="schedule-title">vs Trondheim VBK</p>
+              <p class="schedule-meta">Away, 18:30</p>
+            </div>
+            <span class="schedule-type match">Match</span>
+          </div>
+          <div class="schedule-item">
+            <div class="schedule-date"><span class="day">14</span><span class="month">Feb</span></div>
+            <div class="schedule-info">
+              <p class="schedule-title">Team Practice</p>
+              <p class="schedule-meta">Lambertseter Hall, 18:00</p>
+            </div>
+            <span class="schedule-type practice">Practice</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== PLAYER VIEW ===== -->
+  <div class="player-view" id="playerView">
+    <!-- Player header with XP -->
+    <div class="player-header">
+      <div class="player-profile">
+        <div class="player-avatar-lg">EH</div>
+        <div class="player-profile-info">
+          <h2>Erik Hansen</h2>
+          <p class="player-sub">Outside Hitter &middot; Oslo Volley</p>
+        </div>
+      </div>
+      <div class="xp-container">
+        <div class="xp-header">
+          <span class="xp-level">Level 14 &middot; Sharpshooter</span>
+          <span class="xp-amount">2,847 / 4,200 XP</span>
+        </div>
+        <div class="xp-bar">
+          <div class="xp-bar-fill"></div>
+        </div>
+      </div>
+      <div class="streak-badge">
+        <span class="streak-flame">&#128293;</span>
+        <span class="streak-count">12</span>
+        <span class="streak-label">Day Streak</span>
+      </div>
+    </div>
+
+    <div class="player-card-grid">
+      <!-- Next match -->
+      <div class="next-match-card">
+        <div class="next-match-accent"></div>
+        <div class="next-match-body">
+          <p class="next-match-label">Next Match</p>
+          <div class="match-versus">
+            <div class="match-team">
+              <div class="player-avatar" style="width:48px;height:48px;font-size:16px;margin:0 auto 8px;">OV</div>
+              <p class="match-team-name">Oslo</p>
+            </div>
+            <span class="match-vs">VS</span>
+            <div class="match-team">
+              <div class="player-avatar" style="width:48px;height:48px;font-size:16px;margin:0 auto 8px;color:var(--club-primary);">BV</div>
+              <p class="match-team-name">Bergen</p>
+            </div>
+          </div>
+          <div class="match-details">
+            <span>&#128197; Wed, Feb 5</span>
+            <span>&#128336; 19:00</span>
+            <span>&#128205; Ekeberg Hallen</span>
+          </div>
+          <button class="btn btn-primary btn-sm" style="margin-top: var(--space-md); width: 100%;">RSVP &mdash; I'm In</button>
+        </div>
+      </div>
+
+      <!-- My Stats -->
+      <div class="my-stats-card">
+        <div class="card-accent-top"></div>
+        <div class="card-header">
+          <span style="font-family: var(--font-display); font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">My Season Stats</span>
+          <span style="font-family: var(--font-mono); font-size: 11px; color: var(--vq-mid-gray);">14 matches</span>
+        </div>
+        <div class="stats-grid-mini">
+          <div class="stat-cell">
+            <p class="stat-cell-value">187</p>
+            <p class="stat-cell-label">Kills</p>
+          </div>
+          <div class="stat-cell">
+            <p class="stat-cell-value">42</p>
+            <p class="stat-cell-label">Aces</p>
+          </div>
+          <div class="stat-cell">
+            <p class="stat-cell-value">28</p>
+            <p class="stat-cell-label">Blocks</p>
+          </div>
+          <div class="stat-cell">
+            <p class="stat-cell-value" style="color: var(--color-success);">52%</p>
+            <p class="stat-cell-label">Kill %</p>
+          </div>
+          <div class="stat-cell">
+            <p class="stat-cell-value">1.8</p>
+            <p class="stat-cell-label">Digs/Set</p>
+          </div>
+          <div class="stat-cell">
+            <p class="stat-cell-value">95%</p>
+            <p class="stat-cell-label">Attend</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Leaderboard -->
+      <div class="leaderboard">
+        <div class="leaderboard-header">
+          <span class="leaderboard-title">Team XP Board</span>
+          <span class="leaderboard-filter">This Week</span>
+        </div>
+        <ol class="leaderboard-list">
+          <li class="leaderboard-item">
+            <span class="leaderboard-rank">1</span>
+            <span class="player-avatar" style="width:28px;height:28px;font-size:10px;">SN</span>
+            <span class="leaderboard-name">Sofia Nilsen</span>
+            <span class="leaderboard-xp">3,210 XP</span>
+          </li>
+          <li class="leaderboard-item is-me">
+            <span class="leaderboard-rank">2</span>
+            <span class="player-avatar" style="width:28px;height:28px;font-size:10px;">EH</span>
+            <span class="leaderboard-name">Erik Hansen (You)</span>
+            <span class="leaderboard-xp">2,847 XP</span>
+          </li>
+          <li class="leaderboard-item">
+            <span class="leaderboard-rank">3</span>
+            <span class="player-avatar" style="width:28px;height:28px;font-size:10px;">KL</span>
+            <span class="leaderboard-name">Kristian Larsen</span>
+            <span class="leaderboard-xp">2,654 XP</span>
+          </li>
+          <li class="leaderboard-item">
+            <span class="leaderboard-rank">4</span>
+            <span class="player-avatar" style="width:28px;height:28px;font-size:10px;">IJ</span>
+            <span class="leaderboard-name">Ingrid Johansen</span>
+            <span class="leaderboard-xp">2,501 XP</span>
+          </li>
+          <li class="leaderboard-item">
+            <span class="leaderboard-rank">5</span>
+            <span class="player-avatar" style="width:28px;height:28px;font-size:10px;">OB</span>
+            <span class="leaderboard-name">Ole Berg</span>
+            <span class="leaderboard-xp">1,988 XP</span>
+          </li>
+        </ol>
+      </div>
+    </div>
+
+    <!-- Achievements -->
+    <div style="margin-top: var(--space-xl);">
+      <p style="font-family: var(--font-display); font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: var(--space-md);">Achievements</p>
+      <div class="achievements-row">
+        <div class="achievement">
+          <div class="achievement-icon gold">&#127942;</div>
+          <div class="achievement-info">
+            <p class="achievement-name">Ace Machine</p>
+            <p class="achievement-desc">Land 40 aces in a season</p>
+            <p class="achievement-progress">42 / 40 &mdash; Unlocked!</p>
+          </div>
+        </div>
+        <div class="achievement">
+          <div class="achievement-icon silver">&#128170;</div>
+          <div class="achievement-info">
+            <p class="achievement-name">Iron Wall</p>
+            <p class="achievement-desc">Record 50 blocks in a season</p>
+            <p class="achievement-progress">28 / 50 &mdash; 56%</p>
+          </div>
+        </div>
+        <div class="achievement">
+          <div class="achievement-icon bronze">&#9889;</div>
+          <div class="achievement-info">
+            <p class="achievement-name">Kill Streak</p>
+            <p class="achievement-desc">Get 5 kills in a row without an error</p>
+            <p class="achievement-progress">Best: 4 &mdash; So close!</p>
+          </div>
+        </div>
+        <div class="achievement">
+          <div class="achievement-icon gold">&#128293;</div>
+          <div class="achievement-info">
+            <p class="achievement-name">Dedication</p>
+            <p class="achievement-desc">Maintain a 10-day streak</p>
+            <p class="achievement-progress">12 days &mdash; Unlocked!</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider" style="max-width: 1400px; margin-left: auto; margin-right: auto;"></div>
+
+<!-- ============================================
+     PLAYER CARDS (FIFA-STYLE)
+     ============================================ -->
+<section class="section">
+  <div class="reveal">
+    <p class="section-label">Gamification</p>
+    <h2 class="section-title">Player Cards</h2>
+    <p class="section-desc">FIFA-style player cards built from rolling season stats. Six universal attributes, an overall rating, and tier-based card styling. Designed to be shared on social media — each card is a billboard for VolleyQuest.</p>
+  </div>
+
+  <!-- Tier legend -->
+  <div class="tier-badges reveal">
+    <div class="tier-badge diamond"><span class="tier-badge-dot"></span> Diamond 92+</div>
+    <div class="tier-badge elite"><span class="tier-badge-dot"></span> Elite 85–91</div>
+    <div class="tier-badge gold"><span class="tier-badge-dot"></span> Gold 75–84</div>
+    <div class="tier-badge silver"><span class="tier-badge-dot"></span> Silver 65–74</div>
+    <div class="tier-badge bronze"><span class="tier-badge-dot"></span> Bronze 50–64</div>
+    <div class="tier-badge iron"><span class="tier-badge-dot"></span> Iron 0–49</div>
+  </div>
+
+  <div class="player-cards-showcase reveal">
+
+    <!-- DIAMOND CARD -->
+    <div class="fifa-card tier-diamond">
+      <div class="card-share-btn">&#8599;</div>
+      <span class="card-watermark">VOLLEYQUEST</span>
+      <div class="fifa-card-inner">
+        <div class="card-top">
+          <div class="card-rating-block">
+            <span class="card-overall">94</span>
+            <span class="card-position">OH</span>
+          </div>
+          <div class="card-club-stripe">
+            <div class="card-club-dot" style="background: #2563EB; box-shadow: 0 2px 8px rgba(37,99,235,0.3);">SK</div>
+            <span class="card-club-name">Stavanger</span>
+          </div>
+        </div>
+        <div class="card-avatar-area">
+          <div class="card-avatar-ring">
+            <span class="card-avatar-initials">AV</span>
+          </div>
+        </div>
+        <p class="card-player-name">Anders Viken</p>
+        <p class="card-tier-label">&#9670; Diamond &#9670;</p>
+        <div class="card-stats">
+          <div class="card-stat"><span class="card-stat-label">ATK</span><span class="card-stat-value high">96</span></div>
+          <div class="card-stat"><span class="card-stat-label">SRV</span><span class="card-stat-value high">91</span></div>
+          <div class="card-stat"><span class="card-stat-label">BLK</span><span class="card-stat-value high">88</span></div>
+          <div class="card-stat"><span class="card-stat-label">DIG</span><span class="card-stat-value high">85</span></div>
+          <div class="card-stat"><span class="card-stat-label">SET</span><span class="card-stat-value mid">72</span></div>
+          <div class="card-stat"><span class="card-stat-label">IQ</span><span class="card-stat-value high">93</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ELITE CARD -->
+    <div class="fifa-card tier-elite">
+      <div class="card-share-btn">&#8599;</div>
+      <span class="card-watermark">VOLLEYQUEST</span>
+      <div class="fifa-card-inner">
+        <div class="card-top">
+          <div class="card-rating-block">
+            <span class="card-overall">88</span>
+            <span class="card-position">S</span>
+          </div>
+          <div class="card-club-stripe">
+            <div class="card-club-dot">OV</div>
+            <span class="card-club-name">Oslo</span>
+          </div>
+        </div>
+        <div class="card-avatar-area">
+          <div class="card-avatar-ring">
+            <span class="card-avatar-initials">SN</span>
+          </div>
+        </div>
+        <p class="card-player-name">Sofia Nilsen</p>
+        <p class="card-tier-label">&#9830; Elite &#9830;</p>
+        <div class="card-stats">
+          <div class="card-stat"><span class="card-stat-label">ATK</span><span class="card-stat-value mid">72</span></div>
+          <div class="card-stat"><span class="card-stat-label">SRV</span><span class="card-stat-value high">91</span></div>
+          <div class="card-stat"><span class="card-stat-label">BLK</span><span class="card-stat-value mid">65</span></div>
+          <div class="card-stat"><span class="card-stat-label">DIG</span><span class="card-stat-value high">84</span></div>
+          <div class="card-stat"><span class="card-stat-label">SET</span><span class="card-stat-value high">95</span></div>
+          <div class="card-stat"><span class="card-stat-label">IQ</span><span class="card-stat-value high">92</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- GOLD CARD -->
+    <div class="fifa-card tier-gold">
+      <div class="card-share-btn">&#8599;</div>
+      <span class="card-watermark">VOLLEYQUEST</span>
+      <div class="fifa-card-inner">
+        <div class="card-top">
+          <div class="card-rating-block">
+            <span class="card-overall">81</span>
+            <span class="card-position">OH</span>
+          </div>
+          <div class="card-club-stripe">
+            <div class="card-club-dot">OV</div>
+            <span class="card-club-name">Oslo</span>
+          </div>
+        </div>
+        <div class="card-avatar-area">
+          <div class="card-avatar-ring">
+            <span class="card-avatar-initials">EH</span>
+          </div>
+        </div>
+        <p class="card-player-name">Erik Hansen</p>
+        <p class="card-tier-label">&#9733; Gold &#9733;</p>
+        <div class="card-stats">
+          <div class="card-stat"><span class="card-stat-label">ATK</span><span class="card-stat-value high">89</span></div>
+          <div class="card-stat"><span class="card-stat-label">SRV</span><span class="card-stat-value high">82</span></div>
+          <div class="card-stat"><span class="card-stat-label">BLK</span><span class="card-stat-value mid">74</span></div>
+          <div class="card-stat"><span class="card-stat-label">DIG</span><span class="card-stat-value mid">71</span></div>
+          <div class="card-stat"><span class="card-stat-label">SET</span><span class="card-stat-value low">58</span></div>
+          <div class="card-stat"><span class="card-stat-label">IQ</span><span class="card-stat-value mid">78</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SILVER CARD -->
+    <div class="fifa-card tier-silver">
+      <div class="card-share-btn">&#8599;</div>
+      <span class="card-watermark">VOLLEYQUEST</span>
+      <div class="fifa-card-inner">
+        <div class="card-top">
+          <div class="card-rating-block">
+            <span class="card-overall">71</span>
+            <span class="card-position">MB</span>
+          </div>
+          <div class="card-club-stripe">
+            <div class="card-club-dot">OV</div>
+            <span class="card-club-name">Oslo</span>
+          </div>
+        </div>
+        <div class="card-avatar-area">
+          <div class="card-avatar-ring">
+            <span class="card-avatar-initials">KL</span>
+          </div>
+        </div>
+        <p class="card-player-name">Kristian Larsen</p>
+        <p class="card-tier-label">Silver</p>
+        <div class="card-stats">
+          <div class="card-stat"><span class="card-stat-label">ATK</span><span class="card-stat-value mid">73</span></div>
+          <div class="card-stat"><span class="card-stat-label">SRV</span><span class="card-stat-value low">62</span></div>
+          <div class="card-stat"><span class="card-stat-label">BLK</span><span class="card-stat-value high">85</span></div>
+          <div class="card-stat"><span class="card-stat-label">DIG</span><span class="card-stat-value low">59</span></div>
+          <div class="card-stat"><span class="card-stat-label">SET</span><span class="card-stat-value low">45</span></div>
+          <div class="card-stat"><span class="card-stat-label">IQ</span><span class="card-stat-value mid">72</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BRONZE CARD -->
+    <div class="fifa-card tier-bronze">
+      <div class="card-share-btn">&#8599;</div>
+      <span class="card-watermark">VOLLEYQUEST</span>
+      <div class="fifa-card-inner">
+        <div class="card-top">
+          <div class="card-rating-block">
+            <span class="card-overall">58</span>
+            <span class="card-position">L</span>
+          </div>
+          <div class="card-club-stripe">
+            <div class="card-club-dot">OV</div>
+            <span class="card-club-name">Oslo</span>
+          </div>
+        </div>
+        <div class="card-avatar-area">
+          <div class="card-avatar-ring">
+            <span class="card-avatar-initials">OB</span>
+          </div>
+        </div>
+        <p class="card-player-name">Ole Berg</p>
+        <p class="card-tier-label">Bronze</p>
+        <div class="card-stats">
+          <div class="card-stat"><span class="card-stat-label">ATK</span><span class="card-stat-value low">22</span></div>
+          <div class="card-stat"><span class="card-stat-label">SRV</span><span class="card-stat-value low">48</span></div>
+          <div class="card-stat"><span class="card-stat-label">BLK</span><span class="card-stat-value low">15</span></div>
+          <div class="card-stat"><span class="card-stat-label">DIG</span><span class="card-stat-value high">82</span></div>
+          <div class="card-stat"><span class="card-stat-label">SET</span><span class="card-stat-value low">38</span></div>
+          <div class="card-stat"><span class="card-stat-label">IQ</span><span class="card-stat-value mid">70</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- IRON CARD -->
+    <div class="fifa-card tier-iron">
+      <div class="card-share-btn">&#8599;</div>
+      <span class="card-watermark">VOLLEYQUEST</span>
+      <div class="fifa-card-inner">
+        <div class="card-top">
+          <div class="card-rating-block">
+            <span class="card-overall">42</span>
+            <span class="card-position">OH</span>
+          </div>
+          <div class="card-club-stripe">
+            <div class="card-club-dot" style="background: #059669; box-shadow: 0 2px 8px rgba(5,150,105,0.3);">AK</div>
+            <span class="card-club-name">Asker</span>
+          </div>
+        </div>
+        <div class="card-avatar-area">
+          <div class="card-avatar-ring">
+            <span class="card-avatar-initials">LM</span>
+          </div>
+        </div>
+        <p class="card-player-name">Lars Moen</p>
+        <p class="card-tier-label">Iron</p>
+        <div class="card-stats">
+          <div class="card-stat"><span class="card-stat-label">ATK</span><span class="card-stat-value low">38</span></div>
+          <div class="card-stat"><span class="card-stat-label">SRV</span><span class="card-stat-value low">41</span></div>
+          <div class="card-stat"><span class="card-stat-label">BLK</span><span class="card-stat-value low">30</span></div>
+          <div class="card-stat"><span class="card-stat-label">DIG</span><span class="card-stat-value low">45</span></div>
+          <div class="card-stat"><span class="card-stat-label">SET</span><span class="card-stat-value low">35</span></div>
+          <div class="card-stat"><span class="card-stat-label">IQ</span><span class="card-stat-value low">52</span></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Share callout -->
+  <div class="reveal" style="text-align: center; margin-top: var(--space-2xl);">
+    <p style="font-family: var(--font-display); font-weight: 700; font-size: 16px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: var(--space-sm);">Built to Share</p>
+    <p style="color: var(--vq-mid-gray); font-size: 14px; max-width: 500px; margin: 0 auto;">Cards render at a fixed aspect ratio optimized for Instagram stories and feed posts. The VQ watermark and club branding travel with every share — organic growth built into the product.</p>
+  </div>
+</section>
+
+<div class="divider" style="max-width: 1400px; margin-left: auto; margin-right: auto;"></div>
+
+<!-- ============================================
+     PROGRESS GRAPHS
+     ============================================ -->
+<section class="section">
+  <div class="reveal">
+    <p class="section-label">Analytics</p>
+    <h2 class="section-title">Progress Over Time</h2>
+    <p class="section-desc">Players see their growth story. Coaches see team trends. Line charts for progression, radar for attribute balance, bars for comparative stats.</p>
+  </div>
+
+  <div class="graphs-grid">
+
+    <!-- OVERALL RATING OVER TIME -->
+    <div class="graph-card reveal">
+      <div class="graph-card-header">
+        <span class="graph-card-title">Overall Rating</span>
+        <div class="graph-period-toggle">
+          <button class="graph-period-btn">4W</button>
+          <button class="graph-period-btn active">Season</button>
+          <button class="graph-period-btn">All</button>
+        </div>
+      </div>
+      <div class="graph-body">
+        <svg class="chart-svg" viewBox="0 0 480 200" preserveAspectRatio="xMidYMid meet">
+          <!-- Grid lines -->
+          <line x1="40" y1="20" x2="460" y2="20" class="chart-grid-line"/>
+          <line x1="40" y1="65" x2="460" y2="65" class="chart-grid-line"/>
+          <line x1="40" y1="110" x2="460" y2="110" class="chart-grid-line"/>
+          <line x1="40" y1="155" x2="460" y2="155" class="chart-grid-line"/>
+          <!-- Y axis labels -->
+          <text x="32" y="24" text-anchor="end" class="chart-axis-label">90</text>
+          <text x="32" y="69" text-anchor="end" class="chart-axis-label">80</text>
+          <text x="32" y="114" text-anchor="end" class="chart-axis-label">70</text>
+          <text x="32" y="159" text-anchor="end" class="chart-axis-label">60</text>
+          <!-- X axis labels -->
+          <text x="75" y="185" text-anchor="middle" class="chart-x-label">Sep</text>
+          <text x="145" y="185" text-anchor="middle" class="chart-x-label">Oct</text>
+          <text x="215" y="185" text-anchor="middle" class="chart-x-label">Nov</text>
+          <text x="285" y="185" text-anchor="middle" class="chart-x-label">Dec</text>
+          <text x="355" y="185" text-anchor="middle" class="chart-x-label">Jan</text>
+          <text x="425" y="185" text-anchor="middle" class="chart-x-label">Feb</text>
+          <!-- Area fill -->
+          <path d="M75,142 L145,128 L215,119 L285,105 L355,87 L425,69 L425,170 L75,170 Z" fill="url(#ratingGrad)" class="chart-area" style="opacity:0.12;"/>
+          <defs>
+            <linearGradient id="ratingGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#E63946"/>
+              <stop offset="100%" stop-color="#E63946" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          <!-- Line shadow -->
+          <polyline points="75,142 145,128 215,119 285,105 355,87 425,69" class="chart-line-shadow" stroke="var(--club-primary)"/>
+          <!-- Main line -->
+          <polyline points="75,142 145,128 215,119 285,105 355,87 425,69" class="chart-line" stroke="var(--club-primary)">
+            <animate attributeName="stroke-dasharray" from="0 1000" to="600 0" dur="1.5s" fill="freeze"/>
+          </polyline>
+          <!-- Dots -->
+          <circle cx="75" cy="142" r="4" fill="var(--vq-navy-90)" stroke="var(--club-primary)" class="chart-dot"/>
+          <circle cx="145" cy="128" r="4" fill="var(--vq-navy-90)" stroke="var(--club-primary)" class="chart-dot"/>
+          <circle cx="215" cy="119" r="4" fill="var(--vq-navy-90)" stroke="var(--club-primary)" class="chart-dot"/>
+          <circle cx="285" cy="105" r="4" fill="var(--vq-navy-90)" stroke="var(--club-primary)" class="chart-dot"/>
+          <circle cx="355" cy="87" r="4" fill="var(--vq-navy-90)" stroke="var(--club-primary)" class="chart-dot"/>
+          <circle cx="425" cy="69" r="4" fill="var(--club-primary)" stroke="var(--club-primary)" class="chart-dot"/>
+        </svg>
+      </div>
+      <div class="graph-deltas">
+        <div class="graph-delta">
+          <p class="graph-delta-value up">+13</p>
+          <p class="graph-delta-label">Season Change</p>
+        </div>
+        <div class="graph-delta">
+          <p class="graph-delta-value up">+4</p>
+          <p class="graph-delta-label">Last Month</p>
+        </div>
+        <div class="graph-delta">
+          <p class="graph-delta-value" style="color: var(--vq-white);">81</p>
+          <p class="graph-delta-label">Current</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- RADAR: ATTRIBUTE COMPARISON -->
+    <div class="graph-card reveal">
+      <div class="graph-card-header">
+        <span class="graph-card-title">Attribute Radar</span>
+        <div class="graph-period-toggle">
+          <button class="graph-period-btn active">Now vs Start</button>
+        </div>
+      </div>
+      <div class="graph-body" style="padding-bottom: var(--space-sm);">
+        <svg class="radar-chart-full" viewBox="0 0 340 300" preserveAspectRatio="xMidYMid meet">
+          <g transform="translate(170, 140)">
+            <!-- Rings -->
+            <polygon points="0,-110 95.3,-55 95.3,55 0,110 -95.3,55 -95.3,-55" class="radar-ring"/>
+            <polygon points="0,-82.5 71.5,-41.3 71.5,41.3 0,82.5 -71.5,41.3 -71.5,-41.3" class="radar-ring"/>
+            <polygon points="0,-55 47.6,-27.5 47.6,27.5 0,55 -47.6,27.5 -47.6,-27.5" class="radar-ring"/>
+            <polygon points="0,-27.5 23.8,-13.8 23.8,13.8 0,27.5 -23.8,13.8 -23.8,-13.8" class="radar-ring"/>
+            <!-- Spokes -->
+            <line x1="0" y1="0" x2="0" y2="-110" class="radar-spoke"/>
+            <line x1="0" y1="0" x2="95.3" y2="-55" class="radar-spoke"/>
+            <line x1="0" y1="0" x2="95.3" y2="55" class="radar-spoke"/>
+            <line x1="0" y1="0" x2="0" y2="110" class="radar-spoke"/>
+            <line x1="0" y1="0" x2="-95.3" y2="55" class="radar-spoke"/>
+            <line x1="0" y1="0" x2="-95.3" y2="-55" class="radar-spoke"/>
+            <!-- Previous season (dashed) — lower values -->
+            <polygon points="0,-66 52,-33 42,33 0,55 -48,27.5 -55,-30" class="radar-area-prev"/>
+            <!-- Current season — higher values -->
+            <polygon points="0,-97.9 77.8,-44.6 64.2,45.1 0,77 -50.5,45.1 -71.5,-38.5" class="radar-area-current">
+              <animate attributeName="opacity" from="0" to="1" dur="0.8s" fill="freeze"/>
+            </polygon>
+            <!-- Current dots -->
+            <circle cx="0" cy="-97.9" r="4" class="radar-dot"/>
+            <circle cx="77.8" cy="-44.6" r="4" class="radar-dot"/>
+            <circle cx="64.2" cy="45.1" r="4" class="radar-dot"/>
+            <circle cx="0" cy="77" r="4" class="radar-dot"/>
+            <circle cx="-50.5" cy="45.1" r="4" class="radar-dot"/>
+            <circle cx="-71.5" cy="-38.5" r="4" class="radar-dot"/>
+            <!-- Labels + values -->
+            <text x="0" y="-120" text-anchor="middle" class="radar-label">ATK</text>
+            <text x="0" y="-131" text-anchor="middle" class="radar-value">89</text>
+            <text x="108" y="-55" text-anchor="start" class="radar-label">SRV</text>
+            <text x="108" y="-43" text-anchor="start" class="radar-value">82</text>
+            <text x="108" y="60" text-anchor="start" class="radar-label">BLK</text>
+            <text x="108" y="72" text-anchor="start" class="radar-value">74</text>
+            <text x="0" y="130" text-anchor="middle" class="radar-label">DIG</text>
+            <text x="0" y="142" text-anchor="middle" class="radar-value">71</text>
+            <text x="-108" y="60" text-anchor="end" class="radar-label">SET</text>
+            <text x="-108" y="72" text-anchor="end" class="radar-value">58</text>
+            <text x="-108" y="-55" text-anchor="end" class="radar-label">IQ</text>
+            <text x="-108" y="-43" text-anchor="end" class="radar-value">78</text>
+          </g>
+        </svg>
+        <div class="chart-legend">
+          <span class="chart-legend-item"><span class="chart-legend-line" style="background: var(--club-primary);"></span> Current</span>
+          <span class="chart-legend-item"><span class="chart-legend-line-dashed" style="border-color: rgba(255,255,255,0.25);"></span> Season Start</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- KILLS PER SET TREND (full width) -->
+    <div class="graph-card graph-card-full reveal">
+      <div class="graph-card-header">
+        <span class="graph-card-title">Kills Per Set — Last 10 Matches</span>
+        <div class="graph-period-toggle">
+          <button class="graph-period-btn active">Kills/Set</button>
+          <button class="graph-period-btn">Aces/Set</button>
+          <button class="graph-period-btn">Digs/Set</button>
+        </div>
+      </div>
+      <div class="graph-body">
+        <svg class="chart-svg" viewBox="0 0 700 180" preserveAspectRatio="xMidYMid meet">
+          <!-- Grid -->
+          <line x1="40" y1="15" x2="680" y2="15" class="chart-grid-line"/>
+          <line x1="40" y1="50" x2="680" y2="50" class="chart-grid-line"/>
+          <line x1="40" y1="85" x2="680" y2="85" class="chart-grid-line"/>
+          <line x1="40" y1="120" x2="680" y2="120" class="chart-grid-line"/>
+          <line x1="40" y1="155" x2="680" y2="155" class="chart-grid-line"/>
+          <!-- Y labels -->
+          <text x="32" y="19" text-anchor="end" class="chart-axis-label">6.0</text>
+          <text x="32" y="54" text-anchor="end" class="chart-axis-label">5.0</text>
+          <text x="32" y="89" text-anchor="end" class="chart-axis-label">4.0</text>
+          <text x="32" y="124" text-anchor="end" class="chart-axis-label">3.0</text>
+          <text x="32" y="159" text-anchor="end" class="chart-axis-label">2.0</text>
+          <!-- X labels (match numbers) -->
+          <text x="104" y="175" text-anchor="middle" class="chart-x-label">M1</text>
+          <text x="168" y="175" text-anchor="middle" class="chart-x-label">M2</text>
+          <text x="232" y="175" text-anchor="middle" class="chart-x-label">M3</text>
+          <text x="296" y="175" text-anchor="middle" class="chart-x-label">M4</text>
+          <text x="360" y="175" text-anchor="middle" class="chart-x-label">M5</text>
+          <text x="424" y="175" text-anchor="middle" class="chart-x-label">M6</text>
+          <text x="488" y="175" text-anchor="middle" class="chart-x-label">M7</text>
+          <text x="552" y="175" text-anchor="middle" class="chart-x-label">M8</text>
+          <text x="616" y="175" text-anchor="middle" class="chart-x-label">M9</text>
+          <text x="680" y="175" text-anchor="middle" class="chart-x-label">M10</text>
+          <!-- Team avg line (dashed) -->
+          <line x1="104" y1="92" x2="680" y2="85" stroke="rgba(255,255,255,0.15)" stroke-width="1.5" stroke-dasharray="6 4"/>
+          <text x="90" y="92" text-anchor="end" style="font-family:var(--font-mono);font-size:9px;fill:rgba(255,255,255,0.25);">AVG</text>
+          <!-- Area -->
+          <path d="M104,120 L168,99 L232,113 L296,78 L360,85 L424,64 L488,71 L552,50 L616,57 L680,36 L680,155 L104,155 Z" fill="url(#killsGrad)" style="opacity:0.1;">
+            <animate attributeName="opacity" from="0" to="0.1" dur="0.8s" fill="freeze"/>
+          </path>
+          <defs>
+            <linearGradient id="killsGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="var(--club-secondary)"/>
+              <stop offset="100%" stop-color="var(--club-secondary)" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          <!-- Line shadow -->
+          <polyline points="104,120 168,99 232,113 296,78 360,85 424,64 488,71 552,50 616,57 680,36" class="chart-line-shadow" stroke="var(--club-secondary)"/>
+          <!-- Main line -->
+          <polyline points="104,120 168,99 232,113 296,78 360,85 424,64 488,71 552,50 616,57 680,36" class="chart-line" stroke="var(--club-secondary)">
+            <animate attributeName="stroke-dasharray" from="0 1500" to="900 0" dur="2s" fill="freeze"/>
+          </polyline>
+          <!-- Dots -->
+          <circle cx="104" cy="120" r="4" fill="var(--vq-navy-90)" stroke="var(--club-secondary)" class="chart-dot"/>
+          <circle cx="168" cy="99" r="4" fill="var(--vq-navy-90)" stroke="var(--club-secondary)" class="chart-dot"/>
+          <circle cx="232" cy="113" r="4" fill="var(--vq-navy-90)" stroke="var(--club-secondary)" class="chart-dot"/>
+          <circle cx="296" cy="78" r="4" fill="var(--vq-navy-90)" stroke="var(--club-secondary)" class="chart-dot"/>
+          <circle cx="360" cy="85" r="4" fill="var(--vq-navy-90)" stroke="var(--club-secondary)" class="chart-dot"/>
+          <circle cx="424" cy="64" r="4" fill="var(--vq-navy-90)" stroke="var(--club-secondary)" class="chart-dot"/>
+          <circle cx="488" cy="71" r="4" fill="var(--vq-navy-90)" stroke="var(--club-secondary)" class="chart-dot"/>
+          <circle cx="552" cy="50" r="4" fill="var(--vq-navy-90)" stroke="var(--club-secondary)" class="chart-dot"/>
+          <circle cx="616" cy="57" r="4" fill="var(--vq-navy-90)" stroke="var(--club-secondary)" class="chart-dot"/>
+          <circle cx="680" cy="36" r="4" fill="var(--club-secondary)" stroke="var(--club-secondary)" class="chart-dot"/>
+        </svg>
+      </div>
+      <div class="graph-deltas">
+        <div class="graph-delta">
+          <p class="graph-delta-value up">+1.8</p>
+          <p class="graph-delta-label">10-Match Trend</p>
+        </div>
+        <div class="graph-delta">
+          <p class="graph-delta-value" style="color: var(--vq-white);">5.4</p>
+          <p class="graph-delta-label">Last Match</p>
+        </div>
+        <div class="graph-delta">
+          <p class="graph-delta-value" style="color: var(--vq-white);">3.9</p>
+          <p class="graph-delta-label">Team Avg</p>
+        </div>
+        <div class="graph-delta">
+          <p class="graph-delta-value up">Top 3</p>
+          <p class="graph-delta-label">League Rank</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ATTRIBUTE BARS: COMPARING TWO TIME PERIODS -->
+    <div class="graph-card reveal">
+      <div class="graph-card-header">
+        <span class="graph-card-title">Stat Growth</span>
+        <div class="graph-period-toggle">
+          <button class="graph-period-btn active">vs Last Month</button>
+        </div>
+      </div>
+      <div class="graph-body">
+        <div class="bar-chart-row">
+          <span class="bar-chart-label">ATK</span>
+          <div class="bar-chart-track">
+            <div class="bar-chart-fill" style="width: 89%; background: linear-gradient(90deg, var(--club-primary), rgba(230,57,70,0.7));">
+              <span class="bar-chart-fill-value">89</span>
+            </div>
+          </div>
+        </div>
+        <div class="bar-chart-row">
+          <span class="bar-chart-label">SRV</span>
+          <div class="bar-chart-track">
+            <div class="bar-chart-fill" style="width: 82%; background: linear-gradient(90deg, var(--club-primary), rgba(230,57,70,0.7));">
+              <span class="bar-chart-fill-value">82</span>
+            </div>
+          </div>
+        </div>
+        <div class="bar-chart-row">
+          <span class="bar-chart-label">BLK</span>
+          <div class="bar-chart-track">
+            <div class="bar-chart-fill" style="width: 74%; background: linear-gradient(90deg, var(--club-secondary), rgba(255,183,3,0.7));">
+              <span class="bar-chart-fill-value">74</span>
+            </div>
+          </div>
+        </div>
+        <div class="bar-chart-row">
+          <span class="bar-chart-label">DIG</span>
+          <div class="bar-chart-track">
+            <div class="bar-chart-fill" style="width: 71%; background: linear-gradient(90deg, var(--club-secondary), rgba(255,183,3,0.7));">
+              <span class="bar-chart-fill-value">71</span>
+            </div>
+          </div>
+        </div>
+        <div class="bar-chart-row">
+          <span class="bar-chart-label">SET</span>
+          <div class="bar-chart-track">
+            <div class="bar-chart-fill" style="width: 58%; background: linear-gradient(90deg, var(--vq-mid-gray), rgba(139,149,165,0.5));">
+              <span class="bar-chart-fill-value">58</span>
+            </div>
+          </div>
+        </div>
+        <div class="bar-chart-row">
+          <span class="bar-chart-label">IQ</span>
+          <div class="bar-chart-track">
+            <div class="bar-chart-fill" style="width: 78%; background: linear-gradient(90deg, var(--club-primary), rgba(230,57,70,0.7));">
+              <span class="bar-chart-fill-value">78</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="graph-deltas">
+        <div class="graph-delta">
+          <p class="graph-delta-value up">+5 ATK</p>
+          <p class="graph-delta-label">Biggest Gain</p>
+        </div>
+        <div class="graph-delta">
+          <p class="graph-delta-value flat">0 SET</p>
+          <p class="graph-delta-label">Unchanged</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ATTENDANCE HEATMAP-STYLE -->
+    <div class="graph-card reveal">
+      <div class="graph-card-header">
+        <span class="graph-card-title">Attendance Streak</span>
+        <div class="graph-period-toggle">
+          <button class="graph-period-btn active">Last 8 Weeks</button>
+        </div>
+      </div>
+      <div class="graph-body">
+        <div style="display: grid; grid-template-columns: repeat(8, 1fr); gap: 6px;">
+          <!-- Week labels -->
+          <div style="text-align:center;font-family:var(--font-display);font-size:9px;letter-spacing:1px;color:var(--vq-mid-gray);text-transform:uppercase;">W1</div>
+          <div style="text-align:center;font-family:var(--font-display);font-size:9px;letter-spacing:1px;color:var(--vq-mid-gray);text-transform:uppercase;">W2</div>
+          <div style="text-align:center;font-family:var(--font-display);font-size:9px;letter-spacing:1px;color:var(--vq-mid-gray);text-transform:uppercase;">W3</div>
+          <div style="text-align:center;font-family:var(--font-display);font-size:9px;letter-spacing:1px;color:var(--vq-mid-gray);text-transform:uppercase;">W4</div>
+          <div style="text-align:center;font-family:var(--font-display);font-size:9px;letter-spacing:1px;color:var(--vq-mid-gray);text-transform:uppercase;">W5</div>
+          <div style="text-align:center;font-family:var(--font-display);font-size:9px;letter-spacing:1px;color:var(--vq-mid-gray);text-transform:uppercase;">W6</div>
+          <div style="text-align:center;font-family:var(--font-display);font-size:9px;letter-spacing:1px;color:var(--vq-mid-gray);text-transform:uppercase;">W7</div>
+          <div style="text-align:center;font-family:var(--font-display);font-size:9px;letter-spacing:1px;color:var(--vq-mid-gray);text-transform:uppercase;">W8</div>
+          <!-- Practice row -->
+          <div style="height:32px;border-radius:4px;background:rgba(34,197,94,0.7);" title="Practice: Present"></div>
+          <div style="height:32px;border-radius:4px;background:rgba(34,197,94,0.7);" title="Practice: Present"></div>
+          <div style="height:32px;border-radius:4px;background:rgba(239,68,68,0.5);" title="Practice: Absent"></div>
+          <div style="height:32px;border-radius:4px;background:rgba(34,197,94,0.7);" title="Practice: Present"></div>
+          <div style="height:32px;border-radius:4px;background:rgba(34,197,94,0.7);" title="Practice: Present"></div>
+          <div style="height:32px;border-radius:4px;background:rgba(34,197,94,0.7);" title="Practice: Present"></div>
+          <div style="height:32px;border-radius:4px;background:rgba(34,197,94,0.7);" title="Practice: Present"></div>
+          <div style="height:32px;border-radius:4px;background:rgba(34,197,94,0.7);" title="Practice: Present"></div>
+          <!-- Practice 2 row -->
+          <div style="height:32px;border-radius:4px;background:rgba(34,197,94,0.7);"></div>
+          <div style="height:32px;border-radius:4px;background:rgba(245,158,11,0.5);" title="Practice: Late"></div>
+          <div style="height:32px;border-radius:4px;background:rgba(34,197,94,0.7);"></div>
+          <div style="height:32px;border-radius:4px;background:rgba(34,197,94,0.7);"></div>
+          <div style="height:32px;border-radius:4px;background:rgba(34,197,94,0.7);"></div>
+          <div style="height:32px;border-radius:4px;background:rgba(239,68,68,0.5);"></div>
+          <div style="height:32px;border-radius:4px;background:rgba(34,197,94,0.7);"></div>
+          <div style="height:32px;border-radius:4px;background:rgba(34,197,94,0.7);"></div>
+          <!-- Match row -->
+          <div style="height:32px;border-radius:4px;background:rgba(230,57,70,0.15);border:1px solid rgba(230,57,70,0.3);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:9px;font-weight:700;color:var(--club-primary);letter-spacing:1px;">W</div>
+          <div style="height:32px;border-radius:4px;background:rgba(255,255,255,0.02);"></div>
+          <div style="height:32px;border-radius:4px;background:rgba(230,57,70,0.15);border:1px solid rgba(230,57,70,0.3);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:9px;font-weight:700;color:var(--club-primary);letter-spacing:1px;">L</div>
+          <div style="height:32px;border-radius:4px;background:rgba(255,255,255,0.02);"></div>
+          <div style="height:32px;border-radius:4px;background:rgba(230,57,70,0.15);border:1px solid rgba(230,57,70,0.3);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:9px;font-weight:700;color:var(--color-success);letter-spacing:1px;">W</div>
+          <div style="height:32px;border-radius:4px;background:rgba(230,57,70,0.15);border:1px solid rgba(230,57,70,0.3);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:9px;font-weight:700;color:var(--color-success);letter-spacing:1px;">W</div>
+          <div style="height:32px;border-radius:4px;background:rgba(255,255,255,0.02);"></div>
+          <div style="height:32px;border-radius:4px;background:rgba(230,57,70,0.15);border:1px solid rgba(230,57,70,0.3);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-size:9px;font-weight:700;color:var(--color-success);letter-spacing:1px;">W</div>
+        </div>
+        <!-- Legend -->
+        <div class="chart-legend" style="margin-top: var(--space-md);">
+          <span class="chart-legend-item"><span class="chart-legend-line" style="background: rgba(34,197,94,0.7);"></span> Present</span>
+          <span class="chart-legend-item"><span class="chart-legend-line" style="background: rgba(245,158,11,0.5);"></span> Late</span>
+          <span class="chart-legend-item"><span class="chart-legend-line" style="background: rgba(239,68,68,0.5);"></span> Absent</span>
+          <span class="chart-legend-item"><span style="font-family:var(--font-display);font-size:10px;font-weight:700;color:var(--club-primary);">W/L</span> Match</span>
+        </div>
+      </div>
+      <div class="graph-deltas">
+        <div class="graph-delta">
+          <p class="graph-delta-value" style="color: var(--vq-white);">95%</p>
+          <p class="graph-delta-label">Attendance</p>
+        </div>
+        <div class="graph-delta">
+          <p class="graph-delta-value up">3W-1L</p>
+          <p class="graph-delta-label">Match Record</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<div class="divider" style="max-width: 1400px; margin-left: auto; margin-right: auto;"></div>
+
+<!-- ============================================
+     POST-GAME ANALYTICS
+     ============================================ -->
+<section class="section">
+  <div class="reveal">
+    <p class="section-label">Post-Match</p>
+    <h2 class="section-title">Game Recap</h2>
+    <p class="section-desc">Appears after every match. The full story of the game — result, awards, team comparison, individual breakdowns, and XP earned. This is where stats become stories.</p>
+  </div>
+
+  <div class="postgame-wrapper reveal">
+
+    <!-- Match result banner -->
+    <div class="match-result-banner win">
+      <p class="result-outcome win">Victory</p>
+      <div class="result-teams">
+        <div class="result-team">
+          <div class="result-team-logo" style="background: var(--club-primary); box-shadow: 0 4px 16px rgba(230,57,70,0.3);">OV</div>
+          <span class="result-team-name">Oslo Volley</span>
+        </div>
+        <div class="result-score-block">
+          <span class="result-score">3 — 1</span>
+          <span class="result-sets">25-22 &middot; 20-25 &middot; 25-19 &middot; 25-21</span>
+        </div>
+        <div class="result-team">
+          <div class="result-team-logo" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12);">BV</div>
+          <span class="result-team-name">Bergen VBK</span>
+        </div>
+      </div>
+      <div class="result-meta">
+        <span>&#128197; Wed, Feb 5, 2026</span>
+        <span>&#128336; 19:00 — 21:15</span>
+        <span>&#128205; Ekeberg Hallen</span>
+        <span>&#128101; NVF Eliteserien R14</span>
+      </div>
+    </div>
+
+    <!-- Set-by-set -->
+    <div class="sets-breakdown">
+      <div class="set-pill won">
+        <span class="set-pill-label">Set 1</span>
+        <span class="set-pill-score">25-22</span>
+      </div>
+      <div class="set-pill lost">
+        <span class="set-pill-label">Set 2</span>
+        <span class="set-pill-score">20-25</span>
+      </div>
+      <div class="set-pill won">
+        <span class="set-pill-label">Set 3</span>
+        <span class="set-pill-score">25-19</span>
+      </div>
+      <div class="set-pill won">
+        <span class="set-pill-label">Set 4</span>
+        <span class="set-pill-score">25-21</span>
+      </div>
+    </div>
+
+    <!-- Awards -->
+    <div class="awards-strip">
+      <div class="award-card mvp">
+        <div class="award-icon">&#127942;</div>
+        <p class="award-title">MVP</p>
+        <p class="award-player">Erik Hansen</p>
+        <p class="award-stat">24 pts &middot; 52% kill eff.</p>
+      </div>
+      <div class="award-card attacker">
+        <div class="award-icon">&#9889;</div>
+        <p class="award-title">Top Attacker</p>
+        <p class="award-player">Ingrid Johansen</p>
+        <p class="award-stat">19 kills &middot; 48% eff.</p>
+      </div>
+      <div class="award-card defender">
+        <div class="award-icon">&#128737;</div>
+        <p class="award-title">Best Defender</p>
+        <p class="award-player">Ole Berg</p>
+        <p class="award-stat">18 digs &middot; 4 saves</p>
+      </div>
+      <div class="award-card server">
+        <div class="award-icon">&#127951;</div>
+        <p class="award-title">Ace King</p>
+        <p class="award-player">Sofia Nilsen</p>
+        <p class="award-stat">5 aces &middot; 92% serve in</p>
+      </div>
+      <div class="award-card playmaker">
+        <div class="award-icon">&#129309;</div>
+        <p class="award-title">Playmaker</p>
+        <p class="award-player">Sofia Nilsen</p>
+        <p class="award-stat">38 assists &middot; 1.2 err/set</p>
+      </div>
+    </div>
+
+    <!-- Team stats comparison -->
+    <div class="team-compare">
+      <div style="font-family: var(--font-display); font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: var(--space-lg); text-align: center;">
+        <span style="color: var(--club-primary);">Oslo</span>
+        <span style="color: var(--vq-mid-gray); margin: 0 var(--space-md);">vs</span>
+        <span style="color: var(--vq-mid-gray);">Bergen</span>
+      </div>
+
+      <div class="team-compare-row">
+        <div class="tc-bar-container">
+          <div class="tc-bar-left"><div class="tc-fill tc-fill-left" style="width: 62%;"><span class="tc-fill-value">58</span></div></div>
+          <div class="tc-vs-dot"></div>
+          <div class="tc-bar-right"><div class="tc-fill tc-fill-right" style="width: 50%;"><span class="tc-fill-value">47</span></div></div>
+        </div>
+        <span class="tc-label">Kills</span>
+      </div>
+
+      <div class="team-compare-row">
+        <div class="tc-bar-container">
+          <div class="tc-bar-left"><div class="tc-fill tc-fill-left" style="width: 55%;"><span class="tc-fill-value">8</span></div></div>
+          <div class="tc-vs-dot"></div>
+          <div class="tc-bar-right"><div class="tc-fill tc-fill-right" style="width: 35%;"><span class="tc-fill-value">5</span></div></div>
+        </div>
+        <span class="tc-label">Aces</span>
+      </div>
+
+      <div class="team-compare-row">
+        <div class="tc-bar-container">
+          <div class="tc-bar-left"><div class="tc-fill tc-fill-left" style="width: 50%;"><span class="tc-fill-value">12</span></div></div>
+          <div class="tc-vs-dot"></div>
+          <div class="tc-bar-right"><div class="tc-fill tc-fill-right" style="width: 45%;"><span class="tc-fill-value">10</span></div></div>
+        </div>
+        <span class="tc-label">Blocks</span>
+      </div>
+
+      <div class="team-compare-row">
+        <div class="tc-bar-container">
+          <div class="tc-bar-left"><div class="tc-fill tc-fill-left" style="width: 58%;"><span class="tc-fill-value">42</span></div></div>
+          <div class="tc-vs-dot"></div>
+          <div class="tc-bar-right"><div class="tc-fill tc-fill-right" style="width: 55%;"><span class="tc-fill-value">39</span></div></div>
+        </div>
+        <span class="tc-label">Digs</span>
+      </div>
+
+      <div class="team-compare-row">
+        <div class="tc-bar-container">
+          <div class="tc-bar-left"><div class="tc-fill tc-fill-left" style="width: 45%;"><span class="tc-fill-value">48%</span></div></div>
+          <div class="tc-vs-dot"></div>
+          <div class="tc-bar-right"><div class="tc-fill tc-fill-right" style="width: 38%;"><span class="tc-fill-value">41%</span></div></div>
+        </div>
+        <span class="tc-label">ATK EFF</span>
+      </div>
+
+      <div class="team-compare-row">
+        <div class="tc-bar-container">
+          <div class="tc-bar-left"><div class="tc-fill tc-fill-left" style="width: 40%;"><span class="tc-fill-value">14</span></div></div>
+          <div class="tc-vs-dot"></div>
+          <div class="tc-bar-right"><div class="tc-fill tc-fill-right" style="width: 52%;"><span class="tc-fill-value">18</span></div></div>
+        </div>
+        <span class="tc-label">Errors</span>
+      </div>
+    </div>
+
+    <!-- Individual player stats table -->
+    <div class="postgame-table-wrap">
+      <div class="postgame-table-header">
+        <span class="postgame-table-title">Individual Performance</span>
+        <span style="font-family: var(--font-mono); font-size: 11px; color: var(--vq-mid-gray);">4 sets played</span>
+      </div>
+      <div style="overflow-x: auto;">
+        <table class="postgame-table">
+          <thead>
+            <tr>
+              <th style="min-width:160px;">Player</th>
+              <th>PTS</th>
+              <th>K</th>
+              <th>K%</th>
+              <th>A</th>
+              <th>ACE</th>
+              <th>BLK</th>
+              <th>DIG</th>
+              <th>ERR</th>
+              <th>Rating</th>
+              <th>&#916;</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="mvp-row">
+              <td>
+                <span class="player-avatar">EH</span>Erik Hansen
+                <span class="mvp-badge-inline">&#127942; MVP</span>
+              </td>
+              <td class="stat-highlight">24</td>
+              <td class="stat-highlight">21</td>
+              <td class="stat-highlight">52%</td>
+              <td>1</td>
+              <td>2</td>
+              <td>1</td>
+              <td>6</td>
+              <td>3</td>
+              <td style="font-weight:700;">8.4</td>
+              <td><span class="rating-change up">+2</span></td>
+            </tr>
+            <tr>
+              <td><span class="player-avatar">SN</span>Sofia Nilsen</td>
+              <td>7</td>
+              <td>2</td>
+              <td>33%</td>
+              <td class="stat-highlight">38</td>
+              <td class="stat-highlight">5</td>
+              <td>0</td>
+              <td>8</td>
+              <td>2</td>
+              <td style="font-weight:700;">8.1</td>
+              <td><span class="rating-change up">+1</span></td>
+            </tr>
+            <tr>
+              <td><span class="player-avatar">IJ</span>Ingrid Johansen</td>
+              <td>22</td>
+              <td>19</td>
+              <td>48%</td>
+              <td>0</td>
+              <td>1</td>
+              <td>2</td>
+              <td>5</td>
+              <td>4</td>
+              <td style="font-weight:700;">7.6</td>
+              <td><span class="rating-change up">+1</span></td>
+            </tr>
+            <tr>
+              <td><span class="player-avatar">KL</span>Kristian Larsen</td>
+              <td>14</td>
+              <td>6</td>
+              <td>40%</td>
+              <td>0</td>
+              <td>0</td>
+              <td class="stat-highlight">8</td>
+              <td>3</td>
+              <td>2</td>
+              <td style="font-weight:700;">7.2</td>
+              <td><span class="rating-change up">+1</span></td>
+            </tr>
+            <tr>
+              <td><span class="player-avatar">OB</span>Ole Berg</td>
+              <td>0</td>
+              <td>0</td>
+              <td>—</td>
+              <td>0</td>
+              <td>0</td>
+              <td>0</td>
+              <td class="stat-highlight">18</td>
+              <td>1</td>
+              <td style="font-weight:700;">7.0</td>
+              <td><span class="rating-change flat">=</span></td>
+            </tr>
+            <tr>
+              <td><span class="player-avatar">MH</span>Magnus Haugen</td>
+              <td>10</td>
+              <td>8</td>
+              <td>44%</td>
+              <td>0</td>
+              <td>0</td>
+              <td>1</td>
+              <td>4</td>
+              <td>5</td>
+              <td style="font-weight:700;">6.3</td>
+              <td><span class="rating-change down">-1</span></td>
+            </tr>
+            <tr>
+              <td><span class="player-avatar">TS</span>Thomas Strand</td>
+              <td>2</td>
+              <td>2</td>
+              <td>29%</td>
+              <td>0</td>
+              <td>0</td>
+              <td>0</td>
+              <td>2</td>
+              <td>3</td>
+              <td style="font-weight:700;">5.8</td>
+              <td><span class="rating-change down">-1</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- XP earned -->
+    <div class="xp-earned-bar">
+      <span class="xp-earned-label">XP Earned</span>
+      <span class="xp-earned-amount">+340 XP</span>
+      <div class="xp-earned-breakdown">
+        <span class="xp-tag">Win bonus <span>+100</span></span>
+        <span class="xp-tag">MVP <span>+75</span></span>
+        <span class="xp-tag">20+ kills <span>+50</span></span>
+        <span class="xp-tag">50%+ eff. <span>+40</span></span>
+        <span class="xp-tag">Attendance <span>+25</span></span>
+        <span class="xp-tag">Base match <span>+50</span></span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<div class="divider" style="max-width: 1400px; margin-left: auto; margin-right: auto;"></div>
+
+<!-- ============================================
+     CARD COMPONENTS
+     ============================================ -->
+<section class="section reveal">
+  <p class="section-label">Components</p>
+  <h2 class="section-title">Cards</h2>
+  <p class="section-desc">Consistent card patterns used across both views. Club accent stripe on top, subtle borders, and hover elevation.</p>
+
+  <div class="card-grid">
+    <div class="card">
+      <div class="card-accent-top"></div>
+      <div class="card-header">
+        <span style="font-family: var(--font-display); font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: 1px;">Info Card</span>
+        <span style="font-size: 12px; color: var(--vq-mid-gray);">Default</span>
+      </div>
+      <div class="card-body">
+        <p style="font-size: 14px; color: var(--vq-light-gray);">Standard card with accent stripe, header with metadata, and body content. Used for schedule items, announcements, and stat summaries.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-accent-top" style="background: var(--vq-teal);"></div>
+      <div class="card-header">
+        <span style="font-family: var(--font-display); font-weight: 700; font-size: 13px; text-transform: uppercase; letter-spacing: 1px;">Teal Accent</span>
+        <span style="font-size: 12px; color: var(--vq-mid-gray);">App Brand</span>
+      </div>
+      <div class="card-body">
+        <p style="font-size: 14px; color: var(--vq-light-gray);">When content is app-level (not club-specific), the teal accent is used instead of club colors. Settings, onboarding, cross-club features.</p>
+      </div>
+    </div>
+
+    <div class="card" style="background: var(--club-primary); border-color: transparent;">
+      <div class="card-body">
+        <p style="font-family: var(--font-display); font-weight: 800; font-size: 22px; text-transform: uppercase; line-height: 1.2; margin-bottom: 8px;">Highlighted Card</p>
+        <p style="font-size: 14px; color: rgba(255,255,255,0.8);">Full club-color background for high-priority items: match day alerts, critical announcements, call-to-action prompts.</p>
+        <button class="btn btn-secondary btn-sm" style="margin-top: var(--space-md); border-color: rgba(255,255,255,0.4);">Take Action</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================
+     ONBOARDING FLOWS
+     ============================================ -->
+<section class="section">
+  <div class="reveal">
+    <p class="section-label">Onboarding</p>
+    <h2 class="section-title">First Impressions</h2>
+    <p class="section-desc">Two paths, both fast. Coaches create the club and invite players. Players join via code, set up a minimal profile, and land on their team. No fake gamification until real data exists.</p>
+  </div>
+
+  <!-- COACH FLOW -->
+  <div class="reveal">
+    <div class="ob-flow-label coach-flow">Coach Flow</div>
+  </div>
+
+  <div class="onboarding-flow reveal">
+
+    <!-- Coach 1: Welcome / Sign Up -->
+    <div class="ob-screen">
+      <div class="ob-status-bar"><span>9:41</span><span>&#9679;&#9679;&#9679;</span></div>
+      <div class="ob-screen-body">
+        <div class="ob-progress">
+          <span class="ob-dot active"></span>
+          <span class="ob-dot"></span>
+          <span class="ob-dot"></span>
+          <span class="ob-dot"></span>
+        </div>
+        <div style="text-align:center; margin-bottom: var(--space-lg);">
+          <div class="logo-mark" style="width:64px;height:64px;margin:0 auto var(--space-md);animation:none;border-radius:var(--radius-md);">
+            <span class="vq-monogram" style="font-size:26px;">VQ</span>
+          </div>
+        </div>
+        <p class="ob-title" style="text-align:center;">Welcome,<br>Coach</p>
+        <p class="ob-subtitle" style="text-align:center;">Set up your team in under a minute. Your players will thank you.</p>
+        <div class="ob-social-btns">
+          <button class="ob-social-btn">&#9679; Continue with Google</button>
+          <button class="ob-social-btn">&#63743; Continue with Apple</button>
+        </div>
+        <div class="ob-divider">or</div>
+        <div class="ob-input-group">
+          <input class="ob-input" type="email" placeholder="Email address">
+        </div>
+        <div class="ob-cta">
+          <button class="ob-btn-primary teal">Get Started</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="ob-arrow">&#8594;</div>
+
+    <!-- Coach 2: Create Club -->
+    <div class="ob-screen">
+      <div class="ob-status-bar"><span>9:41</span><span>&#9679;&#9679;&#9679;</span></div>
+      <div class="ob-screen-body">
+        <div class="ob-progress">
+          <span class="ob-dot done"></span>
+          <span class="ob-dot active"></span>
+          <span class="ob-dot"></span>
+          <span class="ob-dot"></span>
+        </div>
+        <p class="ob-step-label">Step 1</p>
+        <p class="ob-title">Your Club</p>
+        <p class="ob-subtitle">This is the identity players will see. You can change it later.</p>
+
+        <div style="display:flex;gap:var(--space-md);align-items:flex-start;margin-bottom:var(--space-md);">
+          <div class="ob-logo-upload has-logo" style="background:var(--club-primary);">OV</div>
+          <div style="flex:1;">
+            <div class="ob-input-group" style="margin-bottom:var(--space-sm);">
+              <label class="ob-label">Club Name</label>
+              <input class="ob-input filled" value="Oslo Volley">
+            </div>
+          </div>
+        </div>
+
+        <div class="ob-input-group">
+          <label class="ob-label">Primary Color</label>
+          <div class="ob-color-row">
+            <div class="ob-color-swatch-pick selected" style="background:#E63946;"></div>
+            <div class="ob-color-swatch-pick" style="background:#2563EB;"></div>
+            <div class="ob-color-swatch-pick" style="background:#059669;"></div>
+            <div class="ob-color-swatch-pick" style="background:#7C3AED;"></div>
+            <div class="ob-color-swatch-pick" style="background:#EA580C;"></div>
+            <div class="ob-color-swatch-pick" style="background:#0891B2;"></div>
+            <div class="ob-color-swatch-pick" style="background:rgba(255,255,255,0.06); border:1px dashed rgba(255,255,255,0.2); display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--vq-mid-gray);">+</div>
+          </div>
+        </div>
+
+        <div class="ob-input-group">
+          <label class="ob-label">Secondary Color</label>
+          <div class="ob-color-row">
+            <div class="ob-color-swatch-pick" style="background:#FFB703;" class="selected"></div>
+            <div class="ob-color-swatch-pick selected" style="background:#FFB703;"></div>
+            <div class="ob-color-swatch-pick" style="background:#FDE68A;"></div>
+            <div class="ob-color-swatch-pick" style="background:#FFFFFF;"></div>
+            <div class="ob-color-swatch-pick" style="background:#1E293B;"></div>
+          </div>
+        </div>
+
+        <div class="ob-cta">
+          <button class="ob-btn-primary teal">Next</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="ob-arrow">&#8594;</div>
+
+    <!-- Coach 3: Choose Team -->
+    <div class="ob-screen">
+      <div class="ob-status-bar"><span>9:41</span><span>&#9679;&#9679;&#9679;</span></div>
+      <div class="ob-screen-body">
+        <div class="ob-progress">
+          <span class="ob-dot done"></span>
+          <span class="ob-dot done"></span>
+          <span class="ob-dot active"></span>
+          <span class="ob-dot"></span>
+        </div>
+        <p class="ob-step-label">Step 2</p>
+        <p class="ob-title">Add a Team</p>
+        <p class="ob-subtitle">A club can have multiple teams. Start with one — add more later.</p>
+
+        <div class="ob-input-group">
+          <label class="ob-label">Team Name</label>
+          <input class="ob-input filled" value="Men's A">
+        </div>
+
+        <div class="ob-input-group">
+          <label class="ob-label">Division / League (optional)</label>
+          <input class="ob-input" placeholder="e.g. Eliteserien">
+        </div>
+
+        <div class="ob-input-group">
+          <label class="ob-label">Season</label>
+          <input class="ob-input filled" value="2025/26">
+        </div>
+
+        <div style="margin-top:var(--space-md); padding:var(--space-md); border-radius:var(--radius-sm); background:rgba(46,196,182,0.04); border:1px solid rgba(46,196,182,0.1);">
+          <p style="font-family:var(--font-display);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--vq-teal);margin-bottom:4px;">Preview</p>
+          <p style="font-family:var(--font-display);font-weight:700;font-size:16px;text-transform:uppercase;">Oslo Volley <span style="color:var(--vq-mid-gray);font-weight:500;">/ Men's A</span></p>
+        </div>
+
+        <div class="ob-cta">
+          <button class="ob-btn-primary teal">Next</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="ob-arrow">&#8594;</div>
+
+    <!-- Coach 4: Invite Players -->
+    <div class="ob-screen">
+      <div class="ob-status-bar"><span>9:41</span><span>&#9679;&#9679;&#9679;</span></div>
+      <div class="ob-screen-body">
+        <div class="ob-progress">
+          <span class="ob-dot done"></span>
+          <span class="ob-dot done"></span>
+          <span class="ob-dot done"></span>
+          <span class="ob-dot active"></span>
+        </div>
+        <p class="ob-step-label">Step 3</p>
+        <p class="ob-title">Invite Players</p>
+        <p class="ob-subtitle">Share this code with your team. They'll join in seconds.</p>
+
+        <div class="ob-invite-code">
+          <span class="ob-code">VQ-84K</span>
+          <button class="ob-copy-btn">&#128203;</button>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:var(--space-sm);margin-bottom:var(--space-lg);">
+          <button class="ob-social-btn" style="border-color:rgba(46,196,182,0.2);color:var(--vq-teal);">&#128279; Copy Invite Link</button>
+          <button class="ob-social-btn">&#128172; Share via WhatsApp</button>
+          <button class="ob-social-btn">&#128231; Share via Email</button>
+        </div>
+
+        <div style="text-align:center;padding:var(--space-md);border-radius:var(--radius-sm);background:rgba(255,255,255,0.02);">
+          <p style="font-family:var(--font-mono);font-size:12px;color:var(--vq-mid-gray);">0 players joined so far</p>
+        </div>
+
+        <div class="ob-cta">
+          <button class="ob-btn-primary teal">Go to Dashboard</button>
+          <p class="ob-skip" style="margin-top:var(--space-sm);">I'll invite later</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- PLAYER FLOW -->
+  <div class="reveal" style="margin-top: var(--space-3xl);">
+    <div class="ob-flow-label player-flow">Player Flow</div>
+  </div>
+
+  <div class="onboarding-flow reveal">
+
+    <!-- Player 1: Enter Code / Sign Up -->
+    <div class="ob-screen">
+      <div class="ob-status-bar"><span>9:41</span><span>&#9679;&#9679;&#9679;</span></div>
+      <div class="ob-screen-body">
+        <div class="ob-progress">
+          <span class="ob-dot active"></span>
+          <span class="ob-dot"></span>
+          <span class="ob-dot"></span>
+        </div>
+        <div style="text-align:center; margin-bottom: var(--space-lg);">
+          <div class="logo-mark" style="width:64px;height:64px;margin:0 auto var(--space-md);animation:none;border-radius:var(--radius-md);">
+            <span class="vq-monogram" style="font-size:26px;">VQ</span>
+          </div>
+        </div>
+        <p class="ob-title" style="text-align:center;">Join Your<br>Team</p>
+        <p class="ob-subtitle" style="text-align:center;">Enter the code from your coach to get started.</p>
+
+        <div class="ob-invite-code" style="margin-bottom:var(--space-lg);">
+          <span class="ob-code" style="letter-spacing:8px;">VQ-84K</span>
+        </div>
+
+        <div class="ob-social-btns">
+          <button class="ob-social-btn">&#9679; Continue with Google</button>
+          <button class="ob-social-btn">&#63743; Continue with Apple</button>
+        </div>
+        <div class="ob-divider">or</div>
+        <div class="ob-input-group">
+          <input class="ob-input" type="email" placeholder="Email address">
+        </div>
+
+        <div class="ob-cta">
+          <button class="ob-btn-primary teal">Join Team</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="ob-arrow">&#8594;</div>
+
+    <!-- Player 2: Confirm team + profile -->
+    <div class="ob-screen">
+      <div class="ob-status-bar"><span>9:41</span><span>&#9679;&#9679;&#9679;</span></div>
+      <div class="ob-screen-body">
+        <div class="ob-progress">
+          <span class="ob-dot done"></span>
+          <span class="ob-dot active"></span>
+          <span class="ob-dot"></span>
+        </div>
+        <p class="ob-step-label">Your Team</p>
+
+        <div class="ob-team-item" style="border-color:var(--club-primary);background:rgba(230,57,70,0.04);margin-bottom:var(--space-lg);">
+          <div class="ob-team-badge" style="background:var(--club-primary);">OV</div>
+          <div class="ob-team-info">
+            <p class="ob-team-name">Oslo Volley</p>
+            <p class="ob-team-meta">Men's A &middot; Eliteserien 2025/26</p>
+          </div>
+          <span style="color:var(--color-success);font-size:18px;">&#10003;</span>
+        </div>
+
+        <p class="ob-title" style="font-size:22px;">Your Profile</p>
+        <p class="ob-subtitle">Just the basics. Takes 10 seconds.</p>
+
+        <div class="ob-avatar-upload">
+          <span class="upload-icon">&#128247;</span>
+          <span class="upload-text">Photo</span>
+        </div>
+
+        <div class="ob-input-group">
+          <label class="ob-label">Full Name</label>
+          <input class="ob-input filled" value="Erik Hansen">
+        </div>
+
+        <div class="ob-input-group">
+          <label class="ob-label">Jersey Number (optional)</label>
+          <input class="ob-input" placeholder="#">
+        </div>
+
+        <div class="ob-cta">
+          <button class="ob-btn-primary teal">Next</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="ob-arrow">&#8594;</div>
+
+    <!-- Player 3: Position (optional) -->
+    <div class="ob-screen">
+      <div class="ob-status-bar"><span>9:41</span><span>&#9679;&#9679;&#9679;</span></div>
+      <div class="ob-screen-body">
+        <div class="ob-progress">
+          <span class="ob-dot done"></span>
+          <span class="ob-dot done"></span>
+          <span class="ob-dot active"></span>
+        </div>
+        <p class="ob-step-label">Optional</p>
+        <p class="ob-title">Position</p>
+        <p class="ob-subtitle">Pick your primary position, or skip if you're not sure yet. Your coach can set this later too.</p>
+
+        <div class="ob-position-grid">
+          <div class="ob-position-btn selected">
+            <span class="pos-abbr">OH</span>
+            <span class="pos-name">Outside</span>
+          </div>
+          <div class="ob-position-btn">
+            <span class="pos-abbr">OPP</span>
+            <span class="pos-name">Opposite</span>
+          </div>
+          <div class="ob-position-btn">
+            <span class="pos-abbr">S</span>
+            <span class="pos-name">Setter</span>
+          </div>
+          <div class="ob-position-btn">
+            <span class="pos-abbr">MB</span>
+            <span class="pos-name">Middle</span>
+          </div>
+          <div class="ob-position-btn">
+            <span class="pos-abbr">L</span>
+            <span class="pos-name">Libero</span>
+          </div>
+          <div class="ob-position-btn">
+            <span class="pos-abbr">DS</span>
+            <span class="pos-name">Def. Spec</span>
+          </div>
+        </div>
+
+        <div style="padding:var(--space-md);border-radius:var(--radius-sm);background:rgba(255,255,255,0.02);text-align:center;margin-bottom:var(--space-md);">
+          <p style="font-size:13px;color:var(--vq-mid-gray);">Your player card will generate after your first match.</p>
+          <p style="font-family:var(--font-display);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--vq-teal);margin-top:4px;">Play to unlock it.</p>
+        </div>
+
+        <div class="ob-cta">
+          <button class="ob-btn-primary club">Join Oslo Volley</button>
+          <p class="ob-skip" style="margin-top:var(--space-sm);">Skip position for now</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="ob-arrow">&#8594;</div>
+
+    <!-- Player 4: Welcome / Landing -->
+    <div class="ob-screen" style="border-color:rgba(230,57,70,0.15);">
+      <div class="ob-status-bar"><span>9:41</span><span>&#9679;&#9679;&#9679;</span></div>
+      <div style="height:3px;background:linear-gradient(90deg,var(--club-primary),var(--club-secondary));"></div>
+      <div class="ob-screen-body" style="text-align:center;">
+
+        <div style="margin:var(--space-lg) 0;">
+          <div style="width:64px;height:64px;border-radius:50%;background:var(--vq-navy-70);display:flex;align-items:center;justify-content:center;font-family:var(--font-display);font-weight:900;font-size:24px;color:var(--vq-teal);margin:0 auto var(--space-md);border:2px solid var(--club-primary);">EH</div>
+          <p class="ob-title" style="font-size:22px;">You're In!</p>
+          <p style="font-family:var(--font-display);font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:1px;color:var(--club-primary);margin-bottom:var(--space-lg);">Oslo Volley &middot; Men's A</p>
+        </div>
+
+        <!-- Mini preview of what's coming -->
+        <div style="text-align:left;">
+          <div class="ob-team-item" style="background:rgba(230,57,70,0.04);">
+            <div style="min-width:36px;text-align:center;">
+              <span style="font-family:var(--font-display);font-weight:800;font-size:18px;line-height:1;">05</span>
+              <span style="font-family:var(--font-display);font-weight:600;font-size:8px;text-transform:uppercase;letter-spacing:1px;color:var(--vq-mid-gray);display:block;">Feb</span>
+            </div>
+            <div class="ob-team-info">
+              <p class="ob-team-name" style="font-size:13px;">vs Bergen VBK</p>
+              <p class="ob-team-meta">Ekeberg Hallen, 19:00</p>
+            </div>
+            <span class="schedule-type match" style="font-size:9px;">Match</span>
+          </div>
+
+          <div class="ob-team-item">
+            <div style="min-width:36px;text-align:center;">
+              <span style="font-family:var(--font-display);font-weight:800;font-size:18px;line-height:1;">07</span>
+              <span style="font-family:var(--font-display);font-weight:600;font-size:8px;text-transform:uppercase;letter-spacing:1px;color:var(--vq-mid-gray);display:block;">Feb</span>
+            </div>
+            <div class="ob-team-info">
+              <p class="ob-team-name" style="font-size:13px;">Team Practice</p>
+              <p class="ob-team-meta">Lambertseter Hall, 18:00</p>
+            </div>
+            <span class="schedule-type practice" style="font-size:9px;">Practice</span>
+          </div>
+        </div>
+
+        <div style="margin-top:var(--space-md);padding:var(--space-sm);border-radius:var(--radius-full);background:rgba(255,183,3,0.06);border:1px solid rgba(255,183,3,0.12);display:inline-flex;align-items:center;gap:6px;">
+          <span style="font-size:14px;">&#128293;</span>
+          <span style="font-family:var(--font-display);font-weight:700;font-size:12px;color:var(--club-secondary);">Day 1</span>
+          <span style="font-family:var(--font-display);font-weight:500;font-size:11px;color:rgba(255,183,3,0.6);text-transform:uppercase;letter-spacing:1px;">Streak started</span>
+        </div>
+
+        <div class="ob-cta" style="margin-top:var(--space-lg);">
+          <button class="ob-btn-primary club">Let's Go</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<div class="divider" style="max-width: 1400px; margin-left: auto; margin-right: auto;"></div>
+
+<!-- Footer -->
+<footer style="text-align: center; padding: var(--space-3xl) var(--space-xl); color: var(--vq-mid-gray); font-size: 13px;">
+  <div class="logo-mark" style="width: 56px; height: 56px; margin: 0 auto var(--space-md); border-radius: var(--radius-md); animation: none;">
+    <span class="vq-monogram" style="font-size: 22px;">VQ</span>
+  </div>
+  <p style="font-family: var(--font-display); font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: 3px; color: var(--vq-white); margin-bottom: var(--space-sm);">VolleyQuest</p>
+  <p>Design Reference &middot; v1.0</p>
+</footer>
+
+<script>
+// View toggle
+function switchView(view) {
+  const coachView = document.getElementById('coachView');
+  const playerView = document.getElementById('playerView');
+  const buttons = document.querySelectorAll('.view-toggle-btn');
+
+  buttons.forEach(btn => btn.classList.remove('active'));
+
+  if (view === 'coach') {
+    coachView.classList.add('active');
+    playerView.classList.remove('active');
+    buttons[0].classList.add('active');
+  } else {
+    playerView.classList.add('active');
+    coachView.classList.remove('active');
+    buttons[1].classList.add('active');
+  }
+}
+
+// Scroll reveal
+const reveals = document.querySelectorAll('.reveal');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.1 });
+
+reveals.forEach(el => observer.observe(el));
+</script>
+</body>
+</html>

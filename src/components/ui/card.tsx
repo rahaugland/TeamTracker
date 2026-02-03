@@ -4,12 +4,13 @@ import { cn } from "@/lib/utils"
 
 const Card = React.forwardRef<
   HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => (
+  React.HTMLAttributes<HTMLDivElement> & { accentTop?: boolean }
+>(({ className, accentTop, ...props }, ref) => (
   <div
     ref={ref}
     className={cn(
-      "rounded-xl border bg-card text-card-foreground shadow-md hover:shadow-xl transition-shadow duration-300",
+      "rounded-xl border border-white/[0.06] bg-card text-card-foreground shadow-md hover:shadow-xl hover:border-white/[0.12] transition-all duration-300",
+      accentTop && "border-t-2 border-t-club-primary",
       className
     )}
     {...props}
@@ -35,7 +36,7 @@ const CardTitle = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <div
     ref={ref}
-    className={cn("text-lg font-bold leading-none tracking-tight", className)}
+    className={cn("text-lg font-bold leading-none tracking-tight font-display", className)}
     {...props}
   />
 ))

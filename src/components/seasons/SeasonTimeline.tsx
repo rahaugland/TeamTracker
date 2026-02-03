@@ -76,7 +76,7 @@ export function SeasonTimeline({ gameStats, isLoading }: SeasonTimelineProps) {
             />
             <Bar dataKey="value" radius={[4, 4, 0, 0]}>
               {chartData.map((entry, i) => (
-                <Cell key={i} fill={entry.isWin ? 'hsl(142, 71%, 45%)' : 'hsl(0, 84%, 60%)'} />
+                <Cell key={i} fill={entry.isWin ? '#34D399' : '#E63946'} />
               ))}
             </Bar>
           </BarChart>
