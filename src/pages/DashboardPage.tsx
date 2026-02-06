@@ -14,9 +14,18 @@ import { getPlayerAttendance } from '@/services/attendance.service';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { StatCard, TodayEventCard } from '@/components/dashboard';
+import {
+  ExpansionContainer,
+  AttendanceExpansionPanel,
+  WinRateExpansionPanel,
+  ActivePlayersExpansionPanel,
+  NextMatchExpansionPanel,
+} from '@/components/dashboard/expansion';
 import { ScheduleItem } from '@/components/schedule';
 import { PlayerAvatar } from '@/components/player';
 import type { Event, Player } from '@/types/database.types';
+
+type ExpandedPanel = 'attendance' | 'winRate' | 'activePlayers' | 'nextMatch' | null;
 
 interface PlayerWithAttendance {
   id: string;
@@ -45,10 +54,12 @@ export function DashboardPage() {
   const [upcomingEvents, setUpcomingEvents] = useState<Event[]>([]);
   const [teamPlayers, setTeamPlayers] = useState<Player[]>([]);
   const [playersWithAttendance, setPlayersWithAttendance] = useState<PlayerWithAttendance[]>([]);
+  const [attendanceSortOrder, setAttendanceSortOrder] = useState<'asc' | 'desc'>('desc');
   const [winRate, setWinRate] = useState(0);
   const [nextMatch, setNextMatch] = useState<Event | null>(null);
   const [todayPracticePlan, setTodayPracticePlan] = useState<{ name: string; drillCount: number; totalMinutes: number } | null>(null);
   const [lowAttendancePlayer, setLowAttendancePlayer] = useState<PlayerWithAttendance | null>(null);
+  const [expandedPanel, setExpandedPanel] = useState<ExpandedPanel>(null);
 
   const selectedTeam = useMemo(() => {
     if (activeTeamId) {
@@ -201,12 +212,25 @@ export function DashboardPage() {
     return Math.round(total / playersWithAttendance.length);
   }, [playersWithAttendance]);
 
+  // Sorted players for roster table
+  const sortedPlayers = useMemo(() => {
+    return [...playersWithAttendance].sort((a, b) => {
+      return attendanceSortOrder === 'desc'
+        ? b.attendance - a.attendance
+        : a.attendance - b.attendance;
+    });
+  }, [playersWithAttendance, attendanceSortOrder]);
+
   // Calculate days until next match
   const daysUntilNextMatch = useMemo(() => {
     if (!nextMatch) return null;
     const matchDate = parseISO(nextMatch.start_time);
     return differenceInDays(matchDate, new Date());
   }, [nextMatch]);
+
+  const togglePanel = useCallback((panel: ExpandedPanel) => {
+    setExpandedPanel(prev => prev === panel ? null : panel);
+  }, []);
 
   if (isLoading) {
     return (
@@ -273,14 +297,15 @@ export function DashboardPage() {
         )}
 
         {/* Stats Row */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
           <StatCard
             label="Attendance Rate"
             value={`${attendanceRate}%`}
             delta={attendanceRate >= 80 ? 'Good standing' : 'Needs improvement'}
             deltaType={attendanceRate >= 80 ? 'positive' : 'negative'}
             accent="success"
-            onClick={() => navigate('/analytics')}
+            isActive={expandedPanel === 'attendance'}
+            onClick={() => togglePanel('attendance')}
           />
           <StatCard
             label="Win Rate"
@@ -288,6 +313,8 @@ export function DashboardPage() {
             delta="Last 5 games"
             deltaType={winRate >= 50 ? 'positive' : 'neutral'}
             accent="primary"
+            isActive={expandedPanel === 'winRate'}
+            onClick={() => togglePanel('winRate')}
           />
           <StatCard
             label="Active Players"
@@ -295,6 +322,8 @@ export function DashboardPage() {
             delta="On roster"
             deltaType="neutral"
             accent="secondary"
+            isActive={expandedPanel === 'activePlayers'}
+            onClick={() => togglePanel('activePlayers')}
           />
           <StatCard
             label="Next Match"
@@ -302,9 +331,42 @@ export function DashboardPage() {
             delta={nextMatch?.opponent ? `vs ${nextMatch.opponent}` : 'No matches scheduled'}
             deltaType="neutral"
             accent="teal"
-            onClick={() => nextMatch && navigate(`/events/${nextMatch.id}`)}
+            isActive={expandedPanel === 'nextMatch'}
+            onClick={() => togglePanel('nextMatch')}
           />
         </div>
+
+        {/* Expansion Panels */}
+        {selectedTeam && (
+          <div className="mb-4">
+            <ExpansionContainer isExpanded={expandedPanel === 'attendance'}>
+              {expandedPanel === 'attendance' && (
+                <AttendanceExpansionPanel teamId={selectedTeam.id} />
+              )}
+            </ExpansionContainer>
+            <ExpansionContainer isExpanded={expandedPanel === 'winRate'}>
+              {expandedPanel === 'winRate' && (
+                <WinRateExpansionPanel teamId={selectedTeam.id} />
+              )}
+            </ExpansionContainer>
+            <ExpansionContainer isExpanded={expandedPanel === 'activePlayers'}>
+              {expandedPanel === 'activePlayers' && (
+                <ActivePlayersExpansionPanel
+                  teamPlayers={teamPlayers}
+                  playersWithAttendance={playersWithAttendance}
+                />
+              )}
+            </ExpansionContainer>
+            <ExpansionContainer isExpanded={expandedPanel === 'nextMatch'}>
+              {expandedPanel === 'nextMatch' && (
+                <NextMatchExpansionPanel
+                  nextMatch={nextMatch}
+                  upcomingEvents={upcomingEvents}
+                />
+              )}
+            </ExpansionContainer>
+          </div>
+        )}
 
         {/* Attendance Alert - Full Width */}
         {lowAttendancePlayer && (
@@ -351,13 +413,23 @@ export function DashboardPage() {
                   <tr className="border-b border-white/[0.04]">
                     <th className="text-left text-xs font-display font-semibold uppercase tracking-wider text-gray-400 px-4 py-3">Player</th>
                     <th className="text-left text-xs font-display font-semibold uppercase tracking-wider text-gray-400 px-4 py-3">Pos</th>
-                    <th className="text-left text-xs font-display font-semibold uppercase tracking-wider text-gray-400 px-4 py-3">Attendance</th>
+                    <th
+                      className="text-left text-xs font-display font-semibold uppercase tracking-wider text-gray-400 px-4 py-3 cursor-pointer hover:text-white transition-colors select-none"
+                      onClick={() => setAttendanceSortOrder(prev => prev === 'desc' ? 'asc' : 'desc')}
+                    >
+                      <span className="inline-flex items-center gap-1">
+                        Attendance
+                        <span className="text-vq-teal">
+                          {attendanceSortOrder === 'desc' ? '↓' : '↑'}
+                        </span>
+                      </span>
+                    </th>
                     <th className="text-center text-xs font-display font-semibold uppercase tracking-wider text-gray-400 px-4 py-3">Form</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {playersWithAttendance.length > 0 ? (
-                    playersWithAttendance.slice(0, 6).map((player) => (
+                  {sortedPlayers.length > 0 ? (
+                    sortedPlayers.slice(0, 6).map((player) => (
                       <tr
                         key={player.id}
                         className="border-b border-white/[0.04] hover:bg-white/[0.02] cursor-pointer transition-colors"
