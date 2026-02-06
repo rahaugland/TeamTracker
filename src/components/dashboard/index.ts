@@ -7,3 +7,10 @@ export { StatCard } from './StatCard';
 export type { StatCardProps, StatCardAccent } from './StatCard';
 export { TodayEventCard } from './TodayEventCard';
 export type { TodayEventCardProps, RSVPSummary } from './TodayEventCard';
+export {
+  ExpansionContainer,
+  AttendanceExpansionPanel,
+  WinRateExpansionPanel,
+  ActivePlayersExpansionPanel,
+  NextMatchExpansionPanel,
+} from './expansion';

@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { usePlayers, useTeams } from '@/store';
@@ -14,6 +14,8 @@ import { POSITION_NAMES, type VolleyballPosition, type Player } from '@/types/da
 import { cn } from '@/lib/utils';
 
 type FilterTab = 'all' | 'position';
+type SortField = 'name' | 'attendance' | 'rating' | 'games';
+type SortOrder = 'asc' | 'desc';
 
 interface PlayerWithStats extends Player {
   attendancePercent: number;
@@ -67,6 +69,8 @@ export function PlayersPage() {
     playerId: null,
   });
   const [playersWithStats, setPlayersWithStats] = useState<PlayerWithStats[]>([]);
+  const [sortField, setSortField] = useState<SortField>('name');
+  const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
 
   const loadPlayers = useCallback(async () => {
     setIsLoading(true);
@@ -148,12 +152,42 @@ export function PlayersPage() {
     }
   };
 
-  const filteredPlayers = playersWithStats.filter((player) =>
-    player.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortOrder(field === 'name' ? 'asc' : 'desc'); // Default desc for numeric, asc for name
+    }
+  };
+
+  const filteredAndSortedPlayers = useMemo(() => {
+    const filtered = playersWithStats.filter((player) =>
+      player.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
+    return [...filtered].sort((a, b) => {
+      let comparison = 0;
+      switch (sortField) {
+        case 'name':
+          comparison = a.name.localeCompare(b.name);
+          break;
+        case 'attendance':
+          comparison = a.attendancePercent - b.attendancePercent;
+          break;
+        case 'rating':
+          comparison = a.rating - b.rating;
+          break;
+        case 'games':
+          comparison = a.gamesPlayed - b.gamesPlayed;
+          break;
+      }
+      return sortOrder === 'asc' ? comparison : -comparison;
+    });
+  }, [playersWithStats, searchQuery, sortField, sortOrder]);
 
   // Group players by position for position view
-  const playersByPosition = filteredPlayers.reduce((acc, player) => {
+  const playersByPosition = filteredAndSortedPlayers.reduce((acc, player) => {
     player.positions.forEach(pos => {
       if (!acc[pos]) acc[pos] = [];
       acc[pos].push(player);
@@ -177,7 +211,7 @@ export function PlayersPage() {
           {t('navigation.players')}
         </h1>
         <p className="text-sm text-gray-400">
-          {currentTeam?.name} • {filteredPlayers.length} {filteredPlayers.length === 1 ? 'player' : 'players'}
+          {currentTeam?.name} • {filteredAndSortedPlayers.length} {filteredAndSortedPlayers.length === 1 ? 'player' : 'players'}
         </p>
       </div>
 
@@ -197,34 +231,85 @@ export function PlayersPage() {
         </Button>
       </div>
 
-      {/* Filter Tabs */}
-      <div className="flex gap-2 mb-6 border-b border-white/[0.06] pb-2">
-        <button
-          onClick={() => setActiveTab('all')}
-          className={cn(
-            'font-display font-semibold text-[13px] uppercase tracking-wide px-4 py-2 rounded-md transition-all',
-            activeTab === 'all'
-              ? 'bg-club-primary text-white'
-              : 'text-gray-400 hover:text-white'
-          )}
-        >
-          All Players
-        </button>
-        <button
-          onClick={() => setActiveTab('position')}
-          className={cn(
-            'font-display font-semibold text-[13px] uppercase tracking-wide px-4 py-2 rounded-md transition-all',
-            activeTab === 'position'
-              ? 'bg-club-primary text-white'
-              : 'text-gray-400 hover:text-white'
-          )}
-        >
-          By Position
-        </button>
+      {/* Filter Tabs and Sort Controls */}
+      <div className="flex flex-wrap items-center justify-between gap-4 mb-6 border-b border-white/[0.06] pb-2">
+        <div className="flex gap-2">
+          <button
+            onClick={() => setActiveTab('all')}
+            className={cn(
+              'font-display font-semibold text-[13px] uppercase tracking-wide px-4 py-2 rounded-md transition-all',
+              activeTab === 'all'
+                ? 'bg-club-primary text-white'
+                : 'text-gray-400 hover:text-white'
+            )}
+          >
+            All Players
+          </button>
+          <button
+            onClick={() => setActiveTab('position')}
+            className={cn(
+              'font-display font-semibold text-[13px] uppercase tracking-wide px-4 py-2 rounded-md transition-all',
+              activeTab === 'position'
+                ? 'bg-club-primary text-white'
+                : 'text-gray-400 hover:text-white'
+            )}
+          >
+            By Position
+          </button>
+        </div>
+
+        {/* Sort Controls */}
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-gray-400 uppercase tracking-wide">Sort by:</span>
+          <button
+            onClick={() => handleSort('name')}
+            className={cn(
+              'font-display font-semibold text-[11px] uppercase tracking-wide px-3 py-1.5 rounded transition-all',
+              sortField === 'name'
+                ? 'bg-vq-teal/20 text-vq-teal'
+                : 'text-gray-400 hover:text-white hover:bg-white/5'
+            )}
+          >
+            Name {sortField === 'name' && (sortOrder === 'asc' ? '↑' : '↓')}
+          </button>
+          <button
+            onClick={() => handleSort('attendance')}
+            className={cn(
+              'font-display font-semibold text-[11px] uppercase tracking-wide px-3 py-1.5 rounded transition-all',
+              sortField === 'attendance'
+                ? 'bg-vq-teal/20 text-vq-teal'
+                : 'text-gray-400 hover:text-white hover:bg-white/5'
+            )}
+          >
+            Attendance {sortField === 'attendance' && (sortOrder === 'asc' ? '↑' : '↓')}
+          </button>
+          <button
+            onClick={() => handleSort('rating')}
+            className={cn(
+              'font-display font-semibold text-[11px] uppercase tracking-wide px-3 py-1.5 rounded transition-all',
+              sortField === 'rating'
+                ? 'bg-vq-teal/20 text-vq-teal'
+                : 'text-gray-400 hover:text-white hover:bg-white/5'
+            )}
+          >
+            Rating {sortField === 'rating' && (sortOrder === 'asc' ? '↑' : '↓')}
+          </button>
+          <button
+            onClick={() => handleSort('games')}
+            className={cn(
+              'font-display font-semibold text-[11px] uppercase tracking-wide px-3 py-1.5 rounded transition-all',
+              sortField === 'games'
+                ? 'bg-vq-teal/20 text-vq-teal'
+                : 'text-gray-400 hover:text-white hover:bg-white/5'
+            )}
+          >
+            Games {sortField === 'games' && (sortOrder === 'asc' ? '↑' : '↓')}
+          </button>
+        </div>
       </div>
 
       {/* Players Grid or Empty State */}
-      {filteredPlayers.length === 0 ? (
+      {filteredAndSortedPlayers.length === 0 ? (
         <EmptyState
           title={players.length === 0 ? t('player.noPlayers') : t('player.search.noResults')}
           description={players.length === 0 ? t('player.noPlayersDescription') : t('player.search.tryDifferentQuery')}
@@ -239,7 +324,7 @@ export function PlayersPage() {
         />
       ) : activeTab === 'all' ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredPlayers.map((player) => (
+          {filteredAndSortedPlayers.map((player) => (
             <PlayerCard
               key={player.id}
               player={player}
