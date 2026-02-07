@@ -70,48 +70,50 @@ export async function syncToLocal(userId: string): Promise<Partial<SyncResult>> 
   let pulled = 0;
 
   try {
-    // Pull seasons
-    const { data: seasons, error: seasonsError } = await supabase
-      .from('seasons')
-      .select('*');
+    // Fetch all tables in parallel for maximum throughput
+    const [
+      seasonsRes, teamsRes, playersRes, membershipsRes, eventsRes,
+      rsvpsRes, attendanceRes, drillsRes, plansRes, blocksRes, notesRes,
+    ] = await Promise.all([
+      supabase.from('seasons').select('*'),
+      supabase.from('teams').select('*'),
+      supabase.from('players').select('*'),
+      supabase.from('team_memberships').select('*'),
+      supabase.from('events').select('*'),
+      supabase.from('rsvps').select('*'),
+      supabase.from('attendance_records').select('*'),
+      supabase.from('drills').select('*'),
+      supabase.from('practice_plans').select('*').eq('created_by', userId),
+      supabase.from('practice_blocks').select('*'),
+      supabase.from('coach_notes').select('*').eq('author_id', userId),
+    ]);
 
-    if (seasonsError) {
-      errors.push(`Seasons: ${seasonsError.message}`);
-    } else if (seasons) {
-      await db.seasons.bulkPut(
-        seasons.map((s) => addSyncMetadata(s, true))
-      );
-      pulled += seasons.length;
+    // Process seasons
+    if (seasonsRes.error) {
+      errors.push(`Seasons: ${seasonsRes.error.message}`);
+    } else if (seasonsRes.data) {
+      await db.seasons.bulkPut(seasonsRes.data.map((s) => addSyncMetadata(s, true)));
+      pulled += seasonsRes.data.length;
     }
 
-    // Pull teams
-    const { data: teams, error: teamsError } = await supabase
-      .from('teams')
-      .select('*');
-
-    if (teamsError) {
-      errors.push(`Teams: ${teamsError.message}`);
-    } else if (teams) {
-      await db.teams.bulkPut(teams.map((t) => addSyncMetadata(t, true)));
-      pulled += teams.length;
+    // Process teams
+    if (teamsRes.error) {
+      errors.push(`Teams: ${teamsRes.error.message}`);
+    } else if (teamsRes.data) {
+      await db.teams.bulkPut(teamsRes.data.map((t) => addSyncMetadata(t, true)));
+      pulled += teamsRes.data.length;
     }
 
-    // Pull all players (not just created by user, as users may need to see all players)
-    const { data: players, error: playersError } = await supabase
-      .from('players')
-      .select('*');
-
-    if (playersError) {
-      errors.push(`Players: ${playersError.message}`);
-    } else if (players) {
-      // Use bulkPut to merge with existing data, preserving unsynced local changes
+    // Process players with conflict resolution
+    if (playersRes.error) {
+      errors.push(`Players: ${playersRes.error.message}`);
+    } else if (playersRes.data) {
       const playersToSync = await Promise.all(
-        players.map(async (remotePlayer) => {
+        playersRes.data.map(async (remotePlayer) => {
           const localPlayer = await db.players.get(remotePlayer.id);
 
           // If local record exists and is unsynced, check for conflicts
           if (localPlayer && !localPlayer._synced) {
-            // Last-write-wins: compare timestamps
             const localTime = new Date(localPlayer.updated_at).getTime();
             const remoteTime = new Date(remotePlayer.updated_at).getTime();
 
@@ -121,119 +123,76 @@ export async function syncToLocal(userId: string): Promise<Partial<SyncResult>> 
             }
           }
 
-          // Otherwise use remote data
           return addSyncMetadata(remotePlayer, true);
         })
       );
 
       await db.players.bulkPut(playersToSync);
-      pulled += players.length;
+      pulled += playersRes.data.length;
     }
 
-    // Pull team memberships
-    const { data: memberships, error: membershipsError } = await supabase
-      .from('team_memberships')
-      .select('*');
-
-    if (membershipsError) {
-      errors.push(`Memberships: ${membershipsError.message}`);
-    } else if (memberships) {
-      await db.team_memberships.bulkPut(
-        memberships.map((m) => addSyncMetadata(m, true))
-      );
-      pulled += memberships.length;
+    // Process memberships
+    if (membershipsRes.error) {
+      errors.push(`Memberships: ${membershipsRes.error.message}`);
+    } else if (membershipsRes.data) {
+      await db.team_memberships.bulkPut(membershipsRes.data.map((m) => addSyncMetadata(m, true)));
+      pulled += membershipsRes.data.length;
     }
 
-    // Pull events
-    const { data: events, error: eventsError } = await supabase
-      .from('events')
-      .select('*');
-
-    if (eventsError) {
-      errors.push(`Events: ${eventsError.message}`);
-    } else if (events) {
-      await db.events.bulkPut(events.map((e) => addSyncMetadata(e, true)));
-      pulled += events.length;
+    // Process events
+    if (eventsRes.error) {
+      errors.push(`Events: ${eventsRes.error.message}`);
+    } else if (eventsRes.data) {
+      await db.events.bulkPut(eventsRes.data.map((e) => addSyncMetadata(e, true)));
+      pulled += eventsRes.data.length;
     }
 
-    // Pull RSVPs
-    const { data: rsvps, error: rsvpsError } = await supabase
-      .from('rsvps')
-      .select('*');
-
-    if (rsvpsError) {
-      errors.push(`RSVPs: ${rsvpsError.message}`);
-    } else if (rsvps) {
-      await db.rsvps.bulkPut(rsvps.map((r) => addSyncMetadata(r, true)));
-      pulled += rsvps.length;
+    // Process RSVPs
+    if (rsvpsRes.error) {
+      errors.push(`RSVPs: ${rsvpsRes.error.message}`);
+    } else if (rsvpsRes.data) {
+      await db.rsvps.bulkPut(rsvpsRes.data.map((r) => addSyncMetadata(r, true)));
+      pulled += rsvpsRes.data.length;
     }
 
-    // Pull attendance records
-    const { data: attendance, error: attendanceError } = await supabase
-      .from('attendance_records')
-      .select('*');
-
-    if (attendanceError) {
-      errors.push(`Attendance: ${attendanceError.message}`);
-    } else if (attendance) {
-      await db.attendance_records.bulkPut(
-        attendance.map((a) => addSyncMetadata(a, true))
-      );
-      pulled += attendance.length;
+    // Process attendance records
+    if (attendanceRes.error) {
+      errors.push(`Attendance: ${attendanceRes.error.message}`);
+    } else if (attendanceRes.data) {
+      await db.attendance_records.bulkPut(attendanceRes.data.map((a) => addSyncMetadata(a, true)));
+      pulled += attendanceRes.data.length;
     }
 
-    // Pull drills
-    const { data: drills, error: drillsError } = await supabase
-      .from('drills')
-      .select('*');
-
-    if (drillsError) {
-      errors.push(`Drills: ${drillsError.message}`);
-    } else if (drills) {
-      await db.drills.bulkPut(drills.map((d) => addSyncMetadata(d, true)));
-      pulled += drills.length;
+    // Process drills
+    if (drillsRes.error) {
+      errors.push(`Drills: ${drillsRes.error.message}`);
+    } else if (drillsRes.data) {
+      await db.drills.bulkPut(drillsRes.data.map((d) => addSyncMetadata(d, true)));
+      pulled += drillsRes.data.length;
     }
 
-    // Pull practice plans
-    const { data: plans, error: plansError } = await supabase
-      .from('practice_plans')
-      .select('*')
-      .eq('created_by', userId);
-
-    if (plansError) {
-      errors.push(`Practice plans: ${plansError.message}`);
-    } else if (plans) {
-      await db.practice_plans.bulkPut(
-        plans.map((p) => addSyncMetadata(p, true))
-      );
-      pulled += plans.length;
+    // Process practice plans
+    if (plansRes.error) {
+      errors.push(`Practice plans: ${plansRes.error.message}`);
+    } else if (plansRes.data) {
+      await db.practice_plans.bulkPut(plansRes.data.map((p) => addSyncMetadata(p, true)));
+      pulled += plansRes.data.length;
     }
 
-    // Pull practice blocks
-    const { data: blocks, error: blocksError } = await supabase
-      .from('practice_blocks')
-      .select('*');
-
-    if (blocksError) {
-      errors.push(`Practice blocks: ${blocksError.message}`);
-    } else if (blocks) {
-      await db.practice_blocks.bulkPut(
-        blocks.map((b) => addSyncMetadata(b, true))
-      );
-      pulled += blocks.length;
+    // Process practice blocks
+    if (blocksRes.error) {
+      errors.push(`Practice blocks: ${blocksRes.error.message}`);
+    } else if (blocksRes.data) {
+      await db.practice_blocks.bulkPut(blocksRes.data.map((b) => addSyncMetadata(b, true)));
+      pulled += blocksRes.data.length;
     }
 
-    // Pull coach notes
-    const { data: notes, error: notesError } = await supabase
-      .from('coach_notes')
-      .select('*')
-      .eq('author_id', userId);
-
-    if (notesError) {
-      errors.push(`Coach notes: ${notesError.message}`);
-    } else if (notes) {
-      await db.coach_notes.bulkPut(notes.map((n) => addSyncMetadata(n, true)));
-      pulled += notes.length;
+    // Process coach notes
+    if (notesRes.error) {
+      errors.push(`Coach notes: ${notesRes.error.message}`);
+    } else if (notesRes.data) {
+      await db.coach_notes.bulkPut(notesRes.data.map((n) => addSyncMetadata(n, true)));
+      pulled += notesRes.data.length;
     }
 
     return { pulled, errors };

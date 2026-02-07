@@ -12,6 +12,7 @@ export interface ScheduleItemProps {
   isToday?: boolean;
   className?: string;
   onClick?: () => void;
+  actions?: React.ReactNode;
 }
 
 export function ScheduleItem({
@@ -23,6 +24,7 @@ export function ScheduleItem({
   isToday = false,
   className,
   onClick,
+  actions,
 }: ScheduleItemProps) {
   const isClickable = !!onClick;
 
@@ -79,6 +81,9 @@ export function ScheduleItem({
       >
         {isToday ? 'Today' : type === 'match' ? 'Match' : 'Practice'}
       </span>
+
+      {/* Optional actions slot (e.g. RSVP buttons) */}
+      {actions}
     </div>
   );
 }

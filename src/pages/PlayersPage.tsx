@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { EmptyState } from '@/components/common/EmptyState';
 import { ConfirmDialog } from '@/components/common/ConfirmDialog';
-import { PlayerAvatar } from '@/components/player';
+import { PlayerAvatar } from '@/components/player/PlayerAvatar';
 import { POSITION_NAMES, type VolleyballPosition, type Player } from '@/types/database.types';
 import { cn } from '@/lib/utils';
 
@@ -388,6 +388,9 @@ function PlayerCard({ player, onView, onDelete }: PlayerCardProps) {
     <div
       className="bg-navy-90 border border-white/[0.06] rounded-lg p-4 hover:border-white/[0.12] hover:-translate-y-0.5 transition-all duration-200 cursor-pointer"
       onClick={onView}
+      role="link"
+      tabIndex={0}
+      onKeyDown={(e) => { if (e.key === 'Enter') onView(); }}
     >
       {/* Player Card Top - Avatar and Info */}
       <div className="flex items-center gap-4 mb-4">

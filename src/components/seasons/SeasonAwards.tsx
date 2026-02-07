@@ -28,7 +28,7 @@ export function SeasonAwardsDisplay({ awards, playerNames }: SeasonAwardsProps) 
 
   if (awards.length === 0) return null;
 
-  const sorted = [...awards].sort(
+  const sorted = awards.toSorted(
     (a, b) => AWARD_ORDER.indexOf(a.award_type as SeasonAwardType) - AWARD_ORDER.indexOf(b.award_type as SeasonAwardType)
   );
 

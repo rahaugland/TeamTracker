@@ -95,6 +95,7 @@ export function AttendanceCalendar({ playerId, teamId }: AttendanceCalendarProps
             size="icon"
             onClick={goToPreviousMonth}
             className="h-8 w-8 border-white/20 text-white hover:bg-white/5"
+            aria-label="Previous month"
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
@@ -103,6 +104,7 @@ export function AttendanceCalendar({ playerId, teamId }: AttendanceCalendarProps
             size="icon"
             onClick={goToNextMonth}
             className="h-8 w-8 border-white/20 text-white hover:bg-white/5"
+            aria-label="Next month"
           >
             <ChevronRight className="h-4 w-4" />
           </Button>

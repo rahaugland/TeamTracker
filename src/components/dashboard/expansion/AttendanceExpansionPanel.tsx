@@ -1,5 +1,5 @@
 import { useEffect, useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell,
 } from 'recharts';
@@ -25,7 +25,6 @@ function getBarColor(rate: number) {
 }
 
 export function AttendanceExpansionPanel({ teamId }: AttendanceExpansionPanelProps) {
-  const navigate = useNavigate();
   const [players, setPlayers] = useState<PlayerAttendanceRate[]>([]);
   const [teamRate, setTeamRate] = useState<TeamAttendanceRate | null>(null);
   const [preset, setPreset] = useState<Preset>('month');
@@ -65,7 +64,9 @@ export function AttendanceExpansionPanel({ teamId }: AttendanceExpansionPanelPro
   );
 
   const bestPerformer = players[0];
-  const needsAttention = [...players].sort((a, b) => a.attendanceRate - b.attendanceRate)[0];
+  const needsAttention = players.length > 0
+    ? players.reduce((min, p) => p.attendanceRate < min.attendanceRate ? p : min)
+    : undefined;
   const totalEvents = teamRate?.totalEvents ?? 0;
 
   const TrendIcon = teamRate?.trend === 'up' ? TrendingUp
@@ -192,10 +193,10 @@ export function AttendanceExpansionPanel({ teamId }: AttendanceExpansionPanelPro
         {/* Right: Player List */}
         <div className="space-y-2 max-h-[200px] overflow-y-auto pr-1">
           {players.slice(0, 10).map(player => (
-            <div
+            <Link
               key={player.playerId}
-              className="flex items-center gap-2 p-2 rounded hover:bg-white/[0.04] cursor-pointer transition-colors"
-              onClick={() => navigate(`/players/${player.playerId}`)}
+              to={`/players/${player.playerId}`}
+              className="flex items-center gap-2 p-2 rounded hover:bg-white/[0.04] transition-colors"
             >
               <div className="flex-1 min-w-0">
                 <p className="text-sm text-white truncate">{player.playerName}</p>
@@ -217,7 +218,7 @@ export function AttendanceExpansionPanel({ teamId }: AttendanceExpansionPanelPro
                   {Math.round(player.attendanceRate)}%
                 </span>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </div>

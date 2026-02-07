@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import type { BestXI } from '@/services/team-stats.service';
@@ -20,7 +20,6 @@ interface PlayerCardProps {
  */
 export function BestXIFormation({ bestXI, isLoading = false }: BestXIFormationProps) {
   const { t } = useTranslation();
-  const navigate = useNavigate();
 
   const PlayerCard = ({ player, label }: PlayerCardProps) => {
     if (!player) {
@@ -38,9 +37,9 @@ export function BestXIFormation({ bestXI, isLoading = false }: BestXIFormationPr
     }
 
     return (
-      <div
-        className="flex flex-col items-center p-3 border-2 border-primary/20 rounded-lg bg-card hover:bg-accent cursor-pointer transition-colors"
-        onClick={() => navigate(`/players/${player.playerId}`)}
+      <Link
+        to={`/players/${player.playerId}`}
+        className="flex flex-col items-center p-3 border-2 border-primary/20 rounded-lg bg-card hover:bg-accent transition-colors"
       >
         <div className="text-xs font-medium text-muted-foreground mb-2">{label}</div>
 
@@ -71,7 +70,7 @@ export function BestXIFormation({ bestXI, isLoading = false }: BestXIFormationPr
 
         {/* Rating */}
         <Badge className="mt-1">{player.rating}</Badge>
-      </div>
+      </Link>
     );
   };
 

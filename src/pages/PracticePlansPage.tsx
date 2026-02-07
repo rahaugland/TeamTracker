@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { format } from 'date-fns';
 import { useAuth, useTeams } from '@/store';
@@ -173,10 +173,9 @@ export function PracticePlansPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredPlans.map((plan) => (
+            <Link key={plan.id} to={`/practice-plans/${plan.id}`}>
             <Card
-              key={plan.id}
-              className="bg-navy-90 border border-white/[0.06] rounded-lg overflow-hidden cursor-pointer hover:border-white/[0.12] hover:-translate-y-0.5 transition-all duration-200"
-              onClick={() => handlePlanClick(plan.id)}
+              className="bg-navy-90 border border-white/[0.06] rounded-lg overflow-hidden hover:border-white/[0.12] hover:-translate-y-0.5 transition-all duration-200"
             >
               {/* Accent stripe */}
               <div className="h-1 bg-gradient-to-r from-club-primary to-club-secondary" />
@@ -219,6 +218,7 @@ export function PracticePlansPage() {
                 </div>
               </div>
             </Card>
+            </Link>
           ))}
         </div>
       )}

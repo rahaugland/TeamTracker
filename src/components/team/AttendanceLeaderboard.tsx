@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import type { PlayerAttendanceRate } from '@/services/analytics.service';
@@ -20,7 +20,6 @@ export function AttendanceLeaderboard({
   isLoading = false,
 }: AttendanceLeaderboardProps) {
   const { t } = useTranslation();
-  const navigate = useNavigate();
 
   const topAttendees = attendanceRates.slice(0, limit);
 
@@ -57,10 +56,10 @@ export function AttendanceLeaderboard({
         ) : (
           <div className="space-y-4">
             {topAttendees.map((player, index) => (
-              <div
+              <Link
                 key={player.playerId}
-                className="flex items-center gap-3 p-2 rounded-lg hover:bg-accent cursor-pointer transition-colors"
-                onClick={() => navigate(`/players/${player.playerId}`)}
+                to={`/players/${player.playerId}`}
+                className="flex items-center gap-3 p-2 rounded-lg hover:bg-accent transition-colors"
               >
                 {/* Rank */}
                 <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center font-bold text-sm">
@@ -94,7 +93,7 @@ export function AttendanceLeaderboard({
                     {t('team.dashboard.events')}
                   </p>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         )}

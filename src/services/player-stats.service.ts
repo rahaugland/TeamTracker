@@ -596,11 +596,15 @@ export async function getAttendanceStats(
     };
   }
 
-  const attended = records.filter(r => r.status === 'present').length;
-  const absent = records.filter(r => r.status === 'absent').length;
-  const late = records.filter(r => r.status === 'late').length;
-  const excused = records.filter(r => r.status === 'excused').length;
-  const notSelected = records.filter(r => r.status === 'not_selected').length;
+  const statusCounts = { present: 0, absent: 0, late: 0, excused: 0, not_selected: 0 };
+  for (const r of records) {
+    if (r.status in statusCounts) statusCounts[r.status as keyof typeof statusCounts]++;
+  }
+  const attended = statusCounts.present;
+  const absent = statusCounts.absent;
+  const late = statusCounts.late;
+  const excused = statusCounts.excused;
+  const notSelected = statusCounts.not_selected;
 
   const attendanceRate = totalEvents > 0 ? attended / totalEvents : 0;
 
@@ -669,12 +673,16 @@ export async function getEventTypeBreakdown(
     records = records.filter(r => r.event?.team_id === teamId);
   }
 
-  return {
-    practice: records.filter(r => r.event?.type === 'practice').length,
-    game: records.filter(r => r.event?.type === 'game').length,
-    tournament: records.filter(r => r.event?.type === 'tournament').length,
-    other: records.filter(r => r.event?.type && !['practice', 'game', 'tournament'].includes(r.event.type)).length,
-  };
+  const breakdown = { practice: 0, game: 0, tournament: 0, other: 0 };
+  for (const r of records) {
+    const type = r.event?.type;
+    if (type === 'practice') breakdown.practice++;
+    else if (type === 'game') breakdown.game++;
+    else if (type === 'tournament') breakdown.tournament++;
+    else if (type) breakdown.other++;
+  }
+
+  return breakdown;
 }
 
 /**
@@ -1160,8 +1168,8 @@ export async function getPlayerSelectionStats(
   const attendanceStats = await getAttendanceStats(playerId, teamId);
   const attendancePercent = Math.round(attendanceStats.attendanceRate * 100);
 
-  // Get last 3 games for form calculation
-  const recentStats = await getPlayerStats(playerId, 'career', undefined, teamId);
+  // Get last 5 games (only need 3, but last5 is most efficient period)
+  const recentStats = await getPlayerStats(playerId, 'last5', undefined, teamId);
   const last3Games = recentStats.slice(0, 3);
   const aggregated = aggregateStats(last3Games);
 

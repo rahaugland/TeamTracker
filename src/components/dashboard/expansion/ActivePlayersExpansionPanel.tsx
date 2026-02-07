@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
 import { Button } from '@/components/ui/button';
 import type { Player } from '@/types/database.types';
@@ -154,10 +154,10 @@ export function ActivePlayersExpansionPanel({ teamPlayers, playersWithAttendance
                 {POSITION_LABELS[pos] || pos}
               </p>
               {posPlayers.map(player => (
-                <div
+                <Link
                   key={player.id}
-                  className="flex items-center gap-2 py-1.5 px-2 rounded hover:bg-white/[0.04] cursor-pointer transition-colors"
-                  onClick={() => navigate(`/players/${player.id}`)}
+                  to={`/players/${player.id}`}
+                  className="flex items-center gap-2 py-1.5 px-2 rounded hover:bg-white/[0.04] transition-colors"
                 >
                   <span className="text-sm text-white truncate flex-1">{player.name}</span>
                   <div className={`w-2.5 h-2.5 rounded-full shrink-0 ${
@@ -165,7 +165,7 @@ export function ActivePlayersExpansionPanel({ teamPlayers, playersWithAttendance
                     : player.attendance >= 70 ? 'bg-yellow-500'
                     : 'bg-red-500'
                   }`} title={`${player.attendance}% attendance`} />
-                </div>
+                </Link>
               ))}
             </div>
           ))}

@@ -1,0 +1,2042 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VolleyQuest — Mobile Player Experience</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800&family=Barlow+Condensed:wght@600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Barlow', sans-serif;
+            background: #080e1a;
+            color: #fff;
+            padding: 60px 40px;
+            overflow-x: hidden;
+        }
+
+        .showcase-header {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+
+        .showcase-header h1 {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 48px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            color: #2EC4B6;
+            margin-bottom: 12px;
+        }
+
+        .showcase-header .subtitle {
+            font-size: 16px;
+            color: #64748B;
+            margin-bottom: 16px;
+        }
+
+        .showcase-header .info-bar {
+            font-size: 13px;
+            color: #64748B;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .phones-container {
+            display: flex;
+            gap: 40px;
+            padding: 40px 20px;
+            overflow-x: auto;
+            overflow-y: visible;
+            scroll-behavior: smooth;
+            margin-bottom: 60px;
+        }
+
+        .phones-container::-webkit-scrollbar {
+            height: 12px;
+        }
+
+        .phones-container::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.05);
+            border-radius: 6px;
+        }
+
+        .phones-container::-webkit-scrollbar-thumb {
+            background: rgba(46,196,182,0.3);
+            border-radius: 6px;
+        }
+
+        .phones-container::-webkit-scrollbar-thumb:hover {
+            background: rgba(46,196,182,0.5);
+        }
+
+        .phone-wrapper {
+            flex-shrink: 0;
+        }
+
+        .phone-label {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #A0AEC0;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .phone-frame {
+            width: 390px;
+            height: 844px;
+            background: #0A1628;
+            border-radius: 44px;
+            border: 3px solid #1e2d4d;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .status-bar {
+            height: 47px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            font-size: 15px;
+            font-weight: 600;
+            color: #fff;
+            position: relative;
+            z-index: 10;
+        }
+
+        .dynamic-island {
+            position: absolute;
+            top: 11px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 126px;
+            height: 37px;
+            background: #000;
+            border-radius: 19px;
+            z-index: 15;
+        }
+
+        .phone-content {
+            height: calc(844px - 47px - 76px);
+            overflow-y: auto;
+            overflow-x: hidden;
+            background: #0A1628;
+            padding: 16px;
+        }
+
+        .phone-content::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .phone-content::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .phone-content::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+        }
+
+        .bottom-tab-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 76px;
+            background: #0f1e35;
+            border-top: 1px solid rgba(255,255,255,0.06);
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-around;
+            padding: 8px 16px 20px;
+        }
+
+        .tab-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: #64748B;
+            padding: 6px 12px;
+            border-radius: 12px;
+            transition: all 0.2s;
+        }
+
+        .tab-item.active {
+            color: #E63946;
+            background: rgba(230,57,70,0.1);
+        }
+
+        .tab-item svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        .home-indicator {
+            position: absolute;
+            bottom: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 134px;
+            height: 5px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 3px;
+        }
+
+        /* Screen components */
+        .top-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .top-bar.centered {
+            justify-content: center;
+        }
+
+        .top-bar-title {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #A0AEC0;
+        }
+
+        .top-bar-title.large {
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            color: #fff;
+        }
+
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #162843;
+            border: 2px solid #2EC4B6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 12px;
+            font-weight: 700;
+            color: #2EC4B6;
+        }
+
+        .avatar.large {
+            width: 80px;
+            height: 80px;
+            border: 2px solid rgba(255,255,255,0.1);
+            font-size: 28px;
+            font-weight: 800;
+            color: #FFB703;
+        }
+
+        /* FIFA Card */
+        .fifa-card {
+            background: linear-gradient(135deg, #2a1f0a 0%, #1a1508 100%);
+            border: 1px solid rgba(255,183,3,0.3);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .fifa-card-rating {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 60px;
+        }
+
+        .rating-number {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 48px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #FFB703 0%, #FFD166 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
+        }
+
+        .rating-position {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: rgba(255,183,3,0.6);
+            margin-top: 2px;
+        }
+
+        .fifa-card-center {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .fifa-card-center .avatar {
+            width: 56px;
+            height: 56px;
+            font-size: 20px;
+        }
+
+        .fifa-card-name {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 14px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-align: center;
+        }
+
+        .fifa-card-right {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 8px;
+        }
+
+        .trend-badge {
+            background: rgba(34,197,94,0.15);
+            color: #22C55E;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 12px;
+        }
+
+        .skill-pills {
+            display: flex;
+            gap: 6px;
+            margin-top: 8px;
+            width: 100%;
+        }
+
+        .skill-pill {
+            flex: 1;
+            background: #0A1628;
+            border-radius: 6px;
+            padding: 6px 4px;
+            text-align: center;
+        }
+
+        .skill-pill-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            font-weight: 700;
+            color: #FFB703;
+            display: block;
+        }
+
+        .skill-pill-label {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 9px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: #64748B;
+            display: block;
+        }
+
+        /* Next Event Card */
+        .next-event-card {
+            background: linear-gradient(135deg, rgba(230,57,70,0.12), rgba(46,196,182,0.08));
+            border: 1px solid rgba(230,57,70,0.25);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .event-label {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: #E63946;
+            margin-bottom: 8px;
+        }
+
+        .event-title {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 20px;
+            font-weight: 800;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .event-meta {
+            display: flex;
+            gap: 16px;
+            font-size: 13px;
+            color: #A0AEC0;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+
+        .event-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .rsvp-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .rsvp-btn {
+            flex: 1;
+            padding: 14px 0;
+            border-radius: 10px;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            text-align: center;
+            cursor: pointer;
+            border: none;
+        }
+
+        .rsvp-btn.primary {
+            background: #22C55E;
+            color: #fff;
+        }
+
+        .rsvp-btn.secondary {
+            background: transparent;
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        /* Quick Stats Grid */
+        .quick-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: #0f1e35;
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px;
+            padding: 14px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 28px;
+            font-weight: 700;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .stat-value.red { color: #E63946; }
+        .stat-value.green { color: #22C55E; }
+        .stat-value.gold { color: #FFB703; }
+        .stat-value.teal { color: #2EC4B6; }
+
+        .stat-label {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: #64748B;
+            display: block;
+        }
+
+        .stat-extra {
+            font-size: 10px;
+            color: #E63946;
+            margin-top: 2px;
+        }
+
+        /* Section Header */
+        .section-header {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #fff;
+            margin: 24px 0 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-header::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: rgba(255,255,255,0.06);
+        }
+
+        /* Schedule Item */
+        .schedule-item {
+            display: flex;
+            gap: 12px;
+            background: #162843;
+            border-radius: 12px;
+            padding: 12px;
+            border: 1px solid rgba(255,255,255,0.06);
+            margin-bottom: 10px;
+            align-items: center;
+        }
+
+        .schedule-date {
+            width: 44px;
+            height: 44px;
+            background: #0A1628;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .schedule-date-day {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 20px;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .schedule-date-month {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 9px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: #64748B;
+        }
+
+        .schedule-info {
+            flex: 1;
+        }
+
+        .event-type-badge {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 4px 8px;
+            border-radius: 6px;
+            display: inline-block;
+            margin-bottom: 4px;
+        }
+
+        .event-type-badge.practice {
+            background: rgba(46,196,182,0.15);
+            color: #2EC4B6;
+        }
+
+        .event-type-badge.match {
+            background: rgba(230,57,70,0.15);
+            color: #E63946;
+        }
+
+        .event-type-badge.tournament {
+            background: rgba(255,183,3,0.15);
+            color: #FFB703;
+        }
+
+        .schedule-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .schedule-meta {
+            font-size: 12px;
+            color: #64748B;
+        }
+
+        .schedule-rsvp {
+            flex-shrink: 0;
+        }
+
+        .rsvp-status {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 6px 10px;
+            border-radius: 6px;
+            white-space: nowrap;
+        }
+
+        .rsvp-status.going {
+            background: rgba(34,197,94,0.15);
+            color: #22C55E;
+        }
+
+        .rsvp-status.not-going {
+            background: rgba(239,68,68,0.15);
+            color: #EF4444;
+        }
+
+        .rsvp-quick {
+            display: flex;
+            gap: 6px;
+        }
+
+        .rsvp-quick-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+        .rsvp-quick-btn.yes {
+            background: transparent;
+            border: 1.5px solid #22C55E;
+            color: #22C55E;
+        }
+
+        .rsvp-quick-btn.no {
+            background: transparent;
+            border: 1.5px solid #EF4444;
+            color: #EF4444;
+        }
+
+        /* Announcement */
+        .announcement-card {
+            background: #162843;
+            border-left: 3px solid #E63946;
+            border-radius: 10px;
+            padding: 14px;
+            margin-bottom: 10px;
+        }
+
+        .announcement-pinned {
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #E63946;
+            margin-bottom: 6px;
+        }
+
+        .announcement-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .announcement-desc {
+            font-size: 12px;
+            color: #A0AEC0;
+            margin-bottom: 6px;
+        }
+
+        .announcement-time {
+            font-size: 11px;
+            color: #64748B;
+        }
+
+        /* Month Selector */
+        .month-selector {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 16px;
+        }
+
+        .month-nav {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 18px;
+            color: #A0AEC0;
+        }
+
+        .month-current {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* View Toggle */
+        .view-toggle {
+            background: #0f1e35;
+            border-radius: 8px;
+            display: flex;
+            padding: 4px;
+            margin-bottom: 20px;
+        }
+
+        .view-toggle-btn {
+            flex: 1;
+            padding: 8px 0;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            text-align: center;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .view-toggle-btn.active {
+            background: #E63946;
+            color: #fff;
+        }
+
+        .view-toggle-btn:not(.active) {
+            color: #64748B;
+        }
+
+        /* Floating Button */
+        .floating-btn {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #E63946;
+            color: #fff;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 8px 16px;
+            border-radius: 20px;
+            box-shadow: 0 4px 12px rgba(230,57,70,0.4);
+        }
+
+        /* FIFA Card Compact */
+        .fifa-card.compact {
+            padding: 14px;
+            margin-bottom: 16px;
+        }
+
+        .fifa-card.compact .rating-number {
+            font-size: 36px;
+        }
+
+        .fifa-card.compact .rating-position {
+            font-size: 9px;
+        }
+
+        /* Season Pill */
+        .season-pill {
+            background: #162843;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 8px 16px;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            text-align: center;
+            margin: 16px auto;
+            width: fit-content;
+        }
+
+        /* Skill Bars */
+        .skill-bars {
+            margin-bottom: 20px;
+        }
+
+        .skill-bar-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .skill-bar-label {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: #A0AEC0;
+            width: 60px;
+        }
+
+        .skill-bar-track {
+            flex: 1;
+            height: 24px;
+            background: #0A1628;
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .skill-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #2EC4B6, #2EC4B6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            font-weight: 700;
+            color: #fff;
+            position: relative;
+        }
+
+        .skill-bar-fill.attack {
+            background: linear-gradient(90deg, #E63946, #ff5965);
+        }
+
+        .skill-bar-trend {
+            font-size: 14px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .skill-bar-trend.up { color: #22C55E; }
+        .skill-bar-trend.down { color: #EF4444; }
+        .skill-bar-trend.neutral { color: #64748B; }
+
+        /* Game Cards */
+        .game-card {
+            background: #0f1e35;
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 10px;
+        }
+
+        .game-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .game-opponent {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .game-result {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 6px 12px;
+            border-radius: 12px;
+        }
+
+        .game-result.win {
+            background: rgba(34,197,94,0.15);
+            color: #22C55E;
+        }
+
+        .game-result.loss {
+            background: rgba(239,68,68,0.15);
+            color: #EF4444;
+        }
+
+        .game-card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+        }
+
+        .game-date {
+            color: #64748B;
+        }
+
+        .game-stats {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: #A0AEC0;
+        }
+
+        .game-stats span {
+            color: #2EC4B6;
+        }
+
+        /* Chart Placeholder */
+        .chart-placeholder {
+            height: 140px;
+            border: 2px dashed rgba(255,255,255,0.1);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #64748B;
+            font-size: 13px;
+            margin-bottom: 20px;
+        }
+
+        /* Streak Cards */
+        .streak-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .streak-card {
+            background: #0f1e35;
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px;
+            padding: 14px;
+            text-align: center;
+        }
+
+        .streak-icon {
+            font-size: 28px;
+            margin-bottom: 6px;
+        }
+
+        .streak-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 24px;
+            font-weight: 700;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .streak-value.red { color: #E63946; }
+        .streak-value.teal { color: #2EC4B6; }
+        .streak-value.gold { color: #FFB703; }
+        .streak-value.green { color: #22C55E; }
+
+        .streak-label {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: #64748B;
+        }
+
+        /* Goal Cards */
+        .goal-card {
+            background: #162843;
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px;
+            padding: 14px;
+            margin-bottom: 10px;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .goal-card.completed {
+            opacity: 0.6;
+        }
+
+        .goal-checkbox {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 2px solid rgba(255,255,255,0.2);
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+        }
+
+        .goal-checkbox.checked {
+            background: #22C55E;
+            border-color: #22C55E;
+            color: #fff;
+        }
+
+        .goal-content {
+            flex: 1;
+        }
+
+        .goal-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .goal-progress-bar {
+            height: 6px;
+            background: #0A1628;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 4px;
+        }
+
+        .goal-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #2EC4B6, #2EC4B6);
+            border-radius: 3px;
+        }
+
+        .goal-progress-text {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: #64748B;
+            text-align: right;
+        }
+
+        /* Coach Feedback Timeline */
+        .feedback-timeline {
+            position: relative;
+            padding-left: 24px;
+            margin-bottom: 20px;
+        }
+
+        .feedback-timeline::before {
+            content: '';
+            position: absolute;
+            left: 5px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: rgba(255,255,255,0.1);
+        }
+
+        .feedback-item {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .feedback-dot {
+            position: absolute;
+            left: -18px;
+            top: 4px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: 2px solid #2EC4B6;
+            background: #0A1628;
+        }
+
+        .feedback-dot.highlight {
+            background: #E63946;
+            border-color: #E63946;
+        }
+
+        .feedback-date {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: #64748B;
+            margin-bottom: 4px;
+        }
+
+        .feedback-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .feedback-snippet {
+            font-size: 12px;
+            color: #A0AEC0;
+        }
+
+        /* Self Assessment */
+        .self-assessment {
+            background: linear-gradient(135deg, rgba(255,183,3,0.08), rgba(46,196,182,0.08));
+            border: 1px solid rgba(255,183,3,0.2);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .assessment-title {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        .star-rating {
+            font-size: 28px;
+            margin-bottom: 8px;
+            letter-spacing: 4px;
+        }
+
+        .star-filled {
+            color: #FFB703;
+        }
+
+        .star-empty {
+            color: #64748B;
+        }
+
+        .rating-hint {
+            font-size: 11px;
+            color: #64748B;
+            margin-bottom: 16px;
+        }
+
+        .assessment-btn {
+            background: #FFB703;
+            color: #000;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 10px 24px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            display: inline-block;
+        }
+
+        /* Profile Career Stats */
+        .career-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 16px;
+            margin: 24px 0;
+            text-align: center;
+        }
+
+        .career-stat-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 22px;
+            font-weight: 700;
+            color: #fff;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .career-stat-label {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: #64748B;
+        }
+
+        /* Profile Header */
+        .profile-header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .profile-name {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 22px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin: 12px 0;
+        }
+
+        .profile-badges {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .profile-badge {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            padding: 6px 12px;
+            border-radius: 12px;
+            background: rgba(46,196,182,0.15);
+            color: #2EC4B6;
+        }
+
+        /* Settings */
+        .settings-list {
+            margin-top: 20px;
+        }
+
+        .setting-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .setting-label {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .setting-value {
+            font-size: 13px;
+            color: #A0AEC0;
+        }
+
+        .language-toggle {
+            display: flex;
+            gap: 8px;
+        }
+
+        .language-toggle span {
+            cursor: pointer;
+        }
+
+        .language-toggle span.active {
+            color: #2EC4B6;
+            font-weight: 700;
+        }
+
+        .toggle-switch {
+            width: 44px;
+            height: 24px;
+            background: #22C55E;
+            border-radius: 12px;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: #fff;
+            border-radius: 50%;
+            top: 2px;
+            right: 2px;
+            transition: all 0.2s;
+        }
+
+        .account-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: #A0AEC0;
+        }
+
+        .sign-out-btn {
+            width: 100%;
+            background: transparent;
+            border: 1px solid rgba(239,68,68,0.3);
+            color: #EF4444;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 14px;
+            border-radius: 10px;
+            margin-top: 24px;
+            cursor: pointer;
+        }
+
+        /* Design Notes */
+        .design-notes {
+            max-width: 1200px;
+            margin: 40px auto 0;
+            padding: 32px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 16px;
+        }
+
+        .design-notes h2 {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 24px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #2EC4B6;
+            margin-bottom: 20px;
+        }
+
+        .design-notes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .design-note {
+            padding: 16px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 10px;
+        }
+
+        .design-note h3 {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #FFB703;
+            margin-bottom: 8px;
+        }
+
+        .design-note p {
+            font-size: 13px;
+            color: #A0AEC0;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="showcase-header">
+        <h1>VOLLEYQUEST</h1>
+        <div class="subtitle">Mobile Player Experience — Wireframes</div>
+        <div class="info-bar">iPhone 14/15 · 390×844 · Bottom Tab Navigation · Quick RSVP Focus</div>
+    </div>
+
+    <div class="phones-container">
+        <!-- SCREEN 1: HOME -->
+        <div class="phone-wrapper">
+            <div class="phone-label">01 — Home Dashboard</div>
+            <div class="phone-frame">
+                <div class="status-bar">
+                    <span>9:41</span>
+                    <span style="margin-left: auto;">📶 🔋</span>
+                </div>
+                <div class="dynamic-island"></div>
+
+                <div class="phone-content">
+                    <div class="top-bar">
+                        <div class="top-bar-title">OSLO VOLLEY U19</div>
+                        <div class="avatar">EH</div>
+                    </div>
+
+                    <div class="fifa-card">
+                        <div class="fifa-card-rating">
+                            <div class="rating-number">78</div>
+                            <div class="rating-position">OH</div>
+                        </div>
+                        <div class="fifa-card-center">
+                            <div class="avatar" style="width: 56px; height: 56px; font-size: 20px;">EH</div>
+                            <div class="fifa-card-name">ERIK HANSEN</div>
+                        </div>
+                        <div class="fifa-card-right">
+                            <div class="trend-badge">+3 ↑</div>
+                        </div>
+                    </div>
+                    <div class="skill-pills">
+                        <div class="skill-pill">
+                            <span class="skill-pill-value">76</span>
+                            <span class="skill-pill-label">SRV</span>
+                        </div>
+                        <div class="skill-pill">
+                            <span class="skill-pill-value">84</span>
+                            <span class="skill-pill-label">ATK</span>
+                        </div>
+                        <div class="skill-pill">
+                            <span class="skill-pill-value">81</span>
+                            <span class="skill-pill-label">BLK</span>
+                        </div>
+                        <div class="skill-pill">
+                            <span class="skill-pill-value">70</span>
+                            <span class="skill-pill-label">DIG</span>
+                        </div>
+                    </div>
+
+                    <div class="next-event-card">
+                        <div class="event-label">NEXT EVENT</div>
+                        <div class="event-title">Practice Session</div>
+                        <div class="event-meta">
+                            <div class="event-meta-item">📅 Thu, Feb 6 · 18:00</div>
+                            <div class="event-meta-item">📍 Ekeberg Hall</div>
+                        </div>
+                        <div class="rsvp-buttons">
+                            <div class="rsvp-btn primary">✓ GOING</div>
+                            <div class="rsvp-btn secondary">CAN'T MAKE IT</div>
+                        </div>
+                    </div>
+
+                    <div class="quick-stats">
+                        <div class="stat-card">
+                            <span class="stat-value red">7</span>
+                            <span class="stat-label">STREAK</span>
+                            <div class="stat-extra">🔥 Best!</div>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-value green">92%</span>
+                            <span class="stat-label">ATTENDANCE</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-value gold">3</span>
+                            <span class="stat-label">GOALS</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-value teal">12</span>
+                            <span class="stat-label">GAMES</span>
+                        </div>
+                    </div>
+
+                    <div class="section-header">UPCOMING THIS WEEK</div>
+
+                    <div class="schedule-item">
+                        <div class="schedule-date">
+                            <div class="schedule-date-day">06</div>
+                            <div class="schedule-date-month">FEB</div>
+                        </div>
+                        <div class="schedule-info">
+                            <div class="event-type-badge practice">PRACTICE</div>
+                            <div class="schedule-title">Practice Session</div>
+                            <div class="schedule-meta">18:00 · Ekeberg Hall</div>
+                        </div>
+                        <div class="schedule-rsvp">
+                            <div class="rsvp-status going">✓ GOING</div>
+                        </div>
+                    </div>
+
+                    <div class="schedule-item">
+                        <div class="schedule-date">
+                            <div class="schedule-date-day">08</div>
+                            <div class="schedule-date-month">FEB</div>
+                        </div>
+                        <div class="schedule-info">
+                            <div class="event-type-badge match">MATCH</div>
+                            <div class="schedule-title">vs Asker VBK</div>
+                            <div class="schedule-meta">14:00 · Home</div>
+                        </div>
+                        <div class="schedule-rsvp">
+                            <div class="rsvp-quick">
+                                <div class="rsvp-quick-btn yes">✓</div>
+                                <div class="rsvp-quick-btn no">✗</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section-header">TEAM NEWS</div>
+
+                    <div class="announcement-card">
+                        <div class="announcement-pinned">📌 PINNED</div>
+                        <div class="announcement-title">Tournament Schedule Update</div>
+                        <div class="announcement-desc">Updated bracket posted for Oslo Cup...</div>
+                        <div class="announcement-time">2h ago</div>
+                    </div>
+                </div>
+
+                <div class="bottom-tab-bar">
+                    <div class="tab-item active">
+                        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                        <span>Home</span>
+                    </div>
+                    <div class="tab-item">
+                        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10z"/></svg>
+                        <span>Schedule</span>
+                    </div>
+                    <div class="tab-item">
+                        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8z"/></svg>
+                        <span>Stats</span>
+                    </div>
+                    <div class="tab-item">
+                        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-5-9h10v2H7z"/><circle cx="12" cy="12" r="3"/></svg>
+                        <span>Goals</span>
+                    </div>
+                    <div class="tab-item">
+                        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                        <span>Profile</span>
+                    </div>
+                </div>
+                <div class="home-indicator"></div>
+            </div>
+        </div>
+
+        <!-- SCREEN 2: SCHEDULE -->
+        <div class="phone-wrapper">
+            <div class="phone-label">02 — Schedule</div>
+            <div class="phone-frame">
+                <div class="status-bar">
+                    <span>9:41</span>
+                    <span style="margin-left: auto;">📶 🔋</span>
+                </div>
+                <div class="dynamic-island"></div>
+
+                <div class="phone-content">
+                    <div class="top-bar centered">
+                        <div class="top-bar-title large">SCHEDULE</div>
+                    </div>
+
+                    <div class="month-selector">
+                        <div class="month-nav">‹</div>
+                        <div class="month-current">FEBRUARY 2026</div>
+                        <div class="month-nav">›</div>
+                    </div>
+
+                    <div class="view-toggle">
+                        <div class="view-toggle-btn active">List</div>
+                        <div class="view-toggle-btn">Calendar</div>
+                    </div>
+
+                    <div class="schedule-item">
+                        <div class="schedule-date">
+                            <div class="schedule-date-day">06</div>
+                            <div class="schedule-date-month">FEB</div>
+                        </div>
+                        <div class="schedule-info">
+                            <div class="event-type-badge practice">PRACTICE</div>
+                            <div class="schedule-title">Practice Session</div>
+                            <div class="schedule-meta">18:00 · Ekeberg Hall</div>
+                        </div>
+                        <div class="schedule-rsvp">
+                            <div class="rsvp-status going">✓ GOING</div>
+                        </div>
+                    </div>
+
+                    <div class="schedule-item">
+                        <div class="schedule-date">
+                            <div class="schedule-date-day">08</div>
+                            <div class="schedule-date-month">FEB</div>
+                        </div>
+                        <div class="schedule-info">
+                            <div class="event-type-badge match">MATCH</div>
+                            <div class="schedule-title">vs Asker VBK</div>
+                            <div class="schedule-meta">14:00 · Home</div>
+                        </div>
+                        <div class="schedule-rsvp">
+                            <div class="rsvp-quick">
+                                <div class="rsvp-quick-btn yes">✓</div>
+                                <div class="rsvp-quick-btn no">✗</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="schedule-item">
+                        <div class="schedule-date">
+                            <div class="schedule-date-day">10</div>
+                            <div class="schedule-date-month">FEB</div>
+                        </div>
+                        <div class="schedule-info">
+                            <div class="event-type-badge practice">PRACTICE</div>
+                            <div class="schedule-title">Practice Session</div>
+                            <div class="schedule-meta">18:00 · Ekeberg Hall</div>
+                        </div>
+                        <div class="schedule-rsvp">
+                            <div class="rsvp-status not-going">✗ NOT GOING</div>
+                        </div>
+                    </div>
+
+                    <div class="schedule-item">
+                        <div class="schedule-date">
+                            <div class="schedule-date-day">13</div>
+                            <div class="schedule-date-month">FEB</div>
+                        </div>
+                        <div class="schedule-info">
+                            <div class="event-type-badge practice">PRACTICE</div>
+                            <div class="schedule-title">Practice Session</div>
+                            <div class="schedule-meta">18:00 · Nord Hall</div>
+                        </div>
+                        <div class="schedule-rsvp">
+                            <div class="rsvp-quick">
+                                <div class="rsvp-quick-btn yes">✓</div>
+                                <div class="rsvp-quick-btn no">✗</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="schedule-item">
+                        <div class="schedule-date">
+                            <div class="schedule-date-day">15</div>
+                            <div class="schedule-date-month">FEB</div>
+                        </div>
+                        <div class="schedule-info">
+                            <div class="event-type-badge tournament">TOURNAMENT</div>
+                            <div class="schedule-title">Oslo Cup Day 1</div>
+                            <div class="schedule-meta">09:00 · Multiple Courts</div>
+                        </div>
+                        <div class="schedule-rsvp">
+                            <div class="rsvp-quick">
+                                <div class="rsvp-quick-btn yes">✓</div>
+                                <div class="rsvp-quick-btn no">✗</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="schedule-item">
+                        <div class="schedule-date">
+                            <div class="schedule-date-day">16</div>
+                            <div class="schedule-date-month">FEB</div>
+                        </div>
+                        <div class="schedule-info">
+                            <div class="event-type-badge tournament">TOURNAMENT</div>
+                            <div class="schedule-title">Oslo Cup Day 2</div>
+                            <div class="schedule-meta">09:00 · Multiple Courts</div>
+                        </div>
+                        <div class="schedule-rsvp">
+                            <div class="rsvp-status going">✓ GOING</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bottom-tab-bar">
+                    <div class="tab-item">
+                        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                        <span>Home</span>
+                    </div>
+                    <div class="tab-item active">
+                        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10z"/></svg>
+                        <span>Schedule</span>
+                    </div>
+                    <div class="tab-item">
+                        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8z"/></svg>
+                        <span>Stats</span>
+                    </div>
+                    <div class="tab-item">
+                        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-5-9h10v2H7z"/><circle cx="12" cy="12" r="3"/></svg>
+                        <span>Goals</span>
+                    </div>
+                    <div class="tab-item">
+                        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                        <span>Profile</span>
+                    </div>
+                </div>
+                <div class="home-indicator"></div>
+            </div>
+        </div>
+
+        <!-- SCREEN 3: MY STATS -->
+        <div class="phone-wrapper">
+            <div class="phone-label">03 — My Stats</div>
+            <div class="phone-frame">
+                <div class="status-bar">
+                    <span>9:41</span>
+                    <span style="margin-left: auto;">📶 🔋</span>
+                </div>
+                <div class="dynamic-island"></div>
+
+                <div class="phone-content">
+                    <div class="top-bar centered">
+                        <div class="top-bar-title large">MY STATS</div>
+                    </div>
+
+                    <div class="season-pill">2025/26 SEASON ▾</div>
+
+                    <div class="fifa-card compact">
+                        <div class="fifa-card-rating">
+                            <div class="rating-number">78</div>
+                            <div class="rating-position">OVERALL</div>
+                        </div>
+                        <div style="flex: 1; text-align: center;">
+                            <div class="trend-badge">+3 ↑</div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-size: 12px; color: #64748B;">OH · #7</div>
+                        </div>
+                    </div>
+
+                    <div class="section-header">SKILL RATINGS</div>
+
+                    <div class="skill-bars">
+                        <div class="skill-bar-row">
+                            <div class="skill-bar-label">SERVE</div>
+                            <div class="skill-bar-track">
+                                <div class="skill-bar-fill" style="width: 76%;">76</div>
+                            </div>
+                            <div class="skill-bar-trend up">↑</div>
+                        </div>
+                        <div class="skill-bar-row">
+                            <div class="skill-bar-label">RECEIVE</div>
+                            <div class="skill-bar-track">
+                                <div class="skill-bar-fill" style="width: 72%;">72</div>
+                            </div>
+                            <div class="skill-bar-trend down">↓</div>
+                        </div>
+                        <div class="skill-bar-row">
+                            <div class="skill-bar-label">SET</div>
+                            <div class="skill-bar-track">
+                                <div class="skill-bar-fill" style="width: 68%;">68</div>
+                            </div>
+                            <div class="skill-bar-trend neutral">—</div>
+                        </div>
+                        <div class="skill-bar-row">
+                            <div class="skill-bar-label">BLOCK</div>
+                            <div class="skill-bar-track">
+                                <div class="skill-bar-fill" style="width: 81%;">81</div>
+                            </div>
+                            <div class="skill-bar-trend up">↑</div>
+                        </div>
+                        <div class="skill-bar-row">
+                            <div class="skill-bar-label">ATTACK</div>
+                            <div class="skill-bar-track">
+                                <div class="skill-bar-fill attack" style="width: 84%;">84</div>
+                            </div>
+                            <div class="skill-bar-trend up">↑</div>
+                        </div>
+                        <div class="skill-bar-row">
+                            <div class="skill-bar-label">DIG</div>
+                            <div class="skill-bar-track">
+                                <div class="skill-bar-fill" style="width: 70%;">70</div>
+                            </div>
+                            <div class="skill-bar-trend neutral">—</div>
+                        </div>
+                    </div>
+
+                    <div class="section-header">RECENT GAMES</div>
+
+                    <div class="game-card">
+                        <div class="game-card-header">
+                            <div class="game-opponent">vs Rælingen VBK</div>
+                            <div class="game-result win">WIN 3-1</div>
+                        </div>
+                        <div class="game-card-footer">
+                            <div class="game-date">Jan 28</div>
+                            <div class="game-stats">K:<span>8</span> A:<span>3</span> D:<span>5</span> E:<span>2</span></div>
+                        </div>
+                    </div>
+
+                    <div class="game-card">
+                        <div class="game-card-header">
+                            <div class="game-opponent">vs Asker VBK</div>
+                            <div class="game-result loss">LOSS 1-3</div>
+                        </div>
+                        <div class="game-card-footer">
+                            <div class="game-date">Jan 21</div>
+                            <div class="game-stats">K:<span>5</span> A:<span>2</span> D:<span>7</span> E:<span>3</span></div>
+                        </div>
+                    </div>
+
+                    <div class="game-card">
+                        <div class="game-card-header">
+                            <div class="game-opponent">vs Njård IL</div>
+                            <div class="game-result win">WIN 3-0</div>
+                        </div>
+                        <div class="game-card-footer">
+                            <div class="game-date">Jan 14</div>
+                            <div class="game-stats">K:<span>12</span> A:<span>5</span> D:<span>4</span> E:<span>1</span></div>
+                        </div>
+                    </div>
+
+                    <div class="section-header">SERVE TREND</div>
+                    <div class="chart-placeholder">📈 Serve consistency chart</div>
+                </div>
+
+                <div class="bottom-tab-bar">
+                    <div class="tab-item">
+                        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                        <span>Home</span>
+                    </div>
+                    <div class="tab-item">
+                        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10z"/></svg>
+                        <span>Schedule</span>
+                    </div>
+                    <div class="tab-item active">
+                        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8z"/></svg>
+                        <span>Stats</span>
+                    </div>
+                    <div class="tab-item">
+                        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-5-9h10v2H7z"/><circle cx="12" cy="12" r="3"/></svg>
+                        <span>Goals</span>
+                    </div>
+                    <div class="tab-item">
+                        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                        <span>Profile</span>
+                    </div>
+                </div>
+                <div class="home-indicator"></div>
+            </div>
+        </div>
+
+        <!-- SCREEN 4: GOALS & PROGRESS -->
+        <div class="phone-wrapper">
+            <div class="phone-label">04 — Goals & Progress</div>
+            <div class="phone-frame">
+                <div class="status-bar">
+                    <span>9:41</span>
+                    <span style="margin-left: auto;">📶 🔋</span>
+                </div>
+                <div class="dynamic-island"></div>
+
+                <div class="phone-content">
+                    <div class="top-bar centered">
+                        <div class="top-bar-title large">GOALS & PROGRESS</div>
+                    </div>
+
+                    <div class="streak-grid">
+                        <div class="streak-card">
+                            <div class="streak-icon">🔥</div>
+                            <span class="streak-value red">7</span>
+                            <div class="streak-label">ATTENDANCE STREAK</div>
+                        </div>
+                        <div class="streak-card">
+                            <div class="streak-icon">💪</div>
+                            <span class="streak-value teal">5</span>
+                            <div class="streak-label">PRACTICE STREAK</div>
+                        </div>
+                        <div class="streak-card">
+                            <div class="streak-icon">⭐</div>
+                            <span class="streak-value gold">12</span>
+                            <div class="streak-label">BEST STREAK</div>
+                        </div>
+                        <div class="streak-card">
+                            <div class="streak-icon">📊</div>
+                            <span class="streak-value green">23/25</span>
+                            <div class="streak-label">SEASON RECORD</div>
+                        </div>
+                    </div>
+
+                    <div class="section-header">ACTIVE GOALS</div>
+
+                    <div class="goal-card">
+                        <div class="goal-checkbox"></div>
+                        <div class="goal-content">
+                            <div class="goal-title">Improve serve accuracy to 85%</div>
+                            <div class="goal-progress-bar">
+                                <div class="goal-progress-fill" style="width: 72%;"></div>
+                            </div>
+                            <div class="goal-progress-text">72%</div>
+                        </div>
+                    </div>
+
+                    <div class="goal-card">
+                        <div class="goal-checkbox"></div>
+                        <div class="goal-content">
+                            <div class="goal-title">Complete 20 practice sessions</div>
+                            <div class="goal-progress-bar">
+                                <div class="goal-progress-fill" style="width: 75%;"></div>
+                            </div>
+                            <div class="goal-progress-text">75%</div>
+                        </div>
+                    </div>
+
+                    <div class="goal-card completed">
+                        <div class="goal-checkbox checked">✓</div>
+                        <div class="goal-content">
+                            <div class="goal-title">Score 5 aces in a match</div>
+                            <div class="goal-progress-bar">
+                                <div class="goal-progress-fill" style="width: 100%;"></div>
+                            </div>
+                            <div class="goal-progress-text">100%</div>
+                        </div>
+                    </div>
+
+                    <div class="section-header">COACH FEEDBACK</div>
+
+                    <div class="feedback-timeline">
+                        <div class="feedback-item">
+                            <div class="feedback-dot"></div>
+                            <div class="feedback-date">Feb 3, 2026</div>
+                            <div class="feedback-title">Great defensive work today!</div>
+                            <div class="feedback-snippet">Your reading of the game has improved significantly...</div>
+                        </div>
+                        <div class="feedback-item">
+                            <div class="feedback-dot"></div>
+                            <div class="feedback-date">Jan 28, 2026</div>
+                            <div class="feedback-title">Serving needs more consistency</div>
+                            <div class="feedback-snippet">Focus on your toss height and follow through...</div>
+                        </div>
+                        <div class="feedback-item">
+                            <div class="feedback-dot highlight"></div>
+                            <div class="feedback-date">Jan 20, 2026</div>
+                            <div class="feedback-title">Player of the Match! 🏆</div>
+                            <div class="feedback-snippet">Outstanding performance with 12 kills...</div>
+                        </div>
+                    </div>
+
+                    <div class="self-assessment">
+                        <div class="assessment-title">HOW WAS YOUR LAST SESSION?</div>
+                        <div class="star-rating">
+                            <span class="star-filled">★</span>
+                            <span class="star-filled">★</span>
+                            <span class="star-filled">★</span>
+                            <span class="star-empty">★</span>
+                            <span class="star-empty">★</span>
+                        </div>
+                        <div class="rating-hint">Tap to rate</div>
+                        <button class="assessment-btn">SUBMIT REFLECTION</button>
+                    </div>
+                </div>
+
+                <div class="bottom-tab-bar">
+                    <div class="tab-item">
+                        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                        <span>Home</span>
+                    </div>
+                    <div class="tab-item">
+                        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10z"/></svg>
+                        <span>Schedule</span>
+                    </div>
+                    <div class="tab-item">
+                        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8z"/></svg>
+                        <span>Stats</span>
+                    </div>
+                    <div class="tab-item active">
+                        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-5-9h10v2H7z"/><circle cx="12" cy="12" r="3"/></svg>
+                        <span>Goals</span>
+                    </div>
+                    <div class="tab-item">
+                        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                        <span>Profile</span>
+                    </div>
+                </div>
+                <div class="home-indicator"></div>
+            </div>
+        </div>
+
+        <!-- SCREEN 5: PROFILE -->
+        <div class="phone-wrapper">
+            <div class="phone-label">05 — Profile</div>
+            <div class="phone-frame">
+                <div class="status-bar">
+                    <span>9:41</span>
+                    <span style="margin-left: auto;">📶 🔋</span>
+                </div>
+                <div class="dynamic-island"></div>
+
+                <div class="phone-content">
+                    <div class="top-bar centered">
+                        <div class="top-bar-title large">PROFILE</div>
+                    </div>
+
+                    <div class="profile-header">
+                        <div class="avatar large">EH</div>
+                        <div class="profile-name">ERIK HANSEN</div>
+                        <div class="profile-badges">
+                            <div class="profile-badge">OH</div>
+                            <div class="profile-badge">#7</div>
+                            <div class="profile-badge">Oslo Volley U19</div>
+                        </div>
+                    </div>
+
+                    <div class="career-stats">
+                        <div>
+                            <span class="career-stat-value">48</span>
+                            <span class="career-stat-label">Games</span>
+                        </div>
+                        <div>
+                            <span class="career-stat-value">142</span>
+                            <span class="career-stat-label">Kills</span>
+                        </div>
+                        <div>
+                            <span class="career-stat-value">67</span>
+                            <span class="career-stat-label">Aces</span>
+                        </div>
+                        <div>
+                            <span class="career-stat-value">89</span>
+                            <span class="career-stat-label">Blocks</span>
+                        </div>
+                        <div>
+                            <span class="career-stat-value">203</span>
+                            <span class="career-stat-label">Digs</span>
+                        </div>
+                        <div>
+                            <span class="career-stat-value">92%</span>
+                            <span class="career-stat-label">Attendance</span>
+                        </div>
+                    </div>
+
+                    <div class="section-header">SETTINGS</div>
+
+                    <div class="settings-list">
+                        <div class="setting-row">
+                            <div class="setting-label">Language</div>
+                            <div class="language-toggle">
+                                <span class="active">EN</span>
+                                <span>|</span>
+                                <span style="color: #64748B;">NO</span>
+                            </div>
+                        </div>
+                        <div class="setting-row">
+                            <div class="setting-label">Notifications</div>
+                            <div class="toggle-switch"></div>
+                        </div>
+                        <div class="setting-row">
+                            <div class="setting-label">Linked Account</div>
+                            <div class="account-info">
+                                <span>G</span>
+                                <span>erik.h@gmail.com</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="sign-out-btn">SIGN OUT</button>
+                </div>
+
+                <div class="bottom-tab-bar">
+                    <div class="tab-item">
+                        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                        <span>Home</span>
+                    </div>
+                    <div class="tab-item">
+                        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10z"/></svg>
+                        <span>Schedule</span>
+                    </div>
+                    <div class="tab-item">
+                        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8z"/></svg>
+                        <span>Stats</span>
+                    </div>
+                    <div class="tab-item">
+                        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-5-9h10v2H7z"/><circle cx="12" cy="12" r="3"/></svg>
+                        <span>Goals</span>
+                    </div>
+                    <div class="tab-item active">
+                        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                        <span>Profile</span>
+                    </div>
+                </div>
+                <div class="home-indicator"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="design-notes">
+        <h2>Design Notes</h2>
+        <div class="design-notes-grid">
+            <div class="design-note">
+                <h3>Quick RSVP Focus</h3>
+                <p>Every event shows immediate RSVP status or quick action buttons. Players can respond with a single tap using checkmark/X buttons, reducing friction for schedule management.</p>
+            </div>
+            <div class="design-note">
+                <h3>Gamified Stats</h3>
+                <p>FIFA-style rating cards make performance tracking engaging and familiar. Overall rating, skill breakdowns, and trend indicators create a game-like progression system that motivates improvement.</p>
+            </div>
+            <div class="design-note">
+                <h3>Bottom Navigation</h3>
+                <p>Thumb-optimized tab bar keeps primary navigation always accessible. Active states use the club red color with subtle background pills for clear visual feedback.</p>
+            </div>
+            <div class="design-note">
+                <h3>Streak Mechanics</h3>
+                <p>Attendance and practice streaks with emoji icons and prominent counters encourage consistency. The "Best!" callout adds positive reinforcement for maintaining good habits.</p>
+            </div>
+            <div class="design-note">
+                <h3>Timeline Feedback</h3>
+                <p>Coach feedback displayed as a vertical timeline with visual indicators for highlighted entries. Creates a progression narrative and recognizes standout performances.</p>
+            </div>
+            <div class="design-note">
+                <h3>Self-Reflection</h3>
+                <p>Players can rate their own sessions and submit reflections. The gold-accented assessment card stands out while maintaining the overall dark sports aesthetic.</p>
+            </div>
+            <div class="design-note">
+                <h3>Contextual Badges</h3>
+                <p>Event type badges (Practice, Match, Tournament) use semantic colors from the design system. Teal for practice, red for matches, gold for special events.</p>
+            </div>
+            <div class="design-note">
+                <h3>Progressive Disclosure</h3>
+                <p>Home screen shows next event hero card with full details, while upcoming list shows compact versions. Players get critical info at a glance without overwhelming the interface.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

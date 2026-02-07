@@ -181,18 +181,12 @@ export function usePlayerStats(options: UsePlayerStatsOptions): UsePlayerStatsRe
     ]);
   };
 
-  // Initial load
+  // Initial load - fetch all data in parallel
   useEffect(() => {
     fetchStats();
-  }, [playerId, position, period, customRange, teamId, seasonId]);
-
-  useEffect(() => {
     fetchAttendance();
-  }, [playerId, teamId]);
-
-  useEffect(() => {
     fetchDrills();
-  }, [playerId, teamId]);
+  }, [playerId, position, period, customRange, teamId, seasonId]);
 
   return {
     isLoading,

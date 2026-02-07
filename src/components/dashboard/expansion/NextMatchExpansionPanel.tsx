@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { format, parseISO } from 'date-fns';
 import { MapPin, Clock, Calendar } from 'lucide-react';
 import { getRSVPSummary } from '@/services/rsvp.service';
@@ -11,7 +11,6 @@ interface NextMatchExpansionPanelProps {
 }
 
 export function NextMatchExpansionPanel({ nextMatch, upcomingEvents }: NextMatchExpansionPanelProps) {
-  const navigate = useNavigate();
   const [rsvp, setRsvp] = useState<{ attending: number; not_attending: number; pending: number; total: number } | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -67,9 +66,9 @@ export function NextMatchExpansionPanel({ nextMatch, upcomingEvents }: NextMatch
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Left: Match details + RSVP */}
         <div className="space-y-5">
-          <div
-            className="p-4 rounded-lg bg-white/[0.02] border border-white/[0.04] cursor-pointer hover:border-vq-teal/30 transition-colors"
-            onClick={() => navigate(`/events/${nextMatch.id}`)}
+          <Link
+            to={`/events/${nextMatch.id}`}
+            className="block p-4 rounded-lg bg-white/[0.02] border border-white/[0.04] hover:border-vq-teal/30 transition-colors"
           >
             {nextMatch.opponent && (
               <p className="font-display font-bold text-lg text-white mb-3">
@@ -92,7 +91,7 @@ export function NextMatchExpansionPanel({ nextMatch, upcomingEvents }: NextMatch
                 </div>
               )}
             </div>
-          </div>
+          </Link>
 
           {/* RSVP Breakdown */}
           {isLoading ? (
@@ -147,10 +146,10 @@ export function NextMatchExpansionPanel({ nextMatch, upcomingEvents }: NextMatch
               {upcomingMatches.map(match => {
                 const date = parseISO(match.start_time);
                 return (
-                  <div
+                  <Link
                     key={match.id}
-                    className="flex items-center gap-3 p-3 rounded bg-white/[0.02] hover:bg-white/[0.04] cursor-pointer transition-colors"
-                    onClick={() => navigate(`/events/${match.id}`)}
+                    to={`/events/${match.id}`}
+                    className="flex items-center gap-3 p-3 rounded bg-white/[0.02] hover:bg-white/[0.04] transition-colors"
                   >
                     <div className="text-center shrink-0 w-10">
                       <p className="font-mono text-xs text-gray-400">{format(date, 'MMM')}</p>
@@ -164,7 +163,7 @@ export function NextMatchExpansionPanel({ nextMatch, upcomingEvents }: NextMatch
                         {match.location || 'TBD'} • {format(date, 'HH:mm')}
                       </p>
                     </div>
-                  </div>
+                  </Link>
                 );
               })}
             </div>

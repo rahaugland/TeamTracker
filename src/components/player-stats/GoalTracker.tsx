@@ -111,6 +111,7 @@ export function GoalTracker({ goals, isCoach, onCreateGoal, onToggleComplete, on
                     className="h-7 w-7"
                     onClick={() => onToggleComplete(goal.id, true)}
                     title={t('goals.markComplete')}
+                    aria-label={t('goals.markComplete')}
                   >
                     <Check className="h-4 w-4" />
                   </Button>
@@ -120,6 +121,7 @@ export function GoalTracker({ goals, isCoach, onCreateGoal, onToggleComplete, on
                     className="h-7 w-7 text-destructive"
                     onClick={() => onDeleteGoal(goal.id)}
                     title={t('common.buttons.delete')}
+                    aria-label={t('common.buttons.delete')}
                   >
                     <Trash2 className="h-3 w-3" />
                   </Button>
@@ -169,6 +171,7 @@ export function GoalTracker({ goals, isCoach, onCreateGoal, onToggleComplete, on
                           className="h-7 w-7"
                           onClick={() => onToggleComplete(goal.id, false)}
                           title={t('goals.markIncomplete')}
+                          aria-label={t('goals.markIncomplete')}
                         >
                           <Check className="h-4 w-4" />
                         </Button>

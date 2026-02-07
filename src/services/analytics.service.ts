@@ -77,23 +77,7 @@ export async function getPlayerAttendanceRates(
   dateRange?: DateRange
 ): Promise<PlayerAttendanceRate[]> {
   try {
-    // Get all active team members
-    const { data: memberships, error: memberError } = await supabase
-      .from('team_memberships')
-      .select(`
-        player_id,
-        player:players(
-          id,
-          name,
-          photo_url
-        )
-      `)
-      .eq('team_id', teamId)
-      .eq('is_active', true);
-
-    if (memberError) throw memberError;
-
-    // Get events in the date range
+    // Build events query with optional date range
     let eventsQuery = supabase
       .from('events')
       .select('id, start_time')
@@ -106,9 +90,27 @@ export async function getPlayerAttendanceRates(
         .lte('start_time', dateRange.endDate);
     }
 
-    const { data: events, error: eventsError } = await eventsQuery;
-    if (eventsError) throw eventsError;
+    // Fetch memberships and events in parallel
+    const [membershipsRes, eventsRes] = await Promise.all([
+      supabase
+        .from('team_memberships')
+        .select(`
+          player_id,
+          player:players(
+            id,
+            name,
+            photo_url
+          )
+        `)
+        .eq('team_id', teamId)
+        .eq('is_active', true),
+      eventsQuery,
+    ]);
 
+    if (membershipsRes.error) throw membershipsRes.error;
+    if (eventsRes.error) throw eventsRes.error;
+
+    const events = eventsRes.data;
     if (!events || events.length === 0) {
       return [];
     }
@@ -123,37 +125,43 @@ export async function getPlayerAttendanceRates(
 
     if (attendanceError) throw attendanceError;
 
-    // Calculate rates for each player
-    const playerRates: PlayerAttendanceRate[] = (memberships || []).map((membership: any) => {
-      const playerId = membership.player_id;
-      const playerRecords = (attendanceRecords || []).filter(
-        (r) => r.player_id === playerId
-      );
+    // Build index Map for O(1) lookups per player (instead of O(N*M) filter)
+    const recordsByPlayer = new Map<string, Array<{ player_id: string; status: string }>>();
+    for (const r of attendanceRecords || []) {
+      if (!recordsByPlayer.has(r.player_id)) recordsByPlayer.set(r.player_id, []);
+      recordsByPlayer.get(r.player_id)!.push(r);
+    }
 
-      const presentCount = playerRecords.filter((r) => r.status === 'present').length;
-      const lateCount = playerRecords.filter((r) => r.status === 'late').length;
-      const absentCount = playerRecords.filter((r) => r.status === 'absent').length;
-      const excusedCount = playerRecords.filter((r) => r.status === 'excused').length;
+    // Calculate rates for each player using single-pass counting
+    const playerRates: PlayerAttendanceRate[] = (membershipsRes.data || []).map((membership: any) => {
+      const playerId = membership.player_id;
+      const playerRecords = recordsByPlayer.get(playerId) || [];
+
+      // Single-pass status counting instead of 4 separate filter() calls
+      const counts = { present: 0, late: 0, absent: 0, excused: 0 };
+      for (const r of playerRecords) {
+        if (r.status in counts) counts[r.status as keyof typeof counts]++;
+      }
       const totalEvents = playerRecords.length;
 
       // Attendance rate: (present + late) / total events
       const attendanceRate =
-        totalEvents > 0 ? ((presentCount + lateCount) / totalEvents) * 100 : 0;
+        totalEvents > 0 ? ((counts.present + counts.late) / totalEvents) * 100 : 0;
 
       return {
         playerId,
         playerName: membership.player?.name || 'Unknown',
         photoUrl: membership.player?.photo_url,
         totalEvents,
-        presentCount,
-        lateCount,
-        absentCount,
-        excusedCount,
-        attendanceRate: Math.round(attendanceRate * 10) / 10, // Round to 1 decimal
+        presentCount: counts.present,
+        lateCount: counts.late,
+        absentCount: counts.absent,
+        excusedCount: counts.excused,
+        attendanceRate: Math.round(attendanceRate * 10) / 10,
       };
     });
 
-    return playerRates.sort((a, b) => b.attendanceRate - a.attendanceRate);
+    return playerRates.toSorted((a, b) => b.attendanceRate - a.attendanceRate);
   } catch (error) {
     console.error('Error calculating player attendance rates:', error);
     throw error;
@@ -168,17 +176,14 @@ export async function getTeamAttendanceRate(
   dateRange?: DateRange
 ): Promise<TeamAttendanceRate | null> {
   try {
-    // Get team info
-    const { data: team, error: teamError } = await supabase
-      .from('teams')
-      .select('id, name')
-      .eq('id', teamId)
-      .single();
+    // Fetch team info and player rates in parallel
+    const [teamRes, playerRates] = await Promise.all([
+      supabase.from('teams').select('id, name').eq('id', teamId).single(),
+      getPlayerAttendanceRates(teamId, dateRange),
+    ]);
 
-    if (teamError) throw teamError;
-
-    // Get player attendance rates
-    const playerRates = await getPlayerAttendanceRates(teamId, dateRange);
+    if (teamRes.error) throw teamRes.error;
+    const team = teamRes.data;
 
     if (playerRates.length === 0) {
       return {
@@ -417,12 +422,10 @@ export async function getUpcomingEventsWithRSVPs(
           return { ...event, rsvpCounts: { attending: 0, not_attending: 0, maybe: 0, pending: 0 }, totalRSVPs: 0 };
         }
 
-        const rsvpCounts = {
-          attending: rsvps?.filter((r) => r.status === 'attending').length || 0,
-          not_attending: rsvps?.filter((r) => r.status === 'not_attending').length || 0,
-          maybe: rsvps?.filter((r) => r.status === 'maybe').length || 0,
-          pending: rsvps?.filter((r) => r.status === 'pending').length || 0,
-        };
+        const rsvpCounts = { attending: 0, not_attending: 0, maybe: 0, pending: 0 };
+        for (const r of rsvps || []) {
+          if (r.status in rsvpCounts) rsvpCounts[r.status as keyof typeof rsvpCounts]++;
+        }
 
         return {
           ...event,
@@ -447,24 +450,32 @@ export async function getRecentActivity(
   limit: number = 5
 ): Promise<RecentActivity[]> {
   try {
+    // Fetch players and events in parallel
+    const [playersRes, eventsRes] = await Promise.all([
+      supabase
+        .from('team_memberships')
+        .select(`
+          id,
+          joined_at,
+          player:players(
+            name
+          )
+        `)
+        .eq('team_id', teamId)
+        .order('joined_at', { ascending: false })
+        .limit(3),
+      supabase
+        .from('events')
+        .select('id, type, title, created_at')
+        .eq('team_id', teamId)
+        .order('created_at', { ascending: false })
+        .limit(3),
+    ]);
+
     const activities: RecentActivity[] = [];
 
-    // Get recent players added to the team
-    const { data: recentPlayers, error: playersError } = await supabase
-      .from('team_memberships')
-      .select(`
-        id,
-        joined_at,
-        player:players(
-          name
-        )
-      `)
-      .eq('team_id', teamId)
-      .order('joined_at', { ascending: false })
-      .limit(3);
-
-    if (!playersError && recentPlayers) {
-      recentPlayers.forEach((membership: any) => {
+    if (!playersRes.error && playersRes.data) {
+      playersRes.data.forEach((membership: any) => {
         activities.push({
           id: membership.id,
           type: 'player_added',
@@ -475,16 +486,8 @@ export async function getRecentActivity(
       });
     }
 
-    // Get recent events created
-    const { data: recentEvents, error: eventsError } = await supabase
-      .from('events')
-      .select('id, type, title, created_at')
-      .eq('team_id', teamId)
-      .order('created_at', { ascending: false })
-      .limit(3);
-
-    if (!eventsError && recentEvents) {
-      recentEvents.forEach((event) => {
+    if (!eventsRes.error && eventsRes.data) {
+      eventsRes.data.forEach((event) => {
         activities.push({
           id: event.id,
           type: 'event_created',
@@ -497,7 +500,7 @@ export async function getRecentActivity(
 
     // Sort all activities by timestamp and limit
     return activities
-      .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+      .toSorted((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
       .slice(0, limit);
   } catch (error) {
     console.error('Error getting recent activity:', error);

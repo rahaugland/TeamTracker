@@ -10,6 +10,7 @@ import { OfflineIndicator } from '@/components/common/OfflineIndicator';
 import { PageLoadingSpinner } from '@/components/common/LoadingSpinner';
 import { useToastStore } from '@/hooks/useToast';
 import { startAutoSync, stopAutoSync, performSync } from '@/services/sync.service';
+import { PlayerContextProvider } from '@/hooks/usePlayerContext';
 
 // Eagerly loaded pages (authentication and critical paths)
 import { LoginPage } from '@/pages/LoginPage';
@@ -43,6 +44,13 @@ const PlayerStatsPage = lazy(() => import('@/pages/PlayerStatsPage').then(m => (
 const RecordStatsPage = lazy(() => import('@/pages/RecordStatsPage').then(m => ({ default: m.RecordStatsPage })));
 const TeamSeasonsPage = lazy(() => import('@/pages/TeamSeasonsPage').then(m => ({ default: m.TeamSeasonsPage })));
 const MatchSelectionPage = lazy(() => import('@/pages/MatchSelectionPage').then(m => ({ default: m.MatchSelectionPage })));
+
+// Player mobile tab pages
+const PlayerHomePage = lazy(() => import('@/pages/player/PlayerHomePage').then(m => ({ default: m.PlayerHomePage })));
+const PlayerSchedulePage = lazy(() => import('@/pages/player/PlayerSchedulePage').then(m => ({ default: m.PlayerSchedulePage })));
+const PlayerStatsTabPage = lazy(() => import('@/pages/player/PlayerStatsTabPage').then(m => ({ default: m.PlayerStatsTabPage })));
+const PlayerGoalsPage = lazy(() => import('@/pages/player/PlayerGoalsPage').then(m => ({ default: m.PlayerGoalsPage })));
+const PlayerProfilePage = lazy(() => import('@/pages/player/PlayerProfilePage').then(m => ({ default: m.PlayerProfilePage })));
 
 function App() {
   const { syncSession, user } = useAuth();
@@ -97,14 +105,51 @@ function App() {
             {/* Routes with AppShell */}
             <Route element={<AppShellWrapper />}>
               <Route path="/dashboard" element={<DashboardRedirect />} />
-              <Route
-                path="/player-dashboard"
-                element={
-                  <Suspense fallback={<PageLoadingSpinner />}>
-                    <PlayerDashboardPage />
-                  </Suspense>
-                }
-              />
+              {/* Player tab routes wrapped in PlayerContextProvider */}
+              <Route element={<PlayerContextWrapper />}>
+                <Route
+                  path="/player/home"
+                  element={
+                    <Suspense fallback={<PageLoadingSpinner />}>
+                      <PlayerHomePage />
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="/player/schedule"
+                  element={
+                    <Suspense fallback={<PageLoadingSpinner />}>
+                      <PlayerSchedulePage />
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="/player/stats"
+                  element={
+                    <Suspense fallback={<PageLoadingSpinner />}>
+                      <PlayerStatsTabPage />
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="/player/goals"
+                  element={
+                    <Suspense fallback={<PageLoadingSpinner />}>
+                      <PlayerGoalsPage />
+                    </Suspense>
+                  }
+                />
+                <Route
+                  path="/player/profile"
+                  element={
+                    <Suspense fallback={<PageLoadingSpinner />}>
+                      <PlayerProfilePage />
+                    </Suspense>
+                  }
+                />
+              </Route>
+              {/* Backwards compat redirect */}
+              <Route path="/player-dashboard" element={<Navigate to="/player/home" replace />} />
               <Route
                 path="/parent-dashboard"
                 element={
@@ -324,7 +369,7 @@ function DashboardRedirect() {
 
   switch (user.role) {
     case 'player':
-      return <Navigate to="/player-dashboard" replace />;
+      return <Navigate to="/player/home" replace />;
     case 'parent':
       return <Navigate to="/parent-dashboard" replace />;
     case 'head_coach':
@@ -344,6 +389,17 @@ function AppShellWrapper() {
     <AppShell>
       <Outlet />
     </AppShell>
+  );
+}
+
+/**
+ * Wrapper providing PlayerContext to player tab routes
+ */
+function PlayerContextWrapper() {
+  return (
+    <PlayerContextProvider>
+      <Outlet />
+    </PlayerContextProvider>
   );
 }
 

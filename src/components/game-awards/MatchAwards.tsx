@@ -14,7 +14,7 @@ export function MatchAwards({ awards, playerNames }: MatchAwardsProps) {
 
   if (awards.length === 0) return null;
 
-  const sorted = [...awards].sort(
+  const sorted = awards.toSorted(
     (a, b) => AWARD_ORDER.indexOf(a.award_type as GameAwardType) - AWARD_ORDER.indexOf(b.award_type as GameAwardType)
   );
 

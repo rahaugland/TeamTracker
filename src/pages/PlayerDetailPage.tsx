@@ -77,11 +77,10 @@ export function PlayerDetailPage() {
   }, [id]);
 
   // Players can only view their own profile - redirect if viewing another player
-  useEffect(() => {
-    if (isPlayer && player && player.user_id !== user?.id) {
-      navigate('/player-dashboard', { replace: true });
-    }
-  }, [isPlayer, player, user?.id, navigate]);
+  if (isPlayer && player && player.user_id !== user?.id) {
+    navigate('/player-dashboard', { replace: true });
+    return null;
+  }
 
   const loadPlayerData = async (playerId: string) => {
     setIsLoading(true);

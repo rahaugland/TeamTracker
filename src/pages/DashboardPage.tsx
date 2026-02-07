@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { format, isToday, parseISO, differenceInDays } from 'date-fns';
 import { useAuth, useSeasons, useTeams, usePlayers } from '@/store';
 import { getActiveSeason } from '@/services/seasons.service';
@@ -13,7 +13,8 @@ import { getPracticePlansByTeam } from '@/services/practice-plans.service';
 import { getPlayerAttendance } from '@/services/attendance.service';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { StatCard, TodayEventCard } from '@/components/dashboard';
+import { StatCard } from '@/components/dashboard/StatCard';
+import { TodayEventCard } from '@/components/dashboard/TodayEventCard';
 import {
   ExpansionContainer,
   AttendanceExpansionPanel,
@@ -22,7 +23,7 @@ import {
   NextMatchExpansionPanel,
 } from '@/components/dashboard/expansion';
 import { ScheduleItem } from '@/components/schedule';
-import { PlayerAvatar } from '@/components/player';
+import { PlayerAvatar } from '@/components/player/PlayerAvatar';
 import type { Event, Player } from '@/types/database.types';
 
 type ExpandedPanel = 'attendance' | 'winRate' | 'activePlayers' | 'nextMatch' | null;
@@ -214,7 +215,7 @@ export function DashboardPage() {
 
   // Sorted players for roster table
   const sortedPlayers = useMemo(() => {
-    return [...playersWithAttendance].sort((a, b) => {
+    return playersWithAttendance.toSorted((a, b) => {
       return attendanceSortOrder === 'desc'
         ? b.attendance - a.attendance
         : a.attendance - b.attendance;
@@ -413,16 +414,17 @@ export function DashboardPage() {
                   <tr className="border-b border-white/[0.04]">
                     <th className="text-left text-xs font-display font-semibold uppercase tracking-wider text-gray-400 px-4 py-3">Player</th>
                     <th className="text-left text-xs font-display font-semibold uppercase tracking-wider text-gray-400 px-4 py-3">Pos</th>
-                    <th
-                      className="text-left text-xs font-display font-semibold uppercase tracking-wider text-gray-400 px-4 py-3 cursor-pointer hover:text-white transition-colors select-none"
-                      onClick={() => setAttendanceSortOrder(prev => prev === 'desc' ? 'asc' : 'desc')}
-                    >
-                      <span className="inline-flex items-center gap-1">
+                    <th className="text-left text-xs font-display font-semibold uppercase tracking-wider text-gray-400 px-4 py-3">
+                      <button
+                        type="button"
+                        onClick={() => setAttendanceSortOrder(prev => prev === 'desc' ? 'asc' : 'desc')}
+                        className="inline-flex items-center gap-1 cursor-pointer hover:text-white transition-colors select-none"
+                      >
                         Attendance
                         <span className="text-vq-teal">
                           {attendanceSortOrder === 'desc' ? '↓' : '↑'}
                         </span>
-                      </span>
+                      </button>
                     </th>
                     <th className="text-center text-xs font-display font-semibold uppercase tracking-wider text-gray-400 px-4 py-3">Form</th>
                   </tr>
@@ -434,6 +436,9 @@ export function DashboardPage() {
                         key={player.id}
                         className="border-b border-white/[0.04] hover:bg-white/[0.02] cursor-pointer transition-colors"
                         onClick={() => navigate(`/players/${player.id}`)}
+                        tabIndex={0}
+                        role="link"
+                        onKeyDown={(e) => { if (e.key === 'Enter') navigate(`/players/${player.id}`); }}
                       >
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-3">
@@ -531,9 +536,9 @@ export function DashboardPage() {
 
             {/* Practice Plan Link */}
             {todayPracticePlan ? (
-              <div
-                className="flex items-center gap-4 p-4 rounded-lg bg-navy-90 border border-white/[0.06] cursor-pointer hover:border-vq-teal/40 transition-all"
-                onClick={() => navigate('/practice-plans')}
+              <Link
+                to="/practice-plans"
+                className="flex items-center gap-4 p-4 rounded-lg bg-navy-90 border border-white/[0.06] hover:border-vq-teal/40 transition-all"
               >
                 <div className="w-10 h-10 rounded-lg bg-vq-teal/10 flex items-center justify-center text-xl">
                   📋
@@ -543,11 +548,11 @@ export function DashboardPage() {
                   <p className="text-xs text-gray-400">{todayPracticePlan.name} • {todayPracticePlan.drillCount} drills • {todayPracticePlan.totalMinutes} min</p>
                 </div>
                 <span className="text-vq-teal text-xl">→</span>
-              </div>
+              </Link>
             ) : todayEvent?.type === 'practice' ? (
-              <div
-                className="flex items-center gap-4 p-4 rounded-lg bg-navy-90 border border-white/[0.06] cursor-pointer hover:border-vq-teal/40 transition-all"
-                onClick={() => navigate('/practice-plans')}
+              <Link
+                to="/practice-plans"
+                className="flex items-center gap-4 p-4 rounded-lg bg-navy-90 border border-white/[0.06] hover:border-vq-teal/40 transition-all"
               >
                 <div className="w-10 h-10 rounded-lg bg-vq-teal/10 flex items-center justify-center text-xl">
                   📋
@@ -557,7 +562,7 @@ export function DashboardPage() {
                   <p className="text-xs text-gray-400">No plan for today's practice yet</p>
                 </div>
                 <span className="text-vq-teal text-xl">→</span>
-              </div>
+              </Link>
             ) : null}
           </div>
         </div>

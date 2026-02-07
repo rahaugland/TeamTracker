@@ -3,6 +3,7 @@ import { RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, Responsi
 import { cn } from '@/lib/utils';
 import type { SubRatings } from '@/services/player-stats.service';
 import type { VolleyballPosition } from '@/types/database.types';
+import { getCardGradient, getPositionAbbr, getPositionName } from './fifaCardUtils';
 
 interface FifaCardProps {
   overallRating: number;
@@ -16,50 +17,6 @@ interface FifaCardProps {
   isProvisional?: boolean;
   trendDirection?: 'up' | 'down' | 'stable';
   trendDelta?: number;
-}
-
-/**
- * Get card gradient classes based on overall rating
- */
-function getCardGradient(rating: number): string {
-  if (rating >= 90) return 'from-yellow-400 via-amber-500 to-yellow-600'; // Gold
-  if (rating >= 80) return 'from-purple-500 via-indigo-600 to-purple-700'; // Purple
-  if (rating >= 70) return 'from-blue-500 via-cyan-600 to-blue-700'; // Blue
-  if (rating >= 60) return 'from-green-500 via-emerald-600 to-green-700'; // Green
-  if (rating >= 50) return 'from-gray-400 via-slate-500 to-gray-600'; // Gray
-  return 'from-amber-700 via-orange-800 to-amber-900'; // Bronze
-}
-
-/**
- * Get position abbreviation for display
- */
-function getPositionAbbr(position: VolleyballPosition): string {
-  const abbr: Record<VolleyballPosition, string> = {
-    setter: 'SET',
-    outside_hitter: 'OH',
-    middle_blocker: 'MB',
-    opposite: 'OPP',
-    libero: 'LIB',
-    defensive_specialist: 'DS',
-    all_around: 'ALL',
-  };
-  return abbr[position];
-}
-
-/**
- * Get position full name
- */
-function getPositionName(position: VolleyballPosition): string {
-  const names: Record<VolleyballPosition, string> = {
-    setter: 'Setter',
-    outside_hitter: 'Outside Hitter',
-    middle_blocker: 'Middle Blocker',
-    opposite: 'Opposite',
-    libero: 'Libero',
-    defensive_specialist: 'Defensive Specialist',
-    all_around: 'All Around',
-  };
-  return names[position];
 }
 
 /**
