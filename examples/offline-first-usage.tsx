@@ -385,6 +385,15 @@ export function PlayerManagement({ userId }: { userId: string }) {
   const [syncStatus, setSyncStatus] = useState<SyncStatus>('idle');
   const [isOnline, setIsOnline] = useState(navigator.onLine);
 
+  async function loadPlayers() {
+    try {
+      const data = await getPlayers();
+      setPlayers(data);
+    } catch (error) {
+      console.error('Error loading players:', error);
+    }
+  }
+
   useEffect(() => {
     // Load players on mount
     loadPlayers();
@@ -409,16 +418,7 @@ export function PlayerManagement({ userId }: { userId: string }) {
     };
   }, [userId]);
 
-  async function loadPlayers() {
-    try {
-      const data = await getPlayers();
-      setPlayers(data);
-    } catch (error) {
-      console.error('Error loading players:', error);
-    }
-  }
-
-  async function handleCreatePlayer(name: string, email: string) {
+  async function handleCreatePlayer(name: string, _email: string) {
     try {
       await createPlayer({ name, email, created_by: userId });
       // Reload to show new player

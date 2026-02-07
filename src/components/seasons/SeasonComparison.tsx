@@ -37,22 +37,22 @@ export function SeasonComparison({ teamId, seasons }: SeasonComparisonProps) {
   const seasonB = seasons.find((s) => s.id === seasonBId);
 
   useEffect(() => {
-    if (!seasonA) { setSummaryA(null); return; }
+    if (!seasonA) return;
     let cancelled = false;
     getSeasonSummary(teamId, seasonA.start_date, seasonA.end_date)
       .then((d) => { if (!cancelled) setSummaryA(d); })
-      .catch(() => setSummaryA(null));
+      .catch(() => { if (!cancelled) setSummaryA(null); });
     return () => { cancelled = true; };
-  }, [teamId, seasonAId]);
+  }, [teamId, seasonA]);
 
   useEffect(() => {
-    if (!seasonB) { setSummaryB(null); return; }
+    if (!seasonB) return;
     let cancelled = false;
     getSeasonSummary(teamId, seasonB.start_date, seasonB.end_date)
       .then((d) => { if (!cancelled) setSummaryB(d); })
-      .catch(() => setSummaryB(null));
+      .catch(() => { if (!cancelled) setSummaryB(null); });
     return () => { cancelled = true; };
-  }, [teamId, seasonBId]);
+  }, [teamId, seasonB]);
 
   const stats: StatRow[] = summaryA && summaryB ? [
     {
@@ -106,7 +106,7 @@ export function SeasonComparison({ teamId, seasons }: SeasonComparisonProps) {
             <label className="text-xs font-medium text-muted-foreground mb-1 block">
               {t('awards.seasonComparison.seasonA')}
             </label>
-            <Select value={seasonAId} onValueChange={setSeasonAId}>
+            <Select value={seasonAId} onValueChange={(v) => { setSeasonAId(v); setSummaryA(null); }}>
               <SelectTrigger>
                 <SelectValue placeholder={t('awards.seasonComparison.selectSeason')} />
               </SelectTrigger>
@@ -121,7 +121,7 @@ export function SeasonComparison({ teamId, seasons }: SeasonComparisonProps) {
             <label className="text-xs font-medium text-muted-foreground mb-1 block">
               {t('awards.seasonComparison.seasonB')}
             </label>
-            <Select value={seasonBId} onValueChange={setSeasonBId}>
+            <Select value={seasonBId} onValueChange={(v) => { setSeasonBId(v); setSummaryB(null); }}>
               <SelectTrigger>
                 <SelectValue placeholder={t('awards.seasonComparison.selectSeason')} />
               </SelectTrigger>

@@ -23,6 +23,33 @@ const SKILL_COLORS: Record<string, string> = {
 /**
  * Stacked area chart showing training minutes per skill per month
  */
+interface VolumeTooltipEntry {
+  dataKey: string;
+  name: string;
+  value: number;
+  color: string;
+}
+
+function VolumeCustomTooltip({ active, payload, label }: { active?: boolean; payload?: VolumeTooltipEntry[]; label?: string }) {
+  if (active && payload && payload.length) {
+    const total = payload.reduce((sum, entry) => sum + entry.value, 0);
+    return (
+      <div className="bg-card border border-white/10 rounded-lg shadow-lg p-3">
+        <p className="font-semibold text-sm mb-2 text-foreground">{label}</p>
+        <p className="text-xs text-muted-foreground mb-1">Total: {total} minutes</p>
+        {payload
+          .filter((entry) => entry.value > 0)
+          .map((entry) => (
+            <p key={entry.dataKey} className="text-sm" style={{ color: entry.color }}>
+              <span className="font-medium">{entry.name}:</span> {entry.value} min
+            </p>
+          ))}
+      </div>
+    );
+  }
+  return null;
+}
+
 export function TrainingVolumeChart({ volume }: TrainingVolumeChartProps) {
   const chartData = useMemo(() => {
     return volume
@@ -44,26 +71,6 @@ export function TrainingVolumeChart({ volume }: TrainingVolumeChartProps) {
     });
     return Array.from(skillSet).sort();
   }, [volume]);
-
-  const CustomTooltip = ({ active, payload, label }: any) => {
-    if (active && payload && payload.length) {
-      const total = payload.reduce((sum: number, entry: any) => sum + entry.value, 0);
-      return (
-        <div className="bg-card border border-white/10 rounded-lg shadow-lg p-3">
-          <p className="font-semibold text-sm mb-2 text-foreground">{label}</p>
-          <p className="text-xs text-muted-foreground mb-1">Total: {total} minutes</p>
-          {payload
-            .filter((entry: any) => entry.value > 0)
-            .map((entry: any) => (
-              <p key={entry.dataKey} className="text-sm" style={{ color: entry.color }}>
-                <span className="font-medium">{entry.name}:</span> {entry.value} min
-              </p>
-            ))}
-        </div>
-      );
-    }
-    return null;
-  };
 
   if (chartData.length === 0) {
     return (
@@ -99,7 +106,7 @@ export function TrainingVolumeChart({ volume }: TrainingVolumeChartProps) {
               stroke="#8B95A5"
               label={{ value: 'Minutes', angle: -90, position: 'insideLeft', style: { fontSize: 11, fill: '#8B95A5' } }}
             />
-            <Tooltip content={<CustomTooltip />} />
+            <Tooltip content={<VolumeCustomTooltip />} />
             <Legend wrapperStyle={{ fontSize: 11, color: '#8B95A5' }} />
             {skills.map(skill => (
               <Area

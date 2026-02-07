@@ -23,9 +23,7 @@ import { FeedbackSpotlight } from '@/components/player/FeedbackSpotlight';
 import { StatSnapshots } from '@/components/player/StatSnapshots';
 import { ProgressJourney } from '@/components/player/ProgressJourney';
 import { PlayerAwardsShowcase } from '@/components/player/PlayerAwardsShowcase';
-import { getPlayerGoals, createPlayerGoal, toggleGoalCompletion, deletePlayerGoal, refreshGoalProgress } from '@/services/player-goals.service';
-import { GoalTracker } from '@/components/player-stats/GoalTracker';
-import type { PlayerGoalFormData } from '@/lib/validations/playerGoal';
+import { getPlayerGoals } from '@/services/player-goals.service';
 import { getPlayerStats, aggregateStats, getAttendanceStats } from '@/services/player-stats.service';
 import type { AggregatedStats, AttendanceStats } from '@/services/player-stats.service';
 import {

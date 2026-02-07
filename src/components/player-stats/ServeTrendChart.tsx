@@ -10,6 +10,27 @@ interface ServeTrendChartProps {
 /**
  * Bar chart showing aces vs service errors per game
  */
+function ServeCustomTooltip({ active, payload }: { active?: boolean; payload?: Array<{ payload: { opponent: string; date: string; aces: number; errors: number } }> }) {
+  if (active && payload && payload.length) {
+    const data = payload[0].payload;
+    return (
+      <div className="bg-card border border-white/10 rounded-lg shadow-lg p-3">
+        <p className="font-semibold text-sm text-foreground">{data.opponent}</p>
+        <p className="text-xs text-muted-foreground">
+          {format(new Date(data.date), 'MMM d, yyyy')}
+        </p>
+        <p className="text-sm mt-1 text-foreground">
+          <span className="font-medium text-emerald-400">Aces:</span> {data.aces}
+        </p>
+        <p className="text-sm text-foreground">
+          <span className="font-medium text-club-primary">Errors:</span> {data.errors}
+        </p>
+      </div>
+    );
+  }
+  return null;
+}
+
 export function ServeTrendChart({ gameStats }: ServeTrendChartProps) {
   // Prepare data in chronological order
   const chartData = gameStats
@@ -22,27 +43,6 @@ export function ServeTrendChart({ gameStats }: ServeTrendChartProps) {
       errors: game.service_errors,
       opponent: game.event.opponent || 'Unknown',
     }));
-
-  const CustomTooltip = ({ active, payload }: any) => {
-    if (active && payload && payload.length) {
-      const data = payload[0].payload;
-      return (
-        <div className="bg-card border border-white/10 rounded-lg shadow-lg p-3">
-          <p className="font-semibold text-sm text-foreground">{data.opponent}</p>
-          <p className="text-xs text-muted-foreground">
-            {format(new Date(data.date), 'MMM d, yyyy')}
-          </p>
-          <p className="text-sm mt-1 text-foreground">
-            <span className="font-medium text-emerald-400">Aces:</span> {data.aces}
-          </p>
-          <p className="text-sm text-foreground">
-            <span className="font-medium text-club-primary">Errors:</span> {data.errors}
-          </p>
-        </div>
-      );
-    }
-    return null;
-  };
 
   if (chartData.length === 0) {
     return (
@@ -78,7 +78,7 @@ export function ServeTrendChart({ gameStats }: ServeTrendChartProps) {
               stroke="#8B95A5"
               label={{ value: 'Count', angle: -90, position: 'insideLeft', style: { fontSize: 12, fill: '#8B95A5' } }}
             />
-            <Tooltip content={<CustomTooltip />} />
+            <Tooltip content={<ServeCustomTooltip />} />
             <Legend wrapperStyle={{ fontSize: 12, color: '#8B95A5' }} />
             <Bar dataKey="aces" fill="#34D399" name="Aces" />
             <Bar dataKey="errors" fill="#E63946" name="Errors" />

@@ -74,33 +74,29 @@ export function useSyncStatus() {
  */
 export function useLastSyncFormatted(): string | null {
   const { lastSync } = useSyncStatus();
-  const [formatted, setFormatted] = useState<string | null>(null);
+  const [tick, setTick] = useState(0);
 
   useEffect(() => {
-    if (!lastSync) {
-      setFormatted(null);
-      return;
-    }
-
-    const format = () => {
-      const diff = Date.now() - lastSync;
-      if (diff < 60000) return 'Just now';
-      if (diff < 3600000) {
-        const minutes = Math.floor(diff / 60000);
-        return `${minutes} minute${minutes !== 1 ? 's' : ''} ago`;
-      }
-      if (diff < 86400000) {
-        const hours = Math.floor(diff / 3600000);
-        return `${hours} hour${hours !== 1 ? 's' : ''} ago`;
-      }
-      const days = Math.floor(diff / 86400000);
-      return `${days} day${days !== 1 ? 's' : ''} ago`;
-    };
-
-    setFormatted(format());
-    const interval = setInterval(() => setFormatted(format()), 60000);
+    if (!lastSync) return;
+    const interval = setInterval(() => setTick(t => t + 1), 60000);
     return () => clearInterval(interval);
   }, [lastSync]);
 
-  return formatted;
+  // Suppress unused var warning - tick triggers re-renders for time updates
+  void tick;
+
+  if (!lastSync) return null;
+
+  const diff = Date.now() - lastSync;
+  if (diff < 60000) return 'Just now';
+  if (diff < 3600000) {
+    const minutes = Math.floor(diff / 60000);
+    return `${minutes} minute${minutes !== 1 ? 's' : ''} ago`;
+  }
+  if (diff < 86400000) {
+    const hours = Math.floor(diff / 3600000);
+    return `${hours} hour${hours !== 1 ? 's' : ''} ago`;
+  }
+  const days = Math.floor(diff / 86400000);
+  return `${days} day${days !== 1 ? 's' : ''} ago`;
 }
