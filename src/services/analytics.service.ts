@@ -161,7 +161,7 @@ export async function getPlayerAttendanceRates(
       };
     });
 
-    return playerRates.toSorted((a, b) => b.attendanceRate - a.attendanceRate);
+    return [...playerRates].sort((a: PlayerAttendanceRate, b: PlayerAttendanceRate) => b.attendanceRate - a.attendanceRate);
   } catch (error) {
     console.error('Error calculating player attendance rates:', error);
     throw error;
@@ -500,7 +500,7 @@ export async function getRecentActivity(
 
     // Sort all activities by timestamp and limit
     return activities
-      .toSorted((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+      .sort((a: RecentActivity, b: RecentActivity) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
       .slice(0, limit);
   } catch (error) {
     console.error('Error getting recent activity:', error);

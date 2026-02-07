@@ -36,7 +36,7 @@ export function SquadRoster({ players, isLoading = false, hideRatings = false }:
   const { t } = useTranslation();
   const [sortBy, setSortBy] = useState<SortOption>(hideRatings ? 'name' : 'rating');
 
-  const sortedPlayers = players.toSorted((a, b) => {
+  const sortedPlayers = [...players].sort((a: PlayerWithRating, b: PlayerWithRating) => {
     switch (sortBy) {
       case 'rating':
         return (b.rating || 0) - (a.rating || 0);

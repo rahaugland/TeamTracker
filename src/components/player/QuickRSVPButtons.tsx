@@ -37,7 +37,7 @@ export function QuickRSVPButtons({ eventId, playerId, currentStatus, onStatusCha
       onStatusChange?.(newStatus);
     } catch {
       setStatus(previousStatus); // Revert
-      addToast({ type: 'error', message: 'Failed to update RSVP' });
+      addToast({ variant: 'error', description: 'Failed to update RSVP' });
     } finally {
       setIsSubmitting(false);
     }

@@ -46,14 +46,12 @@ export function PlayerStatsTabPage() {
       {/* FIFA Card Compact */}
       {rating && (
         <FifaCardCompact
-          overallRating={rating.overallRating}
+          overallRating={rating.overall}
           subRatings={rating.subRatings}
           position={position}
           playerName={player.name}
           photoUrl={player.photo_url || undefined}
           isProvisional={rating.isProvisional}
-          trendDirection={rating.trendDirection}
-          trendDelta={rating.trendDelta}
         />
       )}
 

@@ -215,7 +215,7 @@ export function DashboardPage() {
 
   // Sorted players for roster table
   const sortedPlayers = useMemo(() => {
-    return playersWithAttendance.toSorted((a, b) => {
+    return [...playersWithAttendance].sort((a: PlayerWithAttendance, b: PlayerWithAttendance) => {
       return attendanceSortOrder === 'desc'
         ? b.attendance - a.attendance
         : a.attendance - b.attendance;

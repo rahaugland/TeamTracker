@@ -17,7 +17,7 @@ import { QuickRSVPButtons } from '@/components/player/QuickRSVPButtons';
 import { AnnouncementsFeed } from '@/components/player/AnnouncementsFeed';
 import { JoinTeamCard } from '@/components/player/JoinTeamCard';
 import { PendingMemberships } from '@/components/player/PendingMemberships';
-import type { Event, Rsvp, PlayerGoal } from '@/types/database.types';
+import type { Event, Rsvp, PlayerGoal, AttendanceRecord } from '@/types/database.types';
 import type { PlayerRating } from '@/services/player-stats.service';
 
 export function PlayerHomePage() {
@@ -74,8 +74,8 @@ export function PlayerHomePage() {
       setAttendanceRate(total > 0 ? Math.round((presentCount / total) * 100) : 0);
 
       // Attendance streak
-      const sorted = attendanceData.toSorted(
-        (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      const sorted = [...attendanceData].sort(
+        (a: AttendanceRecord, b: AttendanceRecord) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
       );
       let s = 0;
       for (const record of sorted) {
@@ -141,14 +141,12 @@ export function PlayerHomePage() {
       {/* FIFA Card Compact */}
       {rating && (
         <FifaCardCompact
-          overallRating={rating.overallRating}
+          overallRating={rating.overall}
           subRatings={rating.subRatings}
           position={player.positions?.[0] || 'all_around'}
           playerName={player.name}
           photoUrl={player.photo_url || undefined}
           isProvisional={rating.isProvisional}
-          trendDirection={rating.trendDirection}
-          trendDelta={rating.trendDelta}
         />
       )}
 

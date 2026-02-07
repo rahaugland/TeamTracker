@@ -118,7 +118,7 @@ export function ActivePlayersExpansionPanel({ teamPlayers, playersWithAttendance
                       color: '#fff',
                       fontSize: 12,
                     }}
-                    formatter={(value: number, name: string) => [`${value} players`, name]}
+                    formatter={(value, name) => [`${value} players`, name as string]}
                   />
                 </PieChart>
               </ResponsiveContainer>

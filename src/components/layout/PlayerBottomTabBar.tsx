@@ -11,13 +11,13 @@ const tabs = [
   { key: 'profile', href: '/player/profile', icon: User },
 ] as const;
 
-const i18nKeys: Record<string, string> = {
+const i18nKeys = {
   home: 'navigation.home',
   schedule: 'navigation.schedule',
   stats: 'navigation.stats',
   goals: 'navigation.goals',
   profile: 'navigation.profile',
-};
+} as const;
 
 export function PlayerBottomTabBar() {
   const { t } = useTranslation();

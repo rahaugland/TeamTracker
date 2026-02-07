@@ -171,9 +171,9 @@ export function AttendanceExpansionPanel({ teamId }: AttendanceExpansionPanelPro
                     color: '#fff',
                     fontSize: 12,
                   }}
-                  formatter={(value: number | string, _name: string, props: { payload: { fullName: string } }) => [
+                  formatter={(value, _name, props) => [
                     `${value}%`,
-                    props.payload.fullName,
+                    (props as { payload: { fullName: string } }).payload.fullName,
                   ]}
                 />
                 <Bar dataKey="rate" radius={[0, 4, 4, 0]} barSize={16}>
