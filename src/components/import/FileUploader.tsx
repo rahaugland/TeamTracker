@@ -72,7 +72,7 @@ export function FileUploader({ onFileSelect, selectedFile, onClear }: FileUpload
                 </p>
               </div>
             </div>
-            <Button variant="ghost" size="icon" onClick={onClear}>
+            <Button variant="ghost" size="icon" onClick={onClear} aria-label="Clear file">
               <X className="w-4 h-4" />
             </Button>
           </div>

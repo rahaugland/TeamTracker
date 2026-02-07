@@ -73,6 +73,10 @@ export function RoleSelectionPage() {
                   : 'hover:border-primary/50'
               }`}
               onClick={() => setSelectedRole(role.value)}
+              role="radio"
+              aria-checked={selectedRole === role.value}
+              tabIndex={0}
+              onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setSelectedRole(role.value); } }}
             >
               <CardHeader>
                 <div className="flex items-center gap-3">

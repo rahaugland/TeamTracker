@@ -82,7 +82,7 @@ export function TeamHeader({
               <div className="flex items-center gap-2 mt-2">
                 <span className="text-sm text-muted-foreground">{t('team.inviteCode')}:</span>
                 <code className="text-sm font-mono bg-muted px-2 py-0.5 rounded">{inviteCode}</code>
-                <Button variant="ghost" size="icon" className="h-6 w-6" onClick={handleCopyCode}>
+                <Button variant="ghost" size="icon" className="h-6 w-6" onClick={handleCopyCode} aria-label={t('team.inviteCode')}>
                   {copied ? <Check className="h-3.5 w-3.5 text-emerald-400" /> : <Copy className="h-3.5 w-3.5" />}
                 </Button>
               </div>

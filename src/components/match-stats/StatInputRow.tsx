@@ -44,6 +44,7 @@ export function StatInputRow({
           type="button"
           onClick={handleDecrement}
           disabled={value <= min}
+          aria-label={`Decrease ${label}`}
           className={cn(
             'w-8 h-8 rounded flex items-center justify-center',
             'bg-navy-80 border border-white/10',
@@ -61,6 +62,7 @@ export function StatInputRow({
           type="button"
           onClick={handleIncrement}
           disabled={value >= max}
+          aria-label={`Increase ${label}`}
           className={cn(
             'w-8 h-8 rounded flex items-center justify-center',
             'bg-navy-80 border border-white/10',

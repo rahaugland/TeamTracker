@@ -11,7 +11,7 @@ import { getBatchPlayerSelectionStats, type PlayerSelectionStats } from '@/servi
 import { useAuth } from '@/store';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { PlayerAvatar } from '@/components/player';
+import { PlayerAvatar } from '@/components/player/PlayerAvatar';
 import { FormIndicator } from '@/components/match';
 import { cn } from '@/lib/utils';
 import { POSITION_NAMES } from '@/types/database.types';

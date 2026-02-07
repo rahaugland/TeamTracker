@@ -112,40 +112,33 @@ export function useEventDetail(eventId: string | undefined, onDelete?: () => voi
         setAttendance(attendanceData);
         setRsvps(rsvpData);
 
-        // Load team players
-        const players = await getPlayersByTeam(eventData.team_id);
+        // Load independent data in parallel
+        const isGameOrTournament = eventData.type === 'game' || eventData.type === 'tournament';
+        const [players, stats, awards, planData] = await Promise.all([
+          getPlayersByTeam(eventData.team_id),
+          isGameOrTournament ? getStatEntriesForEvent(id) : Promise.resolve([]),
+          isGameOrTournament && eventData.is_finalized ? getAwardsForEvent(id) : Promise.resolve([]),
+          eventData.practice_plan_id ? getPracticePlan(eventData.practice_plan_id) : Promise.resolve(null),
+        ]);
+
         setTeamPlayers(players);
+        setStatEntries(stats);
+        setGameAwards(awards);
+        setPracticePlan(planData);
 
-        // Load stat entries for game/tournament events
-        if (eventData.type === 'game' || eventData.type === 'tournament') {
-          const stats = await getStatEntriesForEvent(id);
-          setStatEntries(stats);
-
-          // Load awards if finalized
-          if (eventData.is_finalized) {
-            const awards = await getAwardsForEvent(id);
-            setGameAwards(awards);
-          }
-        }
-
-        // Load practice plan if event has one
-        if (eventData.practice_plan_id) {
-          const planData = await getPracticePlan(eventData.practice_plan_id);
-          setPracticePlan(planData);
-
-          // Load existing drill executions
-          if (planData) {
-            const executions: Record<string, DrillExecution> = {};
-            for (const block of planData.practice_blocks) {
-              if (block.drill_id) {
-                const execution = await getExecutionByEventAndDrill(id, block.drill_id);
-                if (execution) {
-                  executions[block.drill_id] = execution;
-                }
-              }
+        // Load drill executions in parallel (not sequentially)
+        if (planData) {
+          const drillBlocks = planData.practice_blocks.filter(b => b.drill_id);
+          const executionResults = await Promise.all(
+            drillBlocks.map(block => getExecutionByEventAndDrill(id, block.drill_id!))
+          );
+          const executions: Record<string, DrillExecution> = {};
+          drillBlocks.forEach((block, i) => {
+            if (executionResults[i]) {
+              executions[block.drill_id!] = executionResults[i];
             }
-            setDrillExecutions(executions);
-          }
+          });
+          setDrillExecutions(executions);
         }
       }
     } catch (err) {

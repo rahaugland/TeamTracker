@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Select,
@@ -34,10 +34,9 @@ type SortOption = 'rating' | 'name' | 'number';
  */
 export function SquadRoster({ players, isLoading = false, hideRatings = false }: SquadRosterProps) {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const [sortBy, setSortBy] = useState<SortOption>(hideRatings ? 'name' : 'rating');
 
-  const sortedPlayers = [...players].sort((a, b) => {
+  const sortedPlayers = players.toSorted((a, b) => {
     switch (sortBy) {
       case 'rating':
         return (b.rating || 0) - (a.rating || 0);
@@ -110,67 +109,80 @@ export function SquadRoster({ players, isLoading = false, hideRatings = false }:
           </div>
         ) : (
           <div className="space-y-2">
-            {sortedPlayers.map((player) => (
-              <div
-                key={player.id}
-                className={`flex items-center justify-between p-3 border rounded-lg transition-colors ${
-                  hideRatings ? '' : 'hover:bg-accent cursor-pointer'
-                }`}
-                onClick={hideRatings ? undefined : () => navigate(`/players/${player.id}`)}
-              >
-                <div className="flex items-center gap-3">
-                  {/* Jersey Number */}
-                  {player.jerseyNumber && (
-                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center font-bold text-sm">
-                      {player.jerseyNumber}
-                    </div>
-                  )}
-
-                  {/* Player Photo */}
-                  {player.photo_url ? (
-                    <img
-                      src={player.photo_url}
-                      alt={player.name}
-                      className="w-10 h-10 rounded-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-sm font-medium">
-                      {player.name.charAt(0)}
-                    </div>
-                  )}
-
-                  {/* Player Info */}
-                  <div>
-                    <p className="font-medium">{player.name}</p>
-                    <div className="flex gap-1 mt-1">
-                      {player.positions.slice(0, 2).map((pos) => (
-                        <Badge key={pos} variant="secondary" className="text-xs">
-                          {POSITION_NAMES[pos as VolleyballPosition]}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Rating - hidden for players */}
-                {!hideRatings && (
-                  <div className="text-right">
-                    {player.rating ? (
-                      <>
-                        <div className="text-2xl font-bold">{player.rating}</div>
-                        <div className="text-xs text-muted-foreground">
-                          {t('team.dashboard.rating')}
-                        </div>
-                      </>
-                    ) : (
-                      <div className="text-sm text-muted-foreground">
-                        {t('player.stats.noData')}
+            {sortedPlayers.map((player) => {
+              const rowContent = (
+                <>
+                  <div className="flex items-center gap-3">
+                    {/* Jersey Number */}
+                    {player.jerseyNumber && (
+                      <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center font-bold text-sm">
+                        {player.jerseyNumber}
                       </div>
                     )}
+
+                    {/* Player Photo */}
+                    {player.photo_url ? (
+                      <img
+                        src={player.photo_url}
+                        alt={player.name}
+                        className="w-10 h-10 rounded-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-sm font-medium">
+                        {player.name.charAt(0)}
+                      </div>
+                    )}
+
+                    {/* Player Info */}
+                    <div>
+                      <p className="font-medium">{player.name}</p>
+                      <div className="flex gap-1 mt-1">
+                        {player.positions.slice(0, 2).map((pos) => (
+                          <Badge key={pos} variant="secondary" className="text-xs">
+                            {POSITION_NAMES[pos as VolleyballPosition]}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
                   </div>
-                )}
-              </div>
-            ))}
+
+                  {/* Rating - hidden for players */}
+                  {!hideRatings && (
+                    <div className="text-right">
+                      {player.rating ? (
+                        <>
+                          <div className="text-2xl font-bold">{player.rating}</div>
+                          <div className="text-xs text-muted-foreground">
+                            {t('team.dashboard.rating')}
+                          </div>
+                        </>
+                      ) : (
+                        <div className="text-sm text-muted-foreground">
+                          {t('player.stats.noData')}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </>
+              );
+
+              return hideRatings ? (
+                <div
+                  key={player.id}
+                  className="flex items-center justify-between p-3 border rounded-lg transition-colors"
+                >
+                  {rowContent}
+                </div>
+              ) : (
+                <Link
+                  key={player.id}
+                  to={`/players/${player.id}`}
+                  className="flex items-center justify-between p-3 border rounded-lg transition-colors hover:bg-accent"
+                >
+                  {rowContent}
+                </Link>
+              );
+            })}
           </div>
         )}
       </CardContent>

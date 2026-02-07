@@ -138,6 +138,9 @@ export function TeamGameLog({ gameStats, isLoading = false }: TeamGameLogProps) 
                     key={game.eventId}
                     className="cursor-pointer hover:bg-accent"
                     onClick={() => navigate(`/events/${game.eventId}`)}
+                    tabIndex={0}
+                    role="link"
+                    onKeyDown={(e) => { if (e.key === 'Enter') navigate(`/events/${game.eventId}`); }}
                   >
                     <TableCell className="font-medium">{formatDate(game.date)}</TableCell>
                     <TableCell>{game.opponent || 'Unknown'}</TableCell>

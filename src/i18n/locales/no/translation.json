@@ -45,6 +45,7 @@
   },
   "navigation": {
     "dashboard": "Dashbord",
+    "home": "Hjem",
     "teams": "Lag",
     "players": "Spillere",
     "schedule": "Timeplan",
@@ -56,7 +57,9 @@
     "users": "Brukere",
     "profile": "Profil",
     "import": "Importer",
-    "teamSeasons": "Lagsesonger"
+    "teamSeasons": "Lagsesonger",
+    "stats": "Statistikk",
+    "goals": "Mål"
   },
   "player": {
     "singular": "Spiller",

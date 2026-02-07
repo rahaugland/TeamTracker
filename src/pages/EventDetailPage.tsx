@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ConfirmDialog } from '@/components/common/ConfirmDialog';
-import { PlayerAvatar } from '@/components/player';
+import { PlayerAvatar } from '@/components/player/PlayerAvatar';
 import { RSVPStatusBadge } from '@/components/common';
 import { DragDropAttendance } from '@/components/attendance/DragDropAttendance';
 import { EventForm } from '@/components/forms/EventForm';

@@ -196,13 +196,14 @@ export async function getEventAttendanceSummary(eventId: string): Promise<{
 }> {
   const records = await getEventAttendance(eventId);
 
+  const counts = { present: 0, absent: 0, late: 0, excused: 0, not_selected: 0 };
+  for (const r of records) {
+    if (r.status in counts) counts[r.status as keyof typeof counts]++;
+  }
+
   return {
     total: records.length,
-    present: records.filter((r) => r.status === 'present').length,
-    absent: records.filter((r) => r.status === 'absent').length,
-    late: records.filter((r) => r.status === 'late').length,
-    excused: records.filter((r) => r.status === 'excused').length,
-    not_selected: records.filter((r) => r.status === 'not_selected').length,
+    ...counts,
   };
 }
 
@@ -248,20 +249,24 @@ export async function batchMarkAttendance(
     }
   });
 
-  // Perform batch update operations
+  // Perform batch update operations in parallel
   if (recordsToUpdate.length > 0) {
-    for (const record of recordsToUpdate) {
-      const { error } = await supabase
-        .from('attendance_records')
-        .update({
-          status: record.status,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', record.id);
+    const updateResults = await Promise.all(
+      recordsToUpdate.map(record =>
+        supabase
+          .from('attendance_records')
+          .update({
+            status: record.status,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', record.id)
+      )
+    );
 
-      if (error) {
-        console.error('Error updating attendance record:', error);
-        throw error;
+    for (const result of updateResults) {
+      if (result.error) {
+        console.error('Error updating attendance record:', result.error);
+        throw result.error;
       }
     }
   }

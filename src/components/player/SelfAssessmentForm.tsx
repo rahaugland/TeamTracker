@@ -102,6 +102,7 @@ export function SelfAssessmentForm({
                   key={value}
                   type="button"
                   onClick={() => setRating(value)}
+                  aria-label={`${value} out of 5 stars`}
                   className="focus:outline-none focus:ring-2 focus:ring-primary rounded"
                 >
                   <Star

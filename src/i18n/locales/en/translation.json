@@ -45,6 +45,7 @@
   },
   "navigation": {
     "dashboard": "Dashboard",
+    "home": "Home",
     "teams": "Teams",
     "players": "Players",
     "schedule": "Schedule",
@@ -56,7 +57,9 @@
     "users": "Users",
     "profile": "Profile",
     "import": "Import",
-    "teamSeasons": "Team Seasons"
+    "teamSeasons": "Team Seasons",
+    "stats": "Stats",
+    "goals": "Goals"
   },
   "player": {
     "singular": "Player",

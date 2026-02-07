@@ -302,20 +302,23 @@ export async function createRecurringEvents(
 export async function finalizeGame(eventId: string, userId: string): Promise<GameAward[]> {
   const statEntries = await getStatEntriesForEvent(eventId);
   const calculatedAwards = calculateMatchAwards(statEntries);
-  const savedAwards = await saveGameAwards(eventId, calculatedAwards);
 
-  const { error } = await supabase
-    .from('events')
-    .update({
-      is_finalized: true,
-      finalized_at: new Date().toISOString(),
-      finalized_by: userId,
-    })
-    .eq('id', eventId);
+  // Save awards and update event in parallel (independent operations)
+  const [savedAwards, updateResult] = await Promise.all([
+    saveGameAwards(eventId, calculatedAwards),
+    supabase
+      .from('events')
+      .update({
+        is_finalized: true,
+        finalized_at: new Date().toISOString(),
+        finalized_by: userId,
+      })
+      .eq('id', eventId),
+  ]);
 
-  if (error) {
-    console.error('Error finalizing game:', error);
-    throw error;
+  if (updateResult.error) {
+    console.error('Error finalizing game:', updateResult.error);
+    throw updateResult.error;
   }
 
   return savedAwards;

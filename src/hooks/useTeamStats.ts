@@ -134,20 +134,11 @@ export function useTeamStats(options: UseTeamStatsOptions): UseTeamStatsReturn {
     await Promise.all([fetchRating(), fetchGames(), fetchBestXI(), fetchForm()]);
   };
 
-  // Initial load
+  // Initial load - fetch all data in parallel
   useEffect(() => {
     fetchRating();
-  }, [teamId]);
-
-  useEffect(() => {
     fetchGames();
-  }, [teamId]);
-
-  useEffect(() => {
     fetchBestXI();
-  }, [teamId]);
-
-  useEffect(() => {
     fetchForm();
   }, [teamId]);
 

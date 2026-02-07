@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback, memo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import type { Event, EventType } from '@/types/database.types';
 import { Button } from '@/components/ui/button';
@@ -24,7 +24,6 @@ interface CalendarDay {
  * Memoized for performance with large event lists
  */
 export const CalendarView = memo(function CalendarView({ events }: CalendarViewProps) {
-  const navigate = useNavigate();
   const { t } = useTranslation();
   const [currentDate, setCurrentDate] = useState(new Date());
 
@@ -143,10 +142,10 @@ export const CalendarView = memo(function CalendarView({ events }: CalendarViewP
             {t('calendar.today')}
           </Button>
           <div className="flex items-center gap-1">
-            <Button variant="ghost" size="icon" onClick={handlePreviousMonth}>
+            <Button variant="ghost" size="icon" onClick={handlePreviousMonth} aria-label="Previous month">
               <ChevronLeft className="h-4 w-4" />
             </Button>
-            <Button variant="ghost" size="icon" onClick={handleNextMonth}>
+            <Button variant="ghost" size="icon" onClick={handleNextMonth} aria-label="Next month">
               <ChevronRight className="h-4 w-4" />
             </Button>
           </div>
@@ -212,11 +211,11 @@ export const CalendarView = memo(function CalendarView({ events }: CalendarViewP
 
               <div className="space-y-1">
                 {day.events.slice(0, 3).map((event) => (
-                  <div
+                  <Link
                     key={event.id}
-                    onClick={() => navigate(`/events/${event.id}`)}
+                    to={`/events/${event.id}`}
                     className={cn(
-                      'text-xs p-1 rounded cursor-pointer text-white truncate hover:opacity-80 transition-opacity',
+                      'block text-xs p-1 rounded text-white truncate hover:opacity-80 transition-opacity',
                       getEventTypeColor(event.type)
                     )}
                     title={`${event.title} - ${formatEventTime(event.start_time)}`}
@@ -225,7 +224,7 @@ export const CalendarView = memo(function CalendarView({ events }: CalendarViewP
                       <span className="hidden md:inline">{formatEventTime(event.start_time)} </span>
                       {event.title}
                     </div>
-                  </div>
+                  </Link>
                 ))}
                 {day.events.length > 3 && (
                   <div className="text-xs text-muted-foreground font-medium pl-1">
