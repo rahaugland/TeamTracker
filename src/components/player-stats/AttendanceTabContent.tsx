@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { AttendanceStatsRow } from './AttendanceStatsRow';
 import { AttendanceCalendar } from './AttendanceCalendar';
 import { getAttendanceStats, getEventTypeBreakdown } from '@/services/player-stats.service';
-import { getAttendanceWithEvents } from '@/services/attendance.service';
+import { getAttendanceWithEvents, type AttendanceRecordWithEvent } from '@/services/attendance.service';
 import type { AttendanceStats, EventTypeBreakdown as EventBreakdownType } from '@/services/player-stats.service';
 
 interface AttendanceTabContentProps {
@@ -33,23 +33,21 @@ export function AttendanceTabContent({ playerId, teamId }: AttendanceTabContentP
     const loadData = async () => {
       setIsLoading(true);
       try {
-        const [stats, breakdown, timeline, detailedRecords] = await Promise.all([
+        const [stats, breakdown, detailedRecords] = await Promise.all([
           getAttendanceStats(playerId, teamId),
           getEventTypeBreakdown(playerId, teamId),
-          getMissedEventsTimeline(playerId, teamId),
           getAttendanceWithEvents(playerId, teamId),
         ]);
 
         if (!cancelled) {
           setAttendanceStats(stats);
           setEventBreakdown(breakdown);
-          setMissedEvents(timeline);
 
           // Extract missed event details for display
           const missed = detailedRecords
-            .filter(r => r.status === 'absent')
+            .filter((r: AttendanceRecordWithEvent) => r.status === 'absent')
             .slice(0, 5) // Show last 5 missed events
-            .map(r => ({
+            .map((r: AttendanceRecordWithEvent) => ({
               date: r.event.start_time,
               title: r.event.title,
               type: r.event.type,
