@@ -7,7 +7,7 @@ import { getActiveSeason } from '@/services/seasons.service';
 import { getTeams } from '@/services/teams.service';
 import { getPlayers, getPlayersByTeam } from '@/services/players.service';
 import { getUpcomingEvents, getEventsByTeam } from '@/services/events.service';
-import { getRSVPSummary, getEventRSVPs } from '@/services/rsvp.service';
+import { getRSVPSummary } from '@/services/rsvp.service';
 import { getFormStreak } from '@/services/team-stats.service';
 import { getPracticePlansByTeam } from '@/services/practice-plans.service';
 import { getPlayerAttendance } from '@/services/attendance.service';
@@ -44,7 +44,7 @@ interface PlayerWithAttendance {
 export function DashboardPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  useAuth();
   const { activeSeason, setActiveSeason } = useSeasons();
   const { teams, setTeams, activeTeamId } = useTeams();
   const { setPlayers } = usePlayers();

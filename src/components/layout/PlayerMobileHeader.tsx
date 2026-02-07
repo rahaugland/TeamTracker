@@ -1,9 +1,7 @@
-import { useTranslation } from 'react-i18next';
 import { useSyncStatus } from '@/hooks/useOffline';
 import { WifiOff, RefreshCw } from 'lucide-react';
 
 export function PlayerMobileHeader() {
-  const { t } = useTranslation();
   const { offline, syncing } = useSyncStatus();
 
   return (

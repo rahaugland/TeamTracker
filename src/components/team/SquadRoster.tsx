@@ -12,7 +12,6 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { POSITION_NAMES, type VolleyballPosition } from '@/types/database.types';
 import type { PlayerWithMemberships } from '@/services/players.service';
-import type { PlayerRating } from '@/services/player-stats.service';
 
 interface PlayerWithRating extends PlayerWithMemberships {
   rating?: number;
