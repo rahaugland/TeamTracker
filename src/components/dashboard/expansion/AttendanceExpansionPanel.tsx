@@ -171,7 +171,7 @@ export function AttendanceExpansionPanel({ teamId }: AttendanceExpansionPanelPro
                     color: '#fff',
                     fontSize: 12,
                   }}
-                  formatter={(value: number, _name: string, props: { payload: { fullName: string } }) => [
+                  formatter={(value: number | string, _name: string, props: { payload: { fullName: string } }) => [
                     `${value}%`,
                     props.payload.fullName,
                   ]}
