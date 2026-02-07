@@ -34,6 +34,29 @@ const SKILL_LABELS: Record<string, string> = {
 /**
  * Multi-line chart showing average progression level over time per skill
  */
+interface TooltipEntry {
+  dataKey: string;
+  name: string;
+  value: number;
+  color: string;
+}
+
+function SkillCustomTooltip({ active, payload, label }: { active?: boolean; payload?: TooltipEntry[]; label?: string }) {
+  if (active && payload && payload.length) {
+    return (
+      <div className="bg-card border border-white/10 rounded-lg shadow-lg p-3">
+        <p className="font-semibold text-sm mb-2 text-foreground">{label}</p>
+        {payload.map((entry) => (
+          <p key={entry.dataKey} className="text-sm" style={{ color: entry.color }}>
+            <span className="font-medium">{entry.name}:</span> {Math.round(entry.value)}
+          </p>
+        ))}
+      </div>
+    );
+  }
+  return null;
+}
+
 export function SkillProgressionChart({ progression }: SkillProgressionChartProps) {
   const chartData = useMemo(() => {
     if (progression.length === 0) return [];
@@ -54,13 +77,13 @@ export function SkillProgressionChart({ progression }: SkillProgressionChartProp
     // Convert to chart format
     return Object.entries(monthMap)
       .map(([month, skills]) => {
-        const dataPoint: any = { month };
+        const dataPoint: Record<string, string | number> = { month };
         Object.entries(skills).forEach(([skill, levels]) => {
           dataPoint[skill] = levels.reduce((a, b) => a + b, 0) / levels.length;
         });
         return dataPoint;
       })
-      .sort((a, b) => a.month.localeCompare(b.month));
+      .sort((a, b) => (a.month as string).localeCompare(b.month as string));
   }, [progression]);
 
   const skills = useMemo(() => {
@@ -68,22 +91,6 @@ export function SkillProgressionChart({ progression }: SkillProgressionChartProp
     progression.forEach(p => skillSet.add(p.skillTag));
     return Array.from(skillSet).sort();
   }, [progression]);
-
-  const CustomTooltip = ({ active, payload, label }: any) => {
-    if (active && payload && payload.length) {
-      return (
-        <div className="bg-card border border-white/10 rounded-lg shadow-lg p-3">
-          <p className="font-semibold text-sm mb-2 text-foreground">{label}</p>
-          {payload.map((entry: any) => (
-            <p key={entry.dataKey} className="text-sm" style={{ color: entry.color }}>
-              <span className="font-medium">{entry.name}:</span> {Math.round(entry.value)}
-            </p>
-          ))}
-        </div>
-      );
-    }
-    return null;
-  };
 
   if (chartData.length === 0) {
     return (
@@ -121,7 +128,7 @@ export function SkillProgressionChart({ progression }: SkillProgressionChartProp
               ticks={[0, 25, 50, 75, 99]}
               label={{ value: 'Rating', angle: -90, position: 'insideLeft', style: { fontSize: 11, fill: '#8B95A5' } }}
             />
-            <Tooltip content={<CustomTooltip />} />
+            <Tooltip content={<SkillCustomTooltip />} />
             <Legend wrapperStyle={{ fontSize: 11, color: '#8B95A5' }} />
             {skills.map(skill => (
               <Line

@@ -14,65 +14,67 @@ interface PlayerCardProps {
   label: string;
 }
 
+function PlayerCard({ player, label }: PlayerCardProps) {
+  const { t } = useTranslation();
+
+  if (!player) {
+    return (
+      <div className="flex flex-col items-center p-3 border-2 border-dashed rounded-lg bg-muted/20">
+        <div className="text-xs font-medium text-muted-foreground mb-2">{label}</div>
+        <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center">
+          <span className="text-2xl text-muted-foreground">?</span>
+        </div>
+        <p className="text-xs text-muted-foreground mt-2 text-center">
+          {t('team.dashboard.noPlayerForPosition')}
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <Link
+      to={`/players/${player.playerId}`}
+      className="flex flex-col items-center p-3 border-2 border-primary/20 rounded-lg bg-card hover:bg-accent transition-colors"
+    >
+      <div className="text-xs font-medium text-muted-foreground mb-2">{label}</div>
+
+      {/* Player Photo */}
+      <div className="relative">
+        {player.photoUrl ? (
+          <img
+            src={player.photoUrl}
+            alt={player.playerName}
+            className="w-16 h-16 rounded-full object-cover border-2 border-primary"
+          />
+        ) : (
+          <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-xl font-bold border-2 border-primary">
+            {player.playerName.charAt(0)}
+          </div>
+        )}
+
+        {/* Jersey Number */}
+        {player.jerseyNumber && (
+          <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center text-xs font-bold">
+            {player.jerseyNumber}
+          </div>
+        )}
+      </div>
+
+      {/* Player Name */}
+      <p className="font-medium text-sm mt-2 text-center">{player.playerName}</p>
+
+      {/* Rating */}
+      <Badge className="mt-1">{player.rating}</Badge>
+    </Link>
+  );
+}
+
 /**
  * BestXIFormation component
  * Displays best starting lineup in a formation layout
  */
 export function BestXIFormation({ bestXI, isLoading = false }: BestXIFormationProps) {
   const { t } = useTranslation();
-
-  const PlayerCard = ({ player, label }: PlayerCardProps) => {
-    if (!player) {
-      return (
-        <div className="flex flex-col items-center p-3 border-2 border-dashed rounded-lg bg-muted/20">
-          <div className="text-xs font-medium text-muted-foreground mb-2">{label}</div>
-          <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center">
-            <span className="text-2xl text-muted-foreground">?</span>
-          </div>
-          <p className="text-xs text-muted-foreground mt-2 text-center">
-            {t('team.dashboard.noPlayerForPosition')}
-          </p>
-        </div>
-      );
-    }
-
-    return (
-      <Link
-        to={`/players/${player.playerId}`}
-        className="flex flex-col items-center p-3 border-2 border-primary/20 rounded-lg bg-card hover:bg-accent transition-colors"
-      >
-        <div className="text-xs font-medium text-muted-foreground mb-2">{label}</div>
-
-        {/* Player Photo */}
-        <div className="relative">
-          {player.photoUrl ? (
-            <img
-              src={player.photoUrl}
-              alt={player.playerName}
-              className="w-16 h-16 rounded-full object-cover border-2 border-primary"
-            />
-          ) : (
-            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center text-xl font-bold border-2 border-primary">
-              {player.playerName.charAt(0)}
-            </div>
-          )}
-
-          {/* Jersey Number */}
-          {player.jerseyNumber && (
-            <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center text-xs font-bold">
-              {player.jerseyNumber}
-            </div>
-          )}
-        </div>
-
-        {/* Player Name */}
-        <p className="font-medium text-sm mt-2 text-center">{player.playerName}</p>
-
-        {/* Rating */}
-        <Badge className="mt-1">{player.rating}</Badge>
-      </Link>
-    );
-  };
 
   if (isLoading) {
     return (

@@ -19,7 +19,6 @@ import { useTranslation } from 'react-i18next';
 
 interface GoalTrackerProps {
   goals: PlayerGoal[];
-  isCoach: boolean;
   onCreateGoal: (data: PlayerGoalFormData) => Promise<void>;
   onToggleComplete: (goalId: string, isCompleted: boolean) => Promise<void>;
   onDeleteGoal: (goalId: string) => Promise<void>;
@@ -33,7 +32,7 @@ const METRIC_COLORS: Record<GoalMetricType, string> = {
   custom: 'bg-white/10 text-foreground',
 };
 
-export function GoalTracker({ goals, isCoach, onCreateGoal, onToggleComplete, onDeleteGoal }: GoalTrackerProps) {
+export function GoalTracker({ goals, onCreateGoal, onToggleComplete, onDeleteGoal }: GoalTrackerProps) {
   const { t } = useTranslation();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -61,26 +60,24 @@ export function GoalTracker({ goals, isCoach, onCreateGoal, onToggleComplete, on
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>{t('goals.title')}</CardTitle>
-        {isCoach && (
-          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-            <DialogTrigger asChild>
-              <Button size="sm" variant="outline">
-                <Plus className="h-4 w-4 mr-1" />
-                {t('goals.addGoal')}
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>{t('goals.addGoal')}</DialogTitle>
-              </DialogHeader>
-              <PlayerGoalForm
-                onSubmit={handleCreate}
-                onCancel={() => setDialogOpen(false)}
-                isSubmitting={isSubmitting}
-              />
-            </DialogContent>
-          </Dialog>
-        )}
+        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+          <DialogTrigger asChild>
+            <Button size="sm" variant="outline">
+              <Plus className="h-4 w-4 mr-1" />
+              {t('goals.addGoal')}
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>{t('goals.addGoal')}</DialogTitle>
+            </DialogHeader>
+            <PlayerGoalForm
+              onSubmit={handleCreate}
+              onCancel={() => setDialogOpen(false)}
+              isSubmitting={isSubmitting}
+            />
+          </DialogContent>
+        </Dialog>
       </CardHeader>
       <CardContent className="space-y-4">
         {activeGoals.length === 0 && completedGoals.length === 0 && (
@@ -103,30 +100,28 @@ export function GoalTracker({ goals, isCoach, onCreateGoal, onToggleComplete, on
                   <p className="text-sm text-muted-foreground">{goal.description}</p>
                 )}
               </div>
-              {isCoach && (
-                <div className="flex gap-1">
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    className="h-7 w-7"
-                    onClick={() => onToggleComplete(goal.id, true)}
-                    title={t('goals.markComplete')}
-                    aria-label={t('goals.markComplete')}
-                  >
-                    <Check className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    className="h-7 w-7 text-destructive"
-                    onClick={() => onDeleteGoal(goal.id)}
-                    title={t('common.buttons.delete')}
-                    aria-label={t('common.buttons.delete')}
-                  >
-                    <Trash2 className="h-3 w-3" />
-                  </Button>
-                </div>
-              )}
+              <div className="flex gap-1">
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="h-7 w-7"
+                  onClick={() => onToggleComplete(goal.id, true)}
+                  title={t('goals.markComplete')}
+                  aria-label={t('goals.markComplete')}
+                >
+                  <Check className="h-4 w-4" />
+                </Button>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="h-7 w-7 text-destructive"
+                  onClick={() => onDeleteGoal(goal.id)}
+                  title={t('common.buttons.delete')}
+                  aria-label={t('common.buttons.delete')}
+                >
+                  <Trash2 className="h-3 w-3" />
+                </Button>
+              </div>
             </div>
             <div className="space-y-1">
               <div className="flex justify-between text-sm">
@@ -164,18 +159,16 @@ export function GoalTracker({ goals, isCoach, onCreateGoal, onToggleComplete, on
                           {t(`goals.metricTypes.${goal.metric_type}`)}
                         </Badge>
                       </div>
-                      {isCoach && (
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          className="h-7 w-7"
-                          onClick={() => onToggleComplete(goal.id, false)}
-                          title={t('goals.markIncomplete')}
-                          aria-label={t('goals.markIncomplete')}
-                        >
-                          <Check className="h-4 w-4" />
-                        </Button>
-                      )}
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="h-7 w-7"
+                        onClick={() => onToggleComplete(goal.id, false)}
+                        title={t('goals.markIncomplete')}
+                        aria-label={t('goals.markIncomplete')}
+                      >
+                        <Check className="h-4 w-4" />
+                      </Button>
                     </div>
                     {goal.completed_at && (
                       <p className="text-xs text-muted-foreground mt-1">

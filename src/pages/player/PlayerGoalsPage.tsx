@@ -87,7 +87,6 @@ export function PlayerGoalsPage() {
 
       <GoalTracker
         goals={goals}
-        isCoach={false}
         onCreateGoal={async (data: PlayerGoalFormData) => {
           await createPlayerGoal({ ...data, player_id: player.id, team_id: teamIds[0], created_by: user?.id || '' });
           await loadGoalsData();

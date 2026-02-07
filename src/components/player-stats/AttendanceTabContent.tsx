@@ -1,12 +1,9 @@
 import { useEffect, useState } from 'react';
 import { AttendanceStatsRow } from './AttendanceStatsRow';
-import { AttendanceStreakCard } from './AttendanceStreakCard';
-import { EventTypeBreakdown } from './EventTypeBreakdown';
 import { AttendanceCalendar } from './AttendanceCalendar';
-import { MissedEventsTimeline } from './MissedEventsTimeline';
-import { getAttendanceStats, getEventTypeBreakdown, getMissedEventsTimeline } from '@/services/player-stats.service';
+import { getAttendanceStats, getEventTypeBreakdown } from '@/services/player-stats.service';
 import { getAttendanceWithEvents } from '@/services/attendance.service';
-import type { AttendanceStats, EventTypeBreakdown as EventBreakdownType, MissedEvent } from '@/services/player-stats.service';
+import type { AttendanceStats, EventTypeBreakdown as EventBreakdownType } from '@/services/player-stats.service';
 
 interface AttendanceTabContentProps {
   playerId: string;
@@ -27,7 +24,6 @@ interface MissedEventDisplay {
 export function AttendanceTabContent({ playerId, teamId }: AttendanceTabContentProps) {
   const [attendanceStats, setAttendanceStats] = useState<AttendanceStats | null>(null);
   const [eventBreakdown, setEventBreakdown] = useState<EventBreakdownType | null>(null);
-  const [missedEvents, setMissedEvents] = useState<MissedEvent[]>([]);
   const [missedEventDetails, setMissedEventDetails] = useState<MissedEventDisplay[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 

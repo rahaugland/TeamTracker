@@ -19,6 +19,17 @@ interface GameLogTableProps {
 type SortField = 'date' | 'kills' | 'killPct' | 'aces' | 'digs' | 'blocks' | 'blockTouches' | 'passRating' | 'setRating' | 'setsPlayed';
 type SortDirection = 'asc' | 'desc';
 
+function SortIcon({ field, sortField, sortDirection }: { field: SortField; sortField: SortField; sortDirection: SortDirection }) {
+  if (sortField !== field) {
+    return <ArrowUpDown className="ml-1 h-3 w-3 inline opacity-30" />;
+  }
+  return sortDirection === 'asc' ? (
+    <ArrowUp className="ml-1 h-3 w-3 inline" />
+  ) : (
+    <ArrowDown className="ml-1 h-3 w-3 inline" />
+  );
+}
+
 /**
  * Sortable table showing full stat line per game
  */
@@ -93,17 +104,6 @@ export function GameLogTable({ gameStats }: GameLogTableProps) {
     });
   }, [gameStats, sortField, sortDirection]);
 
-  const SortIcon = ({ field }: { field: SortField }) => {
-    if (sortField !== field) {
-      return <ArrowUpDown className="ml-1 h-3 w-3 inline opacity-30" />;
-    }
-    return sortDirection === 'asc' ? (
-      <ArrowUp className="ml-1 h-3 w-3 inline" />
-    ) : (
-      <ArrowDown className="ml-1 h-3 w-3 inline" />
-    );
-  };
-
   if (gameStats.length === 0) {
     return (
       <Card>
@@ -134,7 +134,7 @@ export function GameLogTable({ gameStats }: GameLogTableProps) {
                   onClick={() => handleSort('date')}
                 >
                   Date
-                  <SortIcon field="date" />
+                  <SortIcon sortField={sortField} sortDirection={sortDirection} field="date" />
                 </TableHead>
                 <TableHead>Opponent</TableHead>
                 <TableHead
@@ -142,7 +142,7 @@ export function GameLogTable({ gameStats }: GameLogTableProps) {
                   onClick={() => handleSort('kills')}
                 >
                   K
-                  <SortIcon field="kills" />
+                  <SortIcon sortField={sortField} sortDirection={sortDirection} field="kills" />
                 </TableHead>
                 <TableHead className="text-right">E</TableHead>
                 <TableHead className="text-right">TA</TableHead>
@@ -151,14 +151,14 @@ export function GameLogTable({ gameStats }: GameLogTableProps) {
                   onClick={() => handleSort('killPct')}
                 >
                   K%
-                  <SortIcon field="killPct" />
+                  <SortIcon sortField={sortField} sortDirection={sortDirection} field="killPct" />
                 </TableHead>
                 <TableHead
                   className="cursor-pointer hover:bg-muted/50 select-none text-right"
                   onClick={() => handleSort('aces')}
                 >
                   Aces
-                  <SortIcon field="aces" />
+                  <SortIcon sortField={sortField} sortDirection={sortDirection} field="aces" />
                 </TableHead>
                 <TableHead className="text-right">SE</TableHead>
                 <TableHead
@@ -166,42 +166,42 @@ export function GameLogTable({ gameStats }: GameLogTableProps) {
                   onClick={() => handleSort('digs')}
                 >
                   Digs
-                  <SortIcon field="digs" />
+                  <SortIcon sortField={sortField} sortDirection={sortDirection} field="digs" />
                 </TableHead>
                 <TableHead
                   className="cursor-pointer hover:bg-muted/50 select-none text-right"
                   onClick={() => handleSort('blocks')}
                 >
                   Blk
-                  <SortIcon field="blocks" />
+                  <SortIcon sortField={sortField} sortDirection={sortDirection} field="blocks" />
                 </TableHead>
                 <TableHead
                   className="cursor-pointer hover:bg-muted/50 select-none text-right"
                   onClick={() => handleSort('blockTouches')}
                 >
                   BT
-                  <SortIcon field="blockTouches" />
+                  <SortIcon sortField={sortField} sortDirection={sortDirection} field="blockTouches" />
                 </TableHead>
                 <TableHead
                   className="cursor-pointer hover:bg-muted/50 select-none text-right"
                   onClick={() => handleSort('passRating')}
                 >
                   Pass
-                  <SortIcon field="passRating" />
+                  <SortIcon sortField={sortField} sortDirection={sortDirection} field="passRating" />
                 </TableHead>
                 <TableHead
                   className="cursor-pointer hover:bg-muted/50 select-none text-right"
                   onClick={() => handleSort('setRating')}
                 >
                   Set
-                  <SortIcon field="setRating" />
+                  <SortIcon sortField={sortField} sortDirection={sortDirection} field="setRating" />
                 </TableHead>
                 <TableHead
                   className="cursor-pointer hover:bg-muted/50 select-none text-right"
                   onClick={() => handleSort('setsPlayed')}
                 >
                   Sets
-                  <SortIcon field="setsPlayed" />
+                  <SortIcon sortField={sortField} sortDirection={sortDirection} field="setsPlayed" />
                 </TableHead>
               </TableRow>
             </TableHeader>

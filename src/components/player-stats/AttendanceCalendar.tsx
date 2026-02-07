@@ -29,7 +29,6 @@ export function AttendanceCalendar({ playerId, teamId }: AttendanceCalendarProps
   useEffect(() => {
     let cancelled = false;
 
-    setIsLoading(true);
     getAttendanceCalendar(playerId, currentYear, currentMonth, teamId)
       .then(days => {
         if (!cancelled) {
@@ -45,6 +44,7 @@ export function AttendanceCalendar({ playerId, teamId }: AttendanceCalendarProps
   }, [playerId, teamId, currentYear, currentMonth]);
 
   const goToPreviousMonth = () => {
+    setIsLoading(true);
     if (currentMonth === 1) {
       setCurrentMonth(12);
       setCurrentYear(currentYear - 1);
@@ -54,6 +54,7 @@ export function AttendanceCalendar({ playerId, teamId }: AttendanceCalendarProps
   };
 
   const goToNextMonth = () => {
+    setIsLoading(true);
     if (currentMonth === 12) {
       setCurrentMonth(1);
       setCurrentYear(currentYear + 1);
