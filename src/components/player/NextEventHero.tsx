@@ -76,7 +76,7 @@ export function NextEventHero({ event, playerId, currentRsvpStatus, onRsvpChange
               status === 'maybe' && 'bg-yellow-500/20 text-yellow-400'
             )}
           >
-            {t(`rsvp.status.${status}`)}
+            {t(`rsvp.status.${status}` as never)}
           </span>
         )}
       </div>

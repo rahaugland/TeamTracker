@@ -28,8 +28,8 @@ export function SeasonAwardsDisplay({ awards, playerNames }: SeasonAwardsProps) 
 
   if (awards.length === 0) return null;
 
-  const sorted = awards.toSorted(
-    (a, b) => AWARD_ORDER.indexOf(a.award_type as SeasonAwardType) - AWARD_ORDER.indexOf(b.award_type as SeasonAwardType)
+  const sorted = [...awards].sort(
+    (a: SeasonAward, b: SeasonAward) => AWARD_ORDER.indexOf(a.award_type as SeasonAwardType) - AWARD_ORDER.indexOf(b.award_type as SeasonAwardType)
   );
 
   return (
@@ -49,7 +49,7 @@ export function SeasonAwardsDisplay({ awards, playerNames }: SeasonAwardsProps) 
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium truncate">
-                  {t(`awards.types.${award.award_type}`)}
+                  {t(`awards.types.${award.award_type}` as never)}
                 </p>
                 <p className="text-sm text-muted-foreground truncate">
                   {playerNames[award.player_id] || 'Unknown'}

@@ -23,8 +23,8 @@ export function SelfAssessmentHistory({ assessments }: SelfAssessmentHistoryProp
     );
   }
 
-  const sortedAssessments = assessments.toSorted(
-    (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+  const sortedAssessments = [...assessments].sort(
+    (a: SelfAssessmentWithEvent, b: SelfAssessmentWithEvent) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
   );
 
   return (

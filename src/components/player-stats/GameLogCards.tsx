@@ -20,8 +20,8 @@ export function GameLogCards({ games }: GameLogCardsProps) {
   return (
     <div className="space-y-3">
       {games.map((game) => {
-        const killPct = game.attackAttempts > 0
-          ? Math.round((game.kills / game.attackAttempts) * 100)
+        const killPct = game.attack_attempts > 0
+          ? Math.round((game.kills / game.attack_attempts) * 100)
           : null;
 
         return (

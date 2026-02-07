@@ -1,0 +1,2288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VolleyQuest — Player Goals Wireframes</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700;800&family=Barlow+Condensed:wght@600;700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Barlow', sans-serif;
+            background: #080e1a;
+            color: #fff;
+            padding: 60px 40px;
+            overflow-x: hidden;
+        }
+
+        .showcase-header {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+
+        .showcase-header h1 {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 48px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            color: #2EC4B6;
+            margin-bottom: 12px;
+        }
+
+        .showcase-header .subtitle {
+            font-size: 16px;
+            color: #64748B;
+            margin-bottom: 16px;
+        }
+
+        .showcase-header .info-bar {
+            font-size: 13px;
+            color: #64748B;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* === ROW LAYOUT === */
+        .row-section {
+            margin-bottom: 60px;
+        }
+
+        .row-label {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 22px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: #E63946;
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .row-description {
+            font-size: 14px;
+            color: #64748B;
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto 32px;
+            line-height: 1.6;
+        }
+
+        .phones-container {
+            display: flex;
+            gap: 40px;
+            padding: 40px 20px;
+            overflow-x: auto;
+            overflow-y: visible;
+            scroll-behavior: smooth;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .phones-container::-webkit-scrollbar { height: 12px; }
+        .phones-container::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 6px; }
+        .phones-container::-webkit-scrollbar-thumb { background: rgba(46,196,182,0.3); border-radius: 6px; }
+
+        .phone-wrapper { flex-shrink: 0; }
+
+        .phone-label {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #A0AEC0;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .phone-frame {
+            width: 390px;
+            height: 844px;
+            background: #0A1628;
+            border-radius: 44px;
+            border: 3px solid #1e2d4d;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .status-bar {
+            height: 47px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            font-size: 15px;
+            font-weight: 600;
+            color: #fff;
+            position: relative;
+            z-index: 10;
+        }
+
+        .dynamic-island {
+            position: absolute;
+            top: 11px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 126px;
+            height: 37px;
+            background: #000;
+            border-radius: 19px;
+            z-index: 15;
+        }
+
+        .phone-content {
+            height: calc(844px - 47px - 76px);
+            overflow-y: auto;
+            overflow-x: hidden;
+            background: #0A1628;
+            padding: 16px;
+        }
+
+        .phone-content::-webkit-scrollbar { width: 4px; }
+        .phone-content::-webkit-scrollbar-track { background: transparent; }
+        .phone-content::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+
+        .bottom-tab-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 76px;
+            background: #0f1e35;
+            border-top: 1px solid rgba(255,255,255,0.06);
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-around;
+            padding: 8px 16px 20px;
+        }
+
+        .tab-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: #64748B;
+            padding: 6px 12px;
+            border-radius: 12px;
+            transition: all 0.2s;
+        }
+
+        .tab-item.active {
+            color: #E63946;
+            background: rgba(230,57,70,0.1);
+        }
+
+        .tab-item svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        .home-indicator {
+            position: absolute;
+            bottom: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 134px;
+            height: 5px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 3px;
+        }
+
+        /* === SHARED COMPONENTS === */
+        .top-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .top-bar.centered {
+            justify-content: center;
+        }
+
+        .top-bar-title {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #A0AEC0;
+        }
+
+        .top-bar-title.large {
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: 2px;
+            color: #fff;
+        }
+
+        .section-header {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #fff;
+            margin: 24px 0 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-header::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: rgba(255,255,255,0.06);
+        }
+
+        .section-header .count {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: #64748B;
+            font-weight: 400;
+        }
+
+        /* === GOAL HERO SUMMARY === */
+        .goal-summary-hero {
+            background: linear-gradient(135deg, rgba(46,196,182,0.12), rgba(255,183,3,0.08));
+            border: 1px solid rgba(46,196,182,0.25);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .goal-summary-label {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: #2EC4B6;
+            margin-bottom: 12px;
+        }
+
+        .goal-summary-ring {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 12px;
+            position: relative;
+        }
+
+        .goal-summary-ring svg {
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg);
+        }
+
+        .goal-summary-ring .ring-bg {
+            fill: none;
+            stroke: #162843;
+            stroke-width: 8;
+        }
+
+        .goal-summary-ring .ring-fill {
+            fill: none;
+            stroke: #2EC4B6;
+            stroke-width: 8;
+            stroke-linecap: round;
+            stroke-dasharray: 251;
+        }
+
+        .goal-summary-ring .ring-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 22px;
+            font-weight: 700;
+            color: #2EC4B6;
+        }
+
+        .goal-summary-ring .ring-sub {
+            position: absolute;
+            top: 62%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 9px;
+            text-transform: uppercase;
+            color: #64748B;
+            letter-spacing: 1px;
+        }
+
+        .goal-summary-stats {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-top: 8px;
+        }
+
+        .goal-summary-stat {
+            text-align: center;
+        }
+
+        .goal-summary-stat-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 18px;
+            font-weight: 700;
+            display: block;
+        }
+
+        .goal-summary-stat-value.active { color: #FFB703; }
+        .goal-summary-stat-value.done { color: #22C55E; }
+        .goal-summary-stat-value.overdue { color: #EF4444; }
+
+        .goal-summary-stat-label {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: #64748B;
+        }
+
+        /* === GOAL CARDS (enhanced) === */
+        .goal-card {
+            background: #162843;
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 14px;
+            padding: 16px;
+            margin-bottom: 12px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .goal-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            border-radius: 4px 0 0 4px;
+        }
+
+        .goal-card.metric-serve::before { background: #22C55E; }
+        .goal-card.metric-kill::before { background: #E63946; }
+        .goal-card.metric-pass::before { background: #2EC4B6; }
+        .goal-card.metric-attendance::before { background: #FFB703; }
+        .goal-card.metric-custom::before { background: #8B5CF6; }
+
+        .goal-card.completed {
+            opacity: 0.5;
+        }
+
+        .goal-card-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .goal-card-title {
+            font-size: 14px;
+            font-weight: 600;
+            flex: 1;
+            padding-right: 8px;
+        }
+
+        .goal-card-badge {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 4px 8px;
+            border-radius: 6px;
+            white-space: nowrap;
+        }
+
+        .goal-card-badge.serve { background: rgba(34,197,94,0.15); color: #22C55E; }
+        .goal-card-badge.kill { background: rgba(230,57,70,0.15); color: #E63946; }
+        .goal-card-badge.pass { background: rgba(46,196,182,0.15); color: #2EC4B6; }
+        .goal-card-badge.attendance { background: rgba(255,183,3,0.15); color: #FFB703; }
+        .goal-card-badge.custom { background: rgba(139,92,246,0.15); color: #8B5CF6; }
+
+        .goal-card-desc {
+            font-size: 12px;
+            color: #A0AEC0;
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+
+        .goal-progress-container {
+            margin-bottom: 6px;
+        }
+
+        .goal-progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 6px;
+        }
+
+        .goal-progress-current {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 20px;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .goal-progress-target {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: #64748B;
+        }
+
+        .goal-progress-bar {
+            height: 8px;
+            background: #0A1628;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .goal-progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .goal-progress-fill.serve { background: linear-gradient(90deg, #22C55E, #4ADE80); }
+        .goal-progress-fill.kill { background: linear-gradient(90deg, #E63946, #F87171); }
+        .goal-progress-fill.pass { background: linear-gradient(90deg, #2EC4B6, #5EEAD4); }
+        .goal-progress-fill.attendance { background: linear-gradient(90deg, #FFB703, #FCD34D); }
+        .goal-progress-fill.custom { background: linear-gradient(90deg, #8B5CF6, #A78BFA); }
+
+        .goal-card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .goal-deadline {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: #64748B;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .goal-deadline.urgent {
+            color: #EF4444;
+        }
+
+        .goal-card-actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        .goal-action-btn {
+            width: 30px;
+            height: 30px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            cursor: pointer;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            color: #A0AEC0;
+        }
+
+        .goal-action-btn.check {
+            border-color: rgba(34,197,94,0.3);
+            color: #22C55E;
+        }
+
+        .goal-action-btn.edit {
+            border-color: rgba(46,196,182,0.3);
+            color: #2EC4B6;
+        }
+
+        .goal-action-btn.delete {
+            border-color: rgba(239,68,68,0.2);
+            color: #EF4444;
+        }
+
+        /* === FAB (Floating Action Button) === */
+        .fab {
+            position: absolute;
+            bottom: 92px;
+            right: 24px;
+            width: 52px;
+            height: 52px;
+            background: linear-gradient(135deg, #E63946, #ff5965);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            color: #fff;
+            box-shadow: 0 8px 24px rgba(230,57,70,0.4);
+            z-index: 20;
+            cursor: pointer;
+        }
+
+        /* === CREATE GOAL FORM (Bottom Sheet) === */
+        .bottom-sheet-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            z-index: 25;
+            border-radius: 44px;
+        }
+
+        .bottom-sheet {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #0f1e35;
+            border-radius: 24px 24px 44px 44px;
+            padding: 20px 20px 40px;
+            z-index: 30;
+            max-height: 75%;
+            overflow-y: auto;
+        }
+
+        .bottom-sheet-handle {
+            width: 40px;
+            height: 4px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 2px;
+            margin: 0 auto 16px;
+        }
+
+        .bottom-sheet-title {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 18px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        /* === FORM ELEMENTS === */
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #A0AEC0;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px 16px;
+            background: #162843;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            color: #fff;
+            font-family: 'Barlow', sans-serif;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .form-input::placeholder {
+            color: #4A5568;
+        }
+
+        .form-input:focus {
+            border-color: #2EC4B6;
+            box-shadow: 0 0 0 3px rgba(46,196,182,0.15);
+        }
+
+        .form-textarea {
+            width: 100%;
+            padding: 14px 16px;
+            background: #162843;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            color: #fff;
+            font-family: 'Barlow', sans-serif;
+            font-size: 14px;
+            resize: none;
+            min-height: 60px;
+            outline: none;
+        }
+
+        /* Metric type chips */
+        .metric-chip-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .metric-chip {
+            padding: 10px 16px;
+            border-radius: 10px;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            border: 1.5px solid rgba(255,255,255,0.1);
+            background: transparent;
+            color: #A0AEC0;
+            transition: all 0.2s;
+        }
+
+        .metric-chip.selected {
+            border-color: #2EC4B6;
+            background: rgba(46,196,182,0.12);
+            color: #2EC4B6;
+        }
+
+        .metric-chip.selected.serve { border-color: #22C55E; background: rgba(34,197,94,0.12); color: #22C55E; }
+        .metric-chip.selected.kill { border-color: #E63946; background: rgba(230,57,70,0.12); color: #E63946; }
+        .metric-chip.selected.pass { border-color: #2EC4B6; background: rgba(46,196,182,0.12); color: #2EC4B6; }
+        .metric-chip.selected.attendance { border-color: #FFB703; background: rgba(255,183,3,0.12); color: #FFB703; }
+        .metric-chip.selected.custom { border-color: #8B5CF6; background: rgba(139,92,246,0.12); color: #8B5CF6; }
+
+        /* Target value input with unit */
+        .target-input-row {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .target-input-row .form-input {
+            flex: 1;
+        }
+
+        .target-unit {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            color: #64748B;
+            white-space: nowrap;
+        }
+
+        /* Submit btn */
+        .form-submit-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #E63946, #ff5965);
+            border: none;
+            border-radius: 12px;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #fff;
+            cursor: pointer;
+            margin-top: 4px;
+            box-shadow: 0 4px 16px rgba(230,57,70,0.3);
+        }
+
+        .form-cancel-btn {
+            width: 100%;
+            padding: 12px;
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #64748B;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+
+        /* === SUGGESTED GOALS === */
+        .suggested-goal {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 16px;
+            background: linear-gradient(135deg, rgba(255,183,3,0.06), rgba(46,196,182,0.04));
+            border: 1px dashed rgba(255,183,3,0.25);
+            border-radius: 12px;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+
+        .suggested-goal-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: rgba(255,183,3,0.12);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .suggested-goal-text {
+            flex: 1;
+        }
+
+        .suggested-goal-title {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .suggested-goal-hint {
+            font-size: 11px;
+            color: #64748B;
+        }
+
+        .suggested-goal-add {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #FFB703;
+            padding: 6px 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,183,3,0.3);
+            background: transparent;
+        }
+
+        /* === COMPLETED GOAL CARD === */
+        .goal-completed-card {
+            background: #162843;
+            border: 1px solid rgba(34,197,94,0.15);
+            border-radius: 14px;
+            padding: 14px 16px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            opacity: 0.6;
+        }
+
+        .goal-completed-check {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: #22C55E;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: #fff;
+            flex-shrink: 0;
+        }
+
+        .goal-completed-info {
+            flex: 1;
+        }
+
+        .goal-completed-title {
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: line-through;
+            color: #A0AEC0;
+            margin-bottom: 2px;
+        }
+
+        .goal-completed-date {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            color: #4A5568;
+        }
+
+        /* === EDIT GOAL (full screen) === */
+        .edit-screen-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .back-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: #A0AEC0;
+            cursor: pointer;
+        }
+
+        .edit-screen-title {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 18px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* === GOAL DETAIL CARD === */
+        .goal-detail-hero {
+            background: linear-gradient(135deg, rgba(46,196,182,0.1), rgba(46,196,182,0.03));
+            border: 1px solid rgba(46,196,182,0.2);
+            border-radius: 16px;
+            padding: 24px 20px;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .goal-detail-metric-badge {
+            display: inline-block;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            padding: 5px 12px;
+            border-radius: 8px;
+            background: rgba(46,196,182,0.15);
+            color: #2EC4B6;
+            margin-bottom: 12px;
+        }
+
+        .goal-detail-title {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 22px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+        }
+
+        .goal-detail-desc {
+            font-size: 13px;
+            color: #A0AEC0;
+            margin-bottom: 20px;
+        }
+
+        .goal-detail-progress-ring {
+            width: 140px;
+            height: 140px;
+            margin: 0 auto 16px;
+            position: relative;
+        }
+
+        .goal-detail-progress-ring svg {
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg);
+        }
+
+        .goal-detail-progress-ring .ring-bg {
+            fill: none;
+            stroke: #162843;
+            stroke-width: 10;
+        }
+
+        .goal-detail-progress-ring .ring-fill {
+            fill: none;
+            stroke: #2EC4B6;
+            stroke-width: 10;
+            stroke-linecap: round;
+            stroke-dasharray: 377;
+        }
+
+        .goal-detail-progress-ring .ring-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .goal-detail-progress-ring .ring-pct {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 32px;
+            font-weight: 700;
+            color: #2EC4B6;
+            display: block;
+        }
+
+        .goal-detail-progress-ring .ring-label {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 10px;
+            text-transform: uppercase;
+            color: #64748B;
+            letter-spacing: 1px;
+        }
+
+        .goal-detail-values {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+        }
+
+        .goal-detail-val {
+            text-align: center;
+        }
+
+        .goal-detail-val-num {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 22px;
+            font-weight: 700;
+            display: block;
+        }
+
+        .goal-detail-val-label {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 10px;
+            text-transform: uppercase;
+            color: #64748B;
+            letter-spacing: 1px;
+        }
+
+        /* History chart placeholder */
+        .history-chart {
+            background: #0f1e35;
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 14px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .history-chart-header {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #A0AEC0;
+            margin-bottom: 12px;
+        }
+
+        .history-chart-area {
+            height: 120px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            position: relative;
+            display: flex;
+            align-items: flex-end;
+            gap: 8px;
+            padding-bottom: 8px;
+        }
+
+        .chart-bar {
+            flex: 1;
+            border-radius: 4px 4px 0 0;
+            min-height: 8px;
+            position: relative;
+        }
+
+        .chart-bar-label {
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 9px;
+            color: #4A5568;
+            white-space: nowrap;
+        }
+
+        .chart-target-line {
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 1px;
+            border-top: 2px dashed rgba(255,183,3,0.4);
+        }
+
+        .chart-target-label {
+            position: absolute;
+            right: 0;
+            top: -16px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            color: #FFB703;
+        }
+
+        /* Delete/mark complete confirmation */
+        .action-buttons-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 14px;
+            border-radius: 10px;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-align: center;
+            cursor: pointer;
+            border: none;
+        }
+
+        .action-btn.complete {
+            background: rgba(34,197,94,0.15);
+            color: #22C55E;
+            border: 1px solid rgba(34,197,94,0.3);
+        }
+
+        .action-btn.edit-action {
+            background: rgba(46,196,182,0.1);
+            color: #2EC4B6;
+            border: 1px solid rgba(46,196,182,0.2);
+        }
+
+        .action-btn.delete-action {
+            background: rgba(239,68,68,0.1);
+            color: #EF4444;
+            border: 1px solid rgba(239,68,68,0.2);
+        }
+
+        /* === EMPTY STATE === */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .empty-state-title {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 18px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+        }
+
+        .empty-state-desc {
+            font-size: 13px;
+            color: #64748B;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .empty-state-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 14px 28px;
+            background: linear-gradient(135deg, #E63946, #ff5965);
+            border: none;
+            border-radius: 12px;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #fff;
+            cursor: pointer;
+            box-shadow: 0 4px 16px rgba(230,57,70,0.3);
+        }
+
+        /* === ANNOTATION CALLOUTS === */
+        .annotation {
+            position: relative;
+            margin: 40px 0;
+            padding: 16px 20px;
+            background: rgba(255,183,3,0.06);
+            border: 1px solid rgba(255,183,3,0.2);
+            border-radius: 12px;
+        }
+
+        .annotation-tag {
+            position: absolute;
+            top: -10px;
+            left: 16px;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #FFB703;
+            background: #080e1a;
+            padding: 0 8px;
+        }
+
+        .annotation-text {
+            font-size: 13px;
+            color: #A0AEC0;
+            line-height: 1.6;
+        }
+
+        .annotation-text strong {
+            color: #FFB703;
+        }
+
+        /* FLOW SEPARATOR */
+        .flow-sep {
+            text-align: center;
+            margin: 48px 0 24px;
+            position: relative;
+        }
+
+        .flow-sep::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 50%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(46,196,182,0.2), transparent);
+        }
+
+        .flow-sep span {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: #2EC4B6;
+            background: #080e1a;
+            padding: 0 16px;
+            position: relative;
+        }
+
+        /* Streak grid */
+        .streak-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .streak-card {
+            background: #0f1e35;
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px;
+            padding: 14px;
+            text-align: center;
+        }
+
+        .streak-icon { font-size: 22px; margin-bottom: 4px; }
+
+        .streak-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 22px;
+            font-weight: 700;
+            display: block;
+        }
+
+        .streak-value.red { color: #E63946; }
+        .streak-value.teal { color: #2EC4B6; }
+        .streak-value.gold { color: #FFB703; }
+        .streak-value.green { color: #22C55E; }
+
+        .streak-label {
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: #64748B;
+        }
+
+        /* Inline update field */
+        .inline-update {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .inline-update-input {
+            flex: 1;
+            padding: 8px 12px;
+            background: #0A1628;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            color: #fff;
+            width: 80px;
+            text-align: center;
+        }
+
+        .inline-update-btn {
+            padding: 8px 14px;
+            background: #2EC4B6;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Barlow Condensed', sans-serif;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        .inline-update-label {
+            font-size: 11px;
+            color: #64748B;
+        }
+
+        /* Notif */
+        .toast-notif {
+            position: absolute;
+            top: 60px;
+            left: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, rgba(34,197,94,0.15), rgba(34,197,94,0.05));
+            border: 1px solid rgba(34,197,94,0.3);
+            border-radius: 12px;
+            padding: 14px 16px;
+            z-index: 50;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .toast-icon {
+            font-size: 20px;
+        }
+
+        .toast-text {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .toast-sub {
+            font-size: 11px;
+            color: #A0AEC0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="showcase-header">
+    <h1>Player Goal Setting</h1>
+    <div class="subtitle">Self-service goals — let players set, track, and complete their own targets</div>
+    <div class="info-bar">WIREFRAMES &bull; MOBILE-FIRST &bull; 6 SCREENS &bull; VolleyQuest Design System</div>
+</div>
+
+<!-- ========================================== -->
+<!-- ROW 1: GOALS OVERVIEW + EMPTY STATE -->
+<!-- ========================================== -->
+<div class="row-section">
+    <div class="row-label">Flow 1 — Goals Overview</div>
+    <div class="row-description">
+        The Goals tab shows a summary ring of overall progress, streaks and milestones at the top,
+        then lists active goals sorted by urgency. Players tap the FAB (+) to create a new goal.
+        When no goals exist, an inviting empty state with suggested goals is shown.
+    </div>
+
+    <div class="phones-container">
+        <!-- SCREEN 1A: Goals Overview (with goals) -->
+        <div class="phone-wrapper">
+            <div class="phone-label">1A — Goals Dashboard</div>
+            <div class="phone-frame">
+                <div class="status-bar">
+                    <span>9:41</span>
+                    <span style="margin-left: auto;">📶 🔋</span>
+                </div>
+                <div class="dynamic-island"></div>
+
+                <div class="phone-content">
+                    <div class="top-bar centered">
+                        <div class="top-bar-title large">MY GOALS</div>
+                    </div>
+
+                    <!-- Summary Hero -->
+                    <div class="goal-summary-hero">
+                        <div class="goal-summary-label">Overall Progress</div>
+                        <div class="goal-summary-ring">
+                            <svg viewBox="0 0 100 100">
+                                <circle class="ring-bg" cx="50" cy="50" r="40" />
+                                <circle class="ring-fill" cx="50" cy="50" r="40" style="stroke-dashoffset: 88;" />
+                            </svg>
+                            <div class="ring-text">65%</div>
+                            <div class="ring-sub">Avg Progress</div>
+                        </div>
+                        <div class="goal-summary-stats">
+                            <div class="goal-summary-stat">
+                                <span class="goal-summary-stat-value active">3</span>
+                                <div class="goal-summary-stat-label">Active</div>
+                            </div>
+                            <div class="goal-summary-stat">
+                                <span class="goal-summary-stat-value done">2</span>
+                                <div class="goal-summary-stat-label">Done</div>
+                            </div>
+                            <div class="goal-summary-stat">
+                                <span class="goal-summary-stat-value overdue">1</span>
+                                <div class="goal-summary-stat-label">Overdue</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Streaks -->
+                    <div class="streak-grid">
+                        <div class="streak-card">
+                            <div class="streak-icon">🔥</div>
+                            <span class="streak-value red">7</span>
+                            <div class="streak-label">Current Streak</div>
+                        </div>
+                        <div class="streak-card">
+                            <div class="streak-icon">⭐</div>
+                            <span class="streak-value gold">12</span>
+                            <div class="streak-label">Best Streak</div>
+                        </div>
+                    </div>
+
+                    <!-- Active Goals -->
+                    <div class="section-header">Active Goals <span class="count">3</span></div>
+
+                    <div class="goal-card metric-serve">
+                        <div class="goal-card-top">
+                            <div class="goal-card-title">Improve serve accuracy to 85%</div>
+                            <div class="goal-card-badge serve">Serve %</div>
+                        </div>
+                        <div class="goal-card-desc">Focus on consistent toss and follow-through</div>
+                        <div class="goal-progress-container">
+                            <div class="goal-progress-header">
+                                <span class="goal-progress-current">72.4%</span>
+                                <span class="goal-progress-target">/ 85.0%</span>
+                            </div>
+                            <div class="goal-progress-bar">
+                                <div class="goal-progress-fill serve" style="width: 85%;"></div>
+                            </div>
+                        </div>
+                        <div class="goal-card-footer">
+                            <div class="goal-deadline">⏰ 14 days left</div>
+                            <div class="goal-card-actions">
+                                <div class="goal-action-btn edit">✎</div>
+                                <div class="goal-action-btn check">✓</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="goal-card metric-attendance">
+                        <div class="goal-card-top">
+                            <div class="goal-card-title">Hit 90% attendance this season</div>
+                            <div class="goal-card-badge attendance">Attend.</div>
+                        </div>
+                        <div class="goal-progress-container">
+                            <div class="goal-progress-header">
+                                <span class="goal-progress-current">87.5%</span>
+                                <span class="goal-progress-target">/ 90.0%</span>
+                            </div>
+                            <div class="goal-progress-bar">
+                                <div class="goal-progress-fill attendance" style="width: 97%;"></div>
+                            </div>
+                        </div>
+                        <div class="goal-card-footer">
+                            <div class="goal-deadline">⏰ 45 days left</div>
+                            <div class="goal-card-actions">
+                                <div class="goal-action-btn edit">✎</div>
+                                <div class="goal-action-btn check">✓</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="goal-card metric-custom">
+                        <div class="goal-card-top">
+                            <div class="goal-card-title">Complete 10 extra ball-handling drills</div>
+                            <div class="goal-card-badge custom">Custom</div>
+                        </div>
+                        <div class="goal-progress-container">
+                            <div class="goal-progress-header">
+                                <span class="goal-progress-current">4</span>
+                                <span class="goal-progress-target">/ 10</span>
+                            </div>
+                            <div class="goal-progress-bar">
+                                <div class="goal-progress-fill custom" style="width: 40%;"></div>
+                            </div>
+                        </div>
+                        <div class="goal-card-footer">
+                            <div class="goal-deadline urgent">⚠ 3 days left</div>
+                            <div class="goal-card-actions">
+                                <div class="goal-action-btn edit">✎</div>
+                                <div class="goal-action-btn check">✓</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Completed Goals (collapsed) -->
+                    <div class="section-header">Completed <span class="count">2</span></div>
+
+                    <div class="goal-completed-card">
+                        <div class="goal-completed-check">✓</div>
+                        <div class="goal-completed-info">
+                            <div class="goal-completed-title">Score 5 aces in a match</div>
+                            <div class="goal-completed-date">Completed Jan 28, 2026</div>
+                        </div>
+                    </div>
+
+                    <div class="goal-completed-card">
+                        <div class="goal-completed-check">✓</div>
+                        <div class="goal-completed-info">
+                            <div class="goal-completed-title">Reach 40% kill percentage</div>
+                            <div class="goal-completed-date">Completed Jan 15, 2026</div>
+                        </div>
+                    </div>
+
+                    <div style="height: 80px;"></div>
+                </div>
+
+                <!-- FAB -->
+                <div class="fab">+</div>
+
+                <div class="bottom-tab-bar">
+                    <div class="tab-item">
+                        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                        <span>Home</span>
+                    </div>
+                    <div class="tab-item">
+                        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10z"/></svg>
+                        <span>Schedule</span>
+                    </div>
+                    <div class="tab-item">
+                        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8z"/></svg>
+                        <span>Stats</span>
+                    </div>
+                    <div class="tab-item active">
+                        <svg fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.5"/><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>
+                        <span>Goals</span>
+                    </div>
+                    <div class="tab-item">
+                        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                        <span>Profile</span>
+                    </div>
+                </div>
+                <div class="home-indicator"></div>
+            </div>
+        </div>
+
+        <!-- SCREEN 1B: Empty State -->
+        <div class="phone-wrapper">
+            <div class="phone-label">1B — Empty State (New Player)</div>
+            <div class="phone-frame">
+                <div class="status-bar">
+                    <span>9:41</span>
+                    <span style="margin-left: auto;">📶 🔋</span>
+                </div>
+                <div class="dynamic-island"></div>
+
+                <div class="phone-content">
+                    <div class="top-bar centered">
+                        <div class="top-bar-title large">MY GOALS</div>
+                    </div>
+
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🎯</div>
+                        <div class="empty-state-title">Set Your First Goal</div>
+                        <div class="empty-state-desc">
+                            Goals help you track your progress and push yourself.
+                            Set targets for serve %, kill %, attendance, or anything
+                            you want to improve.
+                        </div>
+                        <button class="empty-state-btn">+ Create Goal</button>
+                    </div>
+
+                    <div class="section-header" style="margin-top: 32px;">Suggested Goals</div>
+
+                    <div class="suggested-goal">
+                        <div class="suggested-goal-icon">🏐</div>
+                        <div class="suggested-goal-text">
+                            <div class="suggested-goal-title">Improve serve accuracy</div>
+                            <div class="suggested-goal-hint">Based on your recent 68% serve rate</div>
+                        </div>
+                        <div class="suggested-goal-add">+ Add</div>
+                    </div>
+
+                    <div class="suggested-goal">
+                        <div class="suggested-goal-icon">📅</div>
+                        <div class="suggested-goal-text">
+                            <div class="suggested-goal-title">Attend 90% of practices</div>
+                            <div class="suggested-goal-hint">You're at 85% — push a bit higher!</div>
+                        </div>
+                        <div class="suggested-goal-add">+ Add</div>
+                    </div>
+
+                    <div class="suggested-goal">
+                        <div class="suggested-goal-icon">💪</div>
+                        <div class="suggested-goal-text">
+                            <div class="suggested-goal-title">Reach 45% kill efficiency</div>
+                            <div class="suggested-goal-hint">Great attackers aim for 40%+</div>
+                        </div>
+                        <div class="suggested-goal-add">+ Add</div>
+                    </div>
+
+                    <div class="suggested-goal">
+                        <div class="suggested-goal-icon">⭐</div>
+                        <div class="suggested-goal-text">
+                            <div class="suggested-goal-title">Complete 5 extra drills per week</div>
+                            <div class="suggested-goal-hint">Build consistency outside of practice</div>
+                        </div>
+                        <div class="suggested-goal-add">+ Add</div>
+                    </div>
+                </div>
+
+                <div class="bottom-tab-bar">
+                    <div class="tab-item">
+                        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                        <span>Home</span>
+                    </div>
+                    <div class="tab-item">
+                        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10z"/></svg>
+                        <span>Schedule</span>
+                    </div>
+                    <div class="tab-item">
+                        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8z"/></svg>
+                        <span>Stats</span>
+                    </div>
+                    <div class="tab-item active">
+                        <svg fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.5"/><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>
+                        <span>Goals</span>
+                    </div>
+                    <div class="tab-item">
+                        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                        <span>Profile</span>
+                    </div>
+                </div>
+                <div class="home-indicator"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- ========================================== -->
+<!-- ROW 2: CREATE GOAL FLOW -->
+<!-- ========================================== -->
+<div class="row-section">
+    <div class="row-label">Flow 2 — Create Goal</div>
+    <div class="row-description">
+        Tapping the FAB opens a bottom-sheet form. Players pick a metric type via chips,
+        set a title, optional description, target value, and deadline. Auto-tracked metrics
+        (kill%, serve%, pass, attendance) auto-populate progress from match stats.
+        Custom goals let the player manually update progress.
+    </div>
+
+    <div class="phones-container">
+        <!-- SCREEN 2A: Bottom Sheet — Create Goal -->
+        <div class="phone-wrapper">
+            <div class="phone-label">2A — Create Goal (Bottom Sheet)</div>
+            <div class="phone-frame">
+                <div class="status-bar">
+                    <span>9:41</span>
+                    <span style="margin-left: auto;">📶 🔋</span>
+                </div>
+                <div class="dynamic-island"></div>
+
+                <div class="bottom-sheet-overlay"></div>
+                <div class="bottom-sheet">
+                    <div class="bottom-sheet-handle"></div>
+                    <div class="bottom-sheet-title">Create New Goal</div>
+
+                    <div class="form-group">
+                        <label class="form-label">Metric Type</label>
+                        <div class="metric-chip-group">
+                            <div class="metric-chip selected serve">Serve %</div>
+                            <div class="metric-chip">Kill %</div>
+                            <div class="metric-chip">Pass</div>
+                            <div class="metric-chip">Attend.</div>
+                            <div class="metric-chip">Custom</div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Goal Title</label>
+                        <input class="form-input" type="text" placeholder="e.g. Hit 85% serve accuracy" value="Improve serve accuracy to 85%">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Description (Optional)</label>
+                        <textarea class="form-textarea" placeholder="What will you focus on?">Focus on consistent toss and follow-through</textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Target Value</label>
+                        <div class="target-input-row">
+                            <input class="form-input" type="number" value="85.0">
+                            <div class="target-unit">%</div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Deadline (Optional)</label>
+                        <input class="form-input" type="text" placeholder="Select date" value="2026-03-01">
+                    </div>
+
+                    <button class="form-submit-btn">Create Goal</button>
+                    <button class="form-cancel-btn">Cancel</button>
+                </div>
+
+                <div class="bottom-tab-bar">
+                    <div class="tab-item">
+                        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                        <span>Home</span>
+                    </div>
+                    <div class="tab-item">
+                        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10z"/></svg>
+                        <span>Schedule</span>
+                    </div>
+                    <div class="tab-item">
+                        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8z"/></svg>
+                        <span>Stats</span>
+                    </div>
+                    <div class="tab-item active">
+                        <svg fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.5"/><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>
+                        <span>Goals</span>
+                    </div>
+                    <div class="tab-item">
+                        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                        <span>Profile</span>
+                    </div>
+                </div>
+                <div class="home-indicator"></div>
+            </div>
+        </div>
+
+        <!-- SCREEN 2B: Success Toast -->
+        <div class="phone-wrapper">
+            <div class="phone-label">2B — Goal Created (Toast)</div>
+            <div class="phone-frame">
+                <div class="status-bar">
+                    <span>9:41</span>
+                    <span style="margin-left: auto;">📶 🔋</span>
+                </div>
+                <div class="dynamic-island"></div>
+
+                <div class="toast-notif">
+                    <div class="toast-icon">🎯</div>
+                    <div>
+                        <div class="toast-text">Goal created!</div>
+                        <div class="toast-sub">Serve accuracy will auto-track from matches</div>
+                    </div>
+                </div>
+
+                <div class="phone-content" style="padding-top: 32px;">
+                    <div class="top-bar centered">
+                        <div class="top-bar-title large">MY GOALS</div>
+                    </div>
+
+                    <div class="goal-summary-hero">
+                        <div class="goal-summary-label">Overall Progress</div>
+                        <div class="goal-summary-ring">
+                            <svg viewBox="0 0 100 100">
+                                <circle class="ring-bg" cx="50" cy="50" r="40" />
+                                <circle class="ring-fill" cx="50" cy="50" r="40" style="stroke-dashoffset: 100;" />
+                            </svg>
+                            <div class="ring-text">60%</div>
+                            <div class="ring-sub">Avg Progress</div>
+                        </div>
+                        <div class="goal-summary-stats">
+                            <div class="goal-summary-stat">
+                                <span class="goal-summary-stat-value active">4</span>
+                                <div class="goal-summary-stat-label">Active</div>
+                            </div>
+                            <div class="goal-summary-stat">
+                                <span class="goal-summary-stat-value done">2</span>
+                                <div class="goal-summary-stat-label">Done</div>
+                            </div>
+                            <div class="goal-summary-stat">
+                                <span class="goal-summary-stat-value overdue">1</span>
+                                <div class="goal-summary-stat-label">Overdue</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section-header">Active Goals <span class="count">4</span></div>
+
+                    <!-- Newly created goal at top, highlighted -->
+                    <div class="goal-card metric-serve" style="border-color: rgba(34,197,94,0.3); box-shadow: 0 0 16px rgba(34,197,94,0.1);">
+                        <div class="goal-card-top">
+                            <div class="goal-card-title">Improve serve accuracy to 85%</div>
+                            <div class="goal-card-badge serve">Serve %</div>
+                        </div>
+                        <div class="goal-card-desc">Focus on consistent toss and follow-through</div>
+                        <div class="goal-progress-container">
+                            <div class="goal-progress-header">
+                                <span class="goal-progress-current">68.2%</span>
+                                <span class="goal-progress-target">/ 85.0%</span>
+                            </div>
+                            <div class="goal-progress-bar">
+                                <div class="goal-progress-fill serve" style="width: 80%;"></div>
+                            </div>
+                        </div>
+                        <div class="goal-card-footer">
+                            <div class="goal-deadline">⏰ 22 days left</div>
+                            <div class="goal-card-actions">
+                                <div class="goal-action-btn edit">✎</div>
+                                <div class="goal-action-btn check">✓</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="goal-card metric-attendance">
+                        <div class="goal-card-top">
+                            <div class="goal-card-title">Hit 90% attendance this season</div>
+                            <div class="goal-card-badge attendance">Attend.</div>
+                        </div>
+                        <div class="goal-progress-container">
+                            <div class="goal-progress-header">
+                                <span class="goal-progress-current">87.5%</span>
+                                <span class="goal-progress-target">/ 90.0%</span>
+                            </div>
+                            <div class="goal-progress-bar">
+                                <div class="goal-progress-fill attendance" style="width: 97%;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="height: 80px;"></div>
+                </div>
+
+                <div class="fab">+</div>
+
+                <div class="bottom-tab-bar">
+                    <div class="tab-item">
+                        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                        <span>Home</span>
+                    </div>
+                    <div class="tab-item">
+                        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10z"/></svg>
+                        <span>Schedule</span>
+                    </div>
+                    <div class="tab-item">
+                        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8z"/></svg>
+                        <span>Stats</span>
+                    </div>
+                    <div class="tab-item active">
+                        <svg fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.5"/><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>
+                        <span>Goals</span>
+                    </div>
+                    <div class="tab-item">
+                        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                        <span>Profile</span>
+                    </div>
+                </div>
+                <div class="home-indicator"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ========================================== -->
+<!-- ROW 3: GOAL DETAIL + UPDATE PROGRESS -->
+<!-- ========================================== -->
+<div class="row-section">
+    <div class="row-label">Flow 3 — Goal Detail & Manual Progress Update</div>
+    <div class="row-description">
+        Tapping a goal card expands to a detail view with a large progress ring,
+        trend chart over time, and action buttons. For custom goals, an inline field
+        lets players log progress manually. For auto-tracked metrics, progress updates
+        automatically after each match stat entry.
+    </div>
+
+    <div class="phones-container">
+        <!-- SCREEN 3A: Goal Detail (Auto-tracked) -->
+        <div class="phone-wrapper">
+            <div class="phone-label">3A — Goal Detail (Auto-tracked)</div>
+            <div class="phone-frame">
+                <div class="status-bar">
+                    <span>9:41</span>
+                    <span style="margin-left: auto;">📶 🔋</span>
+                </div>
+                <div class="dynamic-island"></div>
+
+                <div class="phone-content">
+                    <div class="edit-screen-header">
+                        <div class="back-btn">←</div>
+                        <div class="edit-screen-title">Goal Detail</div>
+                    </div>
+
+                    <div class="goal-detail-hero">
+                        <div class="goal-detail-metric-badge">Serve Accuracy</div>
+                        <div class="goal-detail-title">Improve Serve Accuracy to 85%</div>
+                        <div class="goal-detail-desc">Focus on consistent toss and follow-through</div>
+
+                        <div class="goal-detail-progress-ring">
+                            <svg viewBox="0 0 140 140">
+                                <circle class="ring-bg" cx="70" cy="70" r="60" />
+                                <circle class="ring-fill" cx="70" cy="70" r="60" style="stroke-dashoffset: 104;" />
+                            </svg>
+                            <div class="ring-center">
+                                <span class="ring-pct">72%</span>
+                                <span class="ring-label">of target</span>
+                            </div>
+                        </div>
+
+                        <div class="goal-detail-values">
+                            <div class="goal-detail-val">
+                                <span class="goal-detail-val-num" style="color: #2EC4B6;">72.4%</span>
+                                <div class="goal-detail-val-label">Current</div>
+                            </div>
+                            <div class="goal-detail-val">
+                                <span class="goal-detail-val-num" style="color: #FFB703;">85.0%</span>
+                                <div class="goal-detail-val-label">Target</div>
+                            </div>
+                            <div class="goal-detail-val">
+                                <span class="goal-detail-val-num" style="color: #A0AEC0;">14d</span>
+                                <div class="goal-detail-val-label">Remaining</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Trend chart -->
+                    <div class="history-chart">
+                        <div class="history-chart-header">Progress Over Time</div>
+                        <div class="history-chart-area">
+                            <div class="chart-target-line" style="bottom: 85%;">
+                                <div class="chart-target-label">85% target</div>
+                            </div>
+                            <div class="chart-bar" style="height: 55%; background: linear-gradient(180deg, #2EC4B6, rgba(46,196,182,0.3));">
+                                <div class="chart-bar-label">Jan 5</div>
+                            </div>
+                            <div class="chart-bar" style="height: 58%; background: linear-gradient(180deg, #2EC4B6, rgba(46,196,182,0.3));">
+                                <div class="chart-bar-label">Jan 12</div>
+                            </div>
+                            <div class="chart-bar" style="height: 62%; background: linear-gradient(180deg, #2EC4B6, rgba(46,196,182,0.3));">
+                                <div class="chart-bar-label">Jan 19</div>
+                            </div>
+                            <div class="chart-bar" style="height: 60%; background: linear-gradient(180deg, #2EC4B6, rgba(46,196,182,0.3));">
+                                <div class="chart-bar-label">Jan 26</div>
+                            </div>
+                            <div class="chart-bar" style="height: 68%; background: linear-gradient(180deg, #2EC4B6, rgba(46,196,182,0.3));">
+                                <div class="chart-bar-label">Feb 2</div>
+                            </div>
+                            <div class="chart-bar" style="height: 72%; background: linear-gradient(180deg, #22C55E, rgba(34,197,94,0.3));">
+                                <div class="chart-bar-label">Feb 7</div>
+                            </div>
+                        </div>
+                        <div style="height: 24px;"></div>
+                    </div>
+
+                    <div style="padding: 0 4px;">
+                        <div style="background: rgba(46,196,182,0.08); border: 1px solid rgba(46,196,182,0.15); border-radius: 10px; padding: 12px 14px; display: flex; align-items: center; gap: 10px; margin-bottom: 16px;">
+                            <span style="font-size: 18px;">⚡</span>
+                            <div>
+                                <div style="font-size: 12px; font-weight: 600;">Auto-tracked from match stats</div>
+                                <div style="font-size: 11px; color: #64748B;">Updates automatically after each stat entry</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="action-buttons-row">
+                        <button class="action-btn complete">✓ Mark Complete</button>
+                        <button class="action-btn edit-action">✎ Edit Goal</button>
+                    </div>
+                    <div class="action-buttons-row" style="margin-top: 8px;">
+                        <button class="action-btn delete-action">🗑 Delete Goal</button>
+                    </div>
+
+                    <div style="height: 40px;"></div>
+                </div>
+
+                <div class="bottom-tab-bar">
+                    <div class="tab-item">
+                        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                        <span>Home</span>
+                    </div>
+                    <div class="tab-item">
+                        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10z"/></svg>
+                        <span>Schedule</span>
+                    </div>
+                    <div class="tab-item">
+                        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8z"/></svg>
+                        <span>Stats</span>
+                    </div>
+                    <div class="tab-item active">
+                        <svg fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.5"/><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>
+                        <span>Goals</span>
+                    </div>
+                    <div class="tab-item">
+                        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                        <span>Profile</span>
+                    </div>
+                </div>
+                <div class="home-indicator"></div>
+            </div>
+        </div>
+
+        <!-- SCREEN 3B: Goal Detail (Custom — Manual Update) -->
+        <div class="phone-wrapper">
+            <div class="phone-label">3B — Custom Goal (Manual Update)</div>
+            <div class="phone-frame">
+                <div class="status-bar">
+                    <span>9:41</span>
+                    <span style="margin-left: auto;">📶 🔋</span>
+                </div>
+                <div class="dynamic-island"></div>
+
+                <div class="phone-content">
+                    <div class="edit-screen-header">
+                        <div class="back-btn">←</div>
+                        <div class="edit-screen-title">Goal Detail</div>
+                    </div>
+
+                    <div class="goal-detail-hero" style="border-color: rgba(139,92,246,0.2); background: linear-gradient(135deg, rgba(139,92,246,0.1), rgba(139,92,246,0.03));">
+                        <div class="goal-detail-metric-badge" style="background: rgba(139,92,246,0.15); color: #8B5CF6;">Custom Goal</div>
+                        <div class="goal-detail-title">Complete 10 Extra Drills</div>
+                        <div class="goal-detail-desc">Ball-handling drills outside of team practice</div>
+
+                        <div class="goal-detail-progress-ring">
+                            <svg viewBox="0 0 140 140">
+                                <circle class="ring-bg" cx="70" cy="70" r="60" />
+                                <circle class="ring-fill" cx="70" cy="70" r="60" style="stroke-dashoffset: 226; stroke: #8B5CF6;" />
+                            </svg>
+                            <div class="ring-center">
+                                <span class="ring-pct" style="color: #8B5CF6;">40%</span>
+                                <span class="ring-label">of target</span>
+                            </div>
+                        </div>
+
+                        <div class="goal-detail-values">
+                            <div class="goal-detail-val">
+                                <span class="goal-detail-val-num" style="color: #8B5CF6;">4</span>
+                                <div class="goal-detail-val-label">Current</div>
+                            </div>
+                            <div class="goal-detail-val">
+                                <span class="goal-detail-val-num" style="color: #FFB703;">10</span>
+                                <div class="goal-detail-val-label">Target</div>
+                            </div>
+                            <div class="goal-detail-val">
+                                <span class="goal-detail-val-num" style="color: #EF4444;">3d</span>
+                                <div class="goal-detail-val-label">Remaining</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Manual update section -->
+                    <div style="background: #0f1e35; border: 1px solid rgba(139,92,246,0.15); border-radius: 14px; padding: 16px; margin-bottom: 16px;">
+                        <div style="font-family: 'Barlow Condensed', sans-serif; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: #8B5CF6; margin-bottom: 12px;">Update Progress</div>
+                        <div class="inline-update">
+                            <div class="inline-update-label">Completed:</div>
+                            <input class="inline-update-input" type="number" value="4">
+                            <div class="inline-update-label">/ 10</div>
+                            <button class="inline-update-btn" style="background: #8B5CF6;">Save</button>
+                        </div>
+                        <div style="font-size: 11px; color: #64748B; margin-top: 8px;">Last updated 2 days ago</div>
+                    </div>
+
+                    <!-- Quick +1 button -->
+                    <div style="display: flex; gap: 10px; margin-bottom: 16px;">
+                        <button style="flex: 1; padding: 14px; background: rgba(139,92,246,0.12); border: 1px solid rgba(139,92,246,0.25); border-radius: 12px; font-family: 'Barlow Condensed', sans-serif; font-size: 16px; font-weight: 700; color: #8B5CF6; cursor: pointer; text-align: center;">
+                            +1 Drill Done
+                        </button>
+                    </div>
+
+                    <div class="history-chart">
+                        <div class="history-chart-header">Progress Log</div>
+                        <div class="history-chart-area">
+                            <div class="chart-target-line" style="bottom: 100%;">
+                                <div class="chart-target-label">10 target</div>
+                            </div>
+                            <div class="chart-bar" style="height: 10%; background: linear-gradient(180deg, #8B5CF6, rgba(139,92,246,0.3));">
+                                <div class="chart-bar-label">Jan 20</div>
+                            </div>
+                            <div class="chart-bar" style="height: 20%; background: linear-gradient(180deg, #8B5CF6, rgba(139,92,246,0.3));">
+                                <div class="chart-bar-label">Jan 25</div>
+                            </div>
+                            <div class="chart-bar" style="height: 30%; background: linear-gradient(180deg, #8B5CF6, rgba(139,92,246,0.3));">
+                                <div class="chart-bar-label">Feb 1</div>
+                            </div>
+                            <div class="chart-bar" style="height: 40%; background: linear-gradient(180deg, #8B5CF6, rgba(139,92,246,0.3));">
+                                <div class="chart-bar-label">Feb 5</div>
+                            </div>
+                        </div>
+                        <div style="height: 24px;"></div>
+                    </div>
+
+                    <div class="action-buttons-row">
+                        <button class="action-btn complete">✓ Mark Complete</button>
+                        <button class="action-btn edit-action">✎ Edit</button>
+                        <button class="action-btn delete-action">🗑</button>
+                    </div>
+
+                    <div style="height: 40px;"></div>
+                </div>
+
+                <div class="bottom-tab-bar">
+                    <div class="tab-item">
+                        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                        <span>Home</span>
+                    </div>
+                    <div class="tab-item">
+                        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10z"/></svg>
+                        <span>Schedule</span>
+                    </div>
+                    <div class="tab-item">
+                        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8z"/></svg>
+                        <span>Stats</span>
+                    </div>
+                    <div class="tab-item active">
+                        <svg fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.5"/><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>
+                        <span>Goals</span>
+                    </div>
+                    <div class="tab-item">
+                        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                        <span>Profile</span>
+                    </div>
+                </div>
+                <div class="home-indicator"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- ========================================== -->
+<!-- ROW 4: EDIT GOAL + GOAL COMPLETION -->
+<!-- ========================================== -->
+<div class="row-section">
+    <div class="row-label">Flow 4 — Edit Goal & Goal Completion</div>
+    <div class="row-description">
+        Players can edit existing goals via the edit button. When a goal is completed
+        (either manually marked or auto-detected when current_value >= target_value),
+        a celebration overlay congratulates the player and the goal moves to the Completed section.
+    </div>
+
+    <div class="phones-container">
+        <!-- SCREEN 4A: Edit Goal -->
+        <div class="phone-wrapper">
+            <div class="phone-label">4A — Edit Goal</div>
+            <div class="phone-frame">
+                <div class="status-bar">
+                    <span>9:41</span>
+                    <span style="margin-left: auto;">📶 🔋</span>
+                </div>
+                <div class="dynamic-island"></div>
+
+                <div class="phone-content">
+                    <div class="edit-screen-header">
+                        <div class="back-btn">←</div>
+                        <div class="edit-screen-title">Edit Goal</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Metric Type</label>
+                        <div class="metric-chip-group">
+                            <div class="metric-chip selected serve">Serve %</div>
+                            <div class="metric-chip">Kill %</div>
+                            <div class="metric-chip">Pass</div>
+                            <div class="metric-chip">Attend.</div>
+                            <div class="metric-chip">Custom</div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Goal Title</label>
+                        <input class="form-input" type="text" value="Improve serve accuracy to 85%">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Description</label>
+                        <textarea class="form-textarea">Focus on consistent toss and follow-through</textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Target Value</label>
+                        <div class="target-input-row">
+                            <input class="form-input" type="number" value="85.0">
+                            <div class="target-unit">%</div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Deadline</label>
+                        <input class="form-input" type="text" value="2026-03-15">
+                    </div>
+
+                    <button class="form-submit-btn" style="background: linear-gradient(135deg, #2EC4B6, #5EEAD4);">Save Changes</button>
+                    <button class="form-cancel-btn">Cancel</button>
+
+                    <div style="margin-top: 24px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.06);">
+                        <button class="action-btn delete-action" style="width: 100%; padding: 14px;">🗑 Delete This Goal</button>
+                    </div>
+
+                    <div style="height: 40px;"></div>
+                </div>
+
+                <div class="bottom-tab-bar">
+                    <div class="tab-item">
+                        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                        <span>Home</span>
+                    </div>
+                    <div class="tab-item">
+                        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10z"/></svg>
+                        <span>Schedule</span>
+                    </div>
+                    <div class="tab-item">
+                        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8z"/></svg>
+                        <span>Stats</span>
+                    </div>
+                    <div class="tab-item active">
+                        <svg fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.5"/><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>
+                        <span>Goals</span>
+                    </div>
+                    <div class="tab-item">
+                        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                        <span>Profile</span>
+                    </div>
+                </div>
+                <div class="home-indicator"></div>
+            </div>
+        </div>
+
+        <!-- SCREEN 4B: Goal Completed Celebration -->
+        <div class="phone-wrapper">
+            <div class="phone-label">4B — Goal Completed!</div>
+            <div class="phone-frame">
+                <div class="status-bar">
+                    <span>9:41</span>
+                    <span style="margin-left: auto;">📶 🔋</span>
+                </div>
+                <div class="dynamic-island"></div>
+
+                <div class="phone-content" style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 40px 24px;">
+                    <div style="font-size: 72px; margin-bottom: 16px; animation: bounce 0.5s ease;">🏆</div>
+                    <div style="font-family: 'Barlow Condensed', sans-serif; font-size: 28px; font-weight: 900; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 8px; background: linear-gradient(135deg, #FFB703, #FCD34D); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+                        Goal Achieved!
+                    </div>
+                    <div style="font-size: 14px; color: #A0AEC0; margin-bottom: 32px; max-width: 260px;">
+                        You hit <strong style="color: #22C55E;">85.2% serve accuracy</strong> — surpassing your 85% target!
+                    </div>
+
+                    <div style="background: #0f1e35; border: 1px solid rgba(34,197,94,0.2); border-radius: 16px; padding: 24px; width: 100%; margin-bottom: 24px;">
+                        <div style="display: flex; justify-content: space-around; margin-bottom: 16px;">
+                            <div>
+                                <div style="font-family: 'JetBrains Mono', monospace; font-size: 28px; font-weight: 700; color: #22C55E;">85.2%</div>
+                                <div style="font-family: 'Barlow Condensed', sans-serif; font-size: 10px; text-transform: uppercase; color: #64748B; letter-spacing: 1px;">Final</div>
+                            </div>
+                            <div>
+                                <div style="font-family: 'JetBrains Mono', monospace; font-size: 28px; font-weight: 700; color: #FFB703;">85.0%</div>
+                                <div style="font-family: 'Barlow Condensed', sans-serif; font-size: 10px; text-transform: uppercase; color: #64748B; letter-spacing: 1px;">Target</div>
+                            </div>
+                            <div>
+                                <div style="font-family: 'JetBrains Mono', monospace; font-size: 28px; font-weight: 700; color: #A0AEC0;">22d</div>
+                                <div style="font-family: 'Barlow Condensed', sans-serif; font-size: 10px; text-transform: uppercase; color: #64748B; letter-spacing: 1px;">Duration</div>
+                            </div>
+                        </div>
+                        <div style="height: 1px; background: rgba(255,255,255,0.06); margin-bottom: 12px;"></div>
+                        <div style="font-size: 12px; color: #64748B;">3 goals completed this season</div>
+                    </div>
+
+                    <button style="width: 100%; padding: 16px; background: linear-gradient(135deg, #22C55E, #4ADE80); border: none; border-radius: 12px; font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: #fff; cursor: pointer; margin-bottom: 10px; box-shadow: 0 4px 16px rgba(34,197,94,0.3);">
+                        Set Next Goal
+                    </button>
+                    <button style="width: 100%; padding: 12px; background: transparent; border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; font-family: 'Barlow Condensed', sans-serif; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: #A0AEC0; cursor: pointer;">
+                        Back to Goals
+                    </button>
+                </div>
+
+                <div class="bottom-tab-bar">
+                    <div class="tab-item">
+                        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                        <span>Home</span>
+                    </div>
+                    <div class="tab-item">
+                        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10z"/></svg>
+                        <span>Schedule</span>
+                    </div>
+                    <div class="tab-item">
+                        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M5 9.2h3V19H5zM10.6 5h2.8v14h-2.8zm5.6 8H19v6h-2.8z"/></svg>
+                        <span>Stats</span>
+                    </div>
+                    <div class="tab-item active">
+                        <svg fill="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.5"/><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>
+                        <span>Goals</span>
+                    </div>
+                    <div class="tab-item">
+                        <svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                        <span>Profile</span>
+                    </div>
+                </div>
+                <div class="home-indicator"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- ========================================== -->
+<!-- DESIGN NOTES -->
+<!-- ========================================== -->
+<div class="flow-sep"><span>Implementation Notes</span></div>
+
+<div style="max-width: 900px; margin: 0 auto; padding: 0 20px;">
+    <div class="annotation">
+        <div class="annotation-tag">Code Change Required</div>
+        <div class="annotation-text">
+            Currently <strong>GoalTracker.tsx</strong> gates the "Add Goal" button behind <strong>isCoach</strong>.
+            To enable player self-service, remove that guard or add a second entry point that passes <strong>isCoach=false</strong>
+            but still shows the create dialog. The PlayerGoalsPage already passes <strong>isCoach={false}</strong>,
+            so the simplest fix is to always show the + button regardless of role.
+        </div>
+    </div>
+
+    <div class="annotation">
+        <div class="annotation-tag">Data Model</div>
+        <div class="annotation-text">
+            The existing <strong>player_goals</strong> table already supports everything shown here —
+            <strong>title, description, metric_type, target_value, current_value, deadline, is_completed, completed_at</strong>.
+            For the "suggested goals" feature, no schema change is needed — just pre-populate the form with
+            suggested values derived from the player's current stats. The <strong>+1 quick update</strong> for custom goals
+            calls <strong>updatePlayerGoal(id, { current_value: current + 1 })</strong>.
+        </div>
+    </div>
+
+    <div class="annotation">
+        <div class="annotation-tag">Auto-tracking</div>
+        <div class="annotation-text">
+            <strong>refreshGoalProgress()</strong> in player-goals.service.ts already handles auto-updating
+            kill_pct, pass_rating, serve_pct, and attendance goals from live stats.
+            The detail screen just needs to display this clearly with the "Auto-tracked" badge.
+            The progress-over-time chart requires storing historical snapshots — consider adding a
+            <strong>goal_progress_log</strong> table or deriving from stat entry timestamps.
+        </div>
+    </div>
+
+    <div class="annotation">
+        <div class="annotation-tag">UX Patterns</div>
+        <div class="annotation-text">
+            <strong>Color-coded left borders</strong> on goal cards map to metric_type for instant visual scanning.
+            <strong>Urgency indicators</strong> (red deadline badge when &lt;7 days left) drive engagement.
+            <strong>Progress ring</strong> summary gives an at-a-glance achievement overview.
+            <strong>Bottom sheet</strong> for creation keeps context — player sees their goals behind the form.
+            <strong>Celebration screen</strong> on completion gamifies the experience and encourages setting the next goal.
+        </div>
+    </div>
+
+    <div class="annotation">
+        <div class="annotation-tag">RLS Policy</div>
+        <div class="annotation-text">
+            Ensure <strong>player_goals</strong> RLS allows players to INSERT/UPDATE/DELETE their own goals
+            (where <strong>created_by = auth.uid()</strong> or <strong>player_id</strong> matches their player record).
+            Currently the service uses the Supabase client which respects RLS — verify the policy permits
+            player-originated writes, not just coach writes.
+        </div>
+    </div>
+</div>
+
+<div style="height: 100px;"></div>
+
+</body>
+</html>
