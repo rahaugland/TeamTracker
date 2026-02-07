@@ -3,7 +3,6 @@ import { usePlayerContext } from '@/hooks/usePlayerContext';
 import { usePlayerStats } from '@/hooks/usePlayerStats';
 import { FifaCardCompact } from '@/components/player-stats/FifaCardCompact';
 import { GameLogCards } from '@/components/player-stats/GameLogCards';
-import { PlayerAttendanceHistory } from '@/components/player/PlayerAttendanceHistory';
 import type { VolleyballPosition } from '@/types/database.types';
 
 export function PlayerStatsTabPage() {

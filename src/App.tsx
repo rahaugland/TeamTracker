@@ -20,7 +20,7 @@ import { RoleSelectionPage } from '@/pages/RoleSelectionPage';
 // Lazy loaded pages (route-level code splitting)
 const JoinTeamPage = lazy(() => import('@/pages/JoinTeamPage').then(m => ({ default: m.JoinTeamPage })));
 const DashboardPage = lazy(() => import('@/pages/DashboardPage').then(m => ({ default: m.DashboardPage })));
-const PlayerDashboardPage = lazy(() => import('@/pages/PlayerDashboardPage').then(m => ({ default: m.PlayerDashboardPage })));
+
 const ParentDashboardPage = lazy(() => import('@/pages/ParentDashboardPage').then(m => ({ default: m.ParentDashboardPage })));
 const TeamsPage = lazy(() => import('@/pages/TeamsPage').then(m => ({ default: m.TeamsPage })));
 const TeamDetailPage = lazy(() => import('@/pages/TeamDetailPage').then(m => ({ default: m.TeamDetailPage })));

@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabase';
-import type { AttendanceStatus, EventType } from '@/types/database.types';
+import type { EventType } from '@/types/database.types';
 
 /**
  * Analytics service
