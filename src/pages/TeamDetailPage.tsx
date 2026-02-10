@@ -24,6 +24,7 @@ import { TeamRatingRadar } from '@/components/team/TeamRatingRadar';
 import { BestXIFormation } from '@/components/team/BestXIFormation';
 import { PlayerComparison } from '@/components/team/PlayerComparison';
 import { PendingPlayers } from '@/components/team/PendingPlayers';
+import { UnclaimedPlayersPanel } from '@/components/team/UnclaimedPlayersPanel';
 import { ActiveSeasonBar } from '@/components/seasons/ActiveSeasonBar';
 import { SeasonTimeline } from '@/components/seasons/SeasonTimeline';
 import { usePermissions } from '@/hooks/usePermissions';
@@ -171,6 +172,17 @@ export function TeamDetailPage() {
             pendingPlayers={pendingPlayers}
             onUpdate={() => setReloadKey((k) => k + 1)}
             addNotification={addNotification}
+          />
+        </div>
+      )}
+
+      {/* Unclaimed Players — coaches can generate invite links */}
+      {isCoach && id && (
+        <div className="mb-6">
+          <UnclaimedPlayersPanel
+            teamId={id}
+            players={players}
+            onUpdate={() => setReloadKey((k) => k + 1)}
           />
         </div>
       )}

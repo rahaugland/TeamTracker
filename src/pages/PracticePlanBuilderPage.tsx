@@ -4,13 +4,13 @@ import { useTranslation } from 'react-i18next';
 import {
   DndContext,
   DragOverlay,
+  useDroppable,
   useSensor,
   useSensors,
   PointerSensor,
   closestCenter,
   DragStartEvent,
   DragEndEvent,
-  DragOverEvent,
   UniqueIdentifier,
 } from '@dnd-kit/core';
 import {
@@ -220,23 +220,27 @@ function SortablePlanBlock({
 
 // Droppable section container
 function DroppableSection({
+  section,
   title,
   duration,
   blocks,
   globalStartIndex,
   onDeleteBlock,
   onDurationChange,
-  isOver,
 }: {
-  section?: SectionType;
+  section: SectionType;
   title: string;
   duration: number;
   blocks: PlanBlock[];
   globalStartIndex: number;
   onDeleteBlock: (blockId: string) => void;
   onDurationChange: (blockId: string, minutes: number) => void;
-  isOver: boolean;
 }) {
+  const { setNodeRef, isOver } = useDroppable({
+    id: section,
+    data: { type: 'section', section },
+  });
+
   return (
     <div className="mb-6">
       {/* Section header */}
@@ -255,6 +259,7 @@ function DroppableSection({
         strategy={verticalListSortingStrategy}
       >
         <div
+          ref={setNodeRef}
           className={`space-y-2 min-h-[60px] rounded-lg transition-all p-1 -m-1 ${
             isOver ? 'bg-vq-teal/10 ring-2 ring-vq-teal/30 ring-dashed' : ''
           }`}
@@ -364,7 +369,6 @@ export function PracticePlanBuilderPage() {
   const [drillSkillFilter, setDrillSkillFilter] = useState<string | null>(null);
   const [planName, setPlanName] = useState('');
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
-  const [overSection, setOverSection] = useState<SectionType | null>(null);
 
   // Configure dnd-kit sensors
   const sensors = useSensors(
@@ -460,38 +464,9 @@ export function PracticePlanBuilderPage() {
     setActiveId(event.active.id);
   };
 
-  const handleDragOver = (event: DragOverEvent) => {
-    const { over } = event;
-    if (!over) {
-      setOverSection(null);
-      return;
-    }
-
-    // Check if over a section drop zone or a block in a section
-    const overData = over.data.current;
-    if (overData?.type === 'plan-block') {
-      setOverSection(overData.block.section);
-    } else {
-      // Check if over ID matches a section
-      const overId = String(over.id);
-      if (['warmup', 'main', 'game'].includes(overId)) {
-        setOverSection(overId as SectionType);
-      } else {
-        // Check which section the block belongs to
-        const block = [...blocksBySection.warmup, ...blocksBySection.main, ...blocksBySection.game].find(
-          (b) => b.id === overId
-        );
-        if (block) {
-          setOverSection(block.section);
-        }
-      }
-    }
-  };
-
   const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event;
     setActiveId(null);
-    setOverSection(null);
 
     if (!over || !id || !plan) return;
 
@@ -693,7 +668,6 @@ export function PracticePlanBuilderPage() {
       sensors={sensors}
       collisionDetection={closestCenter}
       onDragStart={handleDragStart}
-      onDragOver={handleDragOver}
       onDragEnd={handleDragEnd}
     >
       <div className="h-screen flex flex-col bg-navy">
@@ -839,7 +813,6 @@ export function PracticePlanBuilderPage() {
                 globalStartIndex={0}
                 onDeleteBlock={(blockId) => setDeleteConfirm({ open: true, blockId })}
                 onDurationChange={handleDurationChange}
-                isOver={overSection === 'warmup'}
               />
 
               <DroppableSection
@@ -850,7 +823,6 @@ export function PracticePlanBuilderPage() {
                 globalStartIndex={blocksBySection.warmup.length}
                 onDeleteBlock={(blockId) => setDeleteConfirm({ open: true, blockId })}
                 onDurationChange={handleDurationChange}
-                isOver={overSection === 'main'}
               />
 
               <DroppableSection
@@ -861,7 +833,6 @@ export function PracticePlanBuilderPage() {
                 globalStartIndex={blocksBySection.warmup.length + blocksBySection.main.length}
                 onDeleteBlock={(blockId) => setDeleteConfirm({ open: true, blockId })}
                 onDurationChange={handleDurationChange}
-                isOver={overSection === 'game'}
               />
             </div>
           </div>

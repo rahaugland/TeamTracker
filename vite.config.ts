@@ -63,11 +63,12 @@ export default defineConfig({
             'i18next',
             'react-i18next',
             'date-fns',
-            'papaparse',
             'clsx',
             'tailwind-merge',
             'class-variance-authority',
           ],
+          // Export (lazy-loaded)
+          'vendor-export': ['exceljs', 'jspdf', 'jspdf-autotable', 'papaparse'],
         },
       },
     },
