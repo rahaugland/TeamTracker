@@ -86,38 +86,29 @@ export async function generateClaimToken(
 
 /**
  * Get claim token details for the claim page.
+ * Uses a SECURITY DEFINER RPC so unauthenticated users can view the claim page.
  * Returns player and team display info, or null if token does not exist.
  */
 export async function getClaimTokenDetails(
   token: string
 ): Promise<ClaimTokenDetails | null> {
-  const { data, error } = await supabase
-    .from('player_claim_tokens')
-    .select(`
-      expires_at,
-      claimed_at,
-      player:players(id, name, positions, photo_url),
-      team:teams(id, name)
-    `)
-    .eq('token', token)
-    .maybeSingle();
+  const { data, error } = await supabase.rpc('get_claim_token_details', {
+    p_token: token,
+  });
 
   if (error) throw error;
   if (!data || !data.player || !data.team) return null;
 
-  const player = data.player as unknown as { id: string; name: string; positions: string[]; photo_url?: string };
-  const team = data.team as unknown as { id: string; name: string };
-
   return {
     player: {
-      id: player.id,
-      name: player.name,
-      positions: player.positions,
-      photo_url: player.photo_url,
+      id: data.player.id,
+      name: data.player.name,
+      positions: data.player.positions,
+      photo_url: data.player.photo_url,
     },
     team: {
-      id: team.id,
-      name: team.name,
+      id: data.team.id,
+      name: data.team.name,
     },
     expiresAt: data.expires_at,
     isExpired: new Date(data.expires_at) < new Date(),
