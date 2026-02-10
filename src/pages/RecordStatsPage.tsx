@@ -2,7 +2,7 @@ import { useEffect, useState, useMemo, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ChevronRight } from 'lucide-react';
-import { useAuth } from '@/store';
+import { useAuth, useUI } from '@/store';
 import { getEvent } from '@/services/events.service';
 import { getEventAttendance } from '@/services/attendance.service';
 import { getPlayersByTeam } from '@/services/players.service';
@@ -41,6 +41,7 @@ export function RecordStatsPage() {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { user } = useAuth();
+  const { addNotification } = useUI();
 
   // Data state
   const [event, setEvent] = useState<EventWithDetails | null>(null);
@@ -198,52 +199,77 @@ export function RecordStatsPage() {
         set_scores: setScores.map(s => [s.home, s.away]),
       });
 
-      // Save all player stats
-      for (const row of playerStats) {
-        const statData = {
-          kills: row.kills,
-          attack_errors: row.attackErrors,
-          attack_attempts: row.attackAttempts,
-          aces: row.aces,
-          service_errors: row.serviceErrors,
-          serve_attempts: row.serveAttempts,
-          digs: row.digs,
-          block_solos: row.blockSolos,
-          block_assists: row.blockAssists,
-          ball_handling_errors: row.ballHandlingErrors,
-          pass_attempts: row.passAttempts,
-          pass_sum: row.passSum,
-          block_touches: row.blockTouches,
-          set_attempts: row.setAttempts,
-          set_sum: row.setSum,
-          setting_errors: row.settingErrors,
-          sets_played: row.setsPlayed,
-          rotations_played: row.rotationsPlayed,
-          rotation: (row.rotation as 1 | 2 | 3 | 4 | 5 | 6 | undefined) ?? undefined,
-        };
+      // Save all player stats in parallel so one failure doesn't block the rest
+      const saveResults = await Promise.allSettled(
+        playerStats.map(async (row) => {
+          const statData = {
+            kills: row.kills,
+            attack_errors: row.attackErrors,
+            attack_attempts: row.attackAttempts,
+            aces: row.aces,
+            service_errors: row.serviceErrors,
+            serve_attempts: row.serveAttempts,
+            digs: row.digs,
+            block_solos: row.blockSolos,
+            block_assists: row.blockAssists,
+            ball_handling_errors: row.ballHandlingErrors,
+            pass_attempts: row.passAttempts,
+            pass_sum: row.passSum,
+            block_touches: row.blockTouches,
+            set_attempts: row.setAttempts,
+            set_sum: row.setSum,
+            setting_errors: row.settingErrors,
+            sets_played: row.setsPlayed,
+            rotations_played: row.rotationsPlayed,
+            rotation: (row.rotation as 1 | 2 | 3 | 4 | 5 | 6 | undefined) ?? undefined,
+          };
 
-        if (row.statEntryId) {
-          await updateStatEntry(row.statEntryId, statData);
-        } else {
-          const created = await createStatEntry({
-            player_id: row.playerId,
-            event_id: id,
-            ...statData,
-            recorded_by: user.id,
-          });
-          setPlayerStats((prev) =>
-            prev.map((r) =>
-              r.playerId === row.playerId ? { ...r, statEntryId: created.id } : r
-            )
-          );
-        }
+          if (row.statEntryId) {
+            await updateStatEntry(row.statEntryId, statData);
+            return { playerId: row.playerId, playerName: row.playerName };
+          } else {
+            const created = await createStatEntry({
+              player_id: row.playerId,
+              event_id: id,
+              ...statData,
+              recorded_by: user.id,
+            });
+            setPlayerStats((prev) =>
+              prev.map((r) =>
+                r.playerId === row.playerId ? { ...r, statEntryId: created.id } : r
+              )
+            );
+            return { playerId: row.playerId, playerName: row.playerName };
+          }
+        })
+      );
+
+      // Check for failures and notify user
+      const failures = saveResults.filter(
+        (r): r is PromiseRejectedResult => r.status === 'rejected'
+      );
+
+      if (failures.length > 0) {
+        console.error('Failed to save stats for some players:', failures);
+        addNotification({
+          id: Date.now().toString(),
+          type: 'error',
+          message: `Failed to save stats for ${failures.length} player(s). Check console for details.`,
+          duration: 8000,
+        });
       }
 
       const stats = await getStatEntriesForEvent(id);
       setStatEntries(stats);
       setHasUnsavedChanges(false);
     } catch (err) {
-      console.error('Error saving all stats:', err);
+      console.error('Error saving stats:', err);
+      addNotification({
+        id: Date.now().toString(),
+        type: 'error',
+        message: t('common.messages.error'),
+        duration: 5000,
+      });
     } finally {
       setIsSaving(false);
     }
