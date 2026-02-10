@@ -376,6 +376,18 @@ export interface MatchRoster {
   selected_at: string;
 }
 
+export interface ClaimToken {
+  id: string;
+  token: string;
+  player_id: string;
+  team_id: string;
+  created_by: string;
+  expires_at: string;
+  claimed_at?: string;
+  claimed_by?: string;
+  created_at: string;
+}
+
 // Skill tags (system-defined)
 export const SKILL_TAGS = [
   'passing',

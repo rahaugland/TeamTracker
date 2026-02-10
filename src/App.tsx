@@ -40,10 +40,12 @@ const PracticePlanBuilderPage = lazy(() => import('@/pages/PracticePlanBuilderPa
 const UserManagementPage = lazy(() => import('@/pages/UserManagementPage').then(m => ({ default: m.UserManagementPage })));
 const ProfilePage = lazy(() => import('@/pages/ProfilePage').then(m => ({ default: m.ProfilePage })));
 const ImportPage = lazy(() => import('@/pages/ImportPage').then(m => ({ default: m.ImportPage })));
+const ReportsPage = lazy(() => import('@/pages/ReportsPage').then(m => ({ default: m.ReportsPage })));
 const PlayerStatsPage = lazy(() => import('@/pages/PlayerStatsPage').then(m => ({ default: m.PlayerStatsPage })));
 const RecordStatsPage = lazy(() => import('@/pages/RecordStatsPage').then(m => ({ default: m.RecordStatsPage })));
 const TeamSeasonsPage = lazy(() => import('@/pages/TeamSeasonsPage').then(m => ({ default: m.TeamSeasonsPage })));
 const MatchSelectionPage = lazy(() => import('@/pages/MatchSelectionPage').then(m => ({ default: m.MatchSelectionPage })));
+const ClaimPlayerPage = lazy(() => import('@/pages/ClaimPlayerPage').then(m => ({ default: m.ClaimPlayerPage })));
 
 // Player mobile tab pages
 const PlayerHomePage = lazy(() => import('@/pages/player/PlayerHomePage').then(m => ({ default: m.PlayerHomePage })));
@@ -89,6 +91,14 @@ function App() {
           {/* Public routes */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/auth/callback" element={<AuthCallbackPage />} />
+          <Route
+            path="/claim/:token"
+            element={
+              <Suspense fallback={<PageLoadingSpinner />}>
+                <ClaimPlayerPage />
+              </Suspense>
+            }
+          />
 
           {/* Protected routes */}
           <Route element={<ProtectedRoute />}>
@@ -339,6 +349,14 @@ function App() {
                 element={
                   <Suspense fallback={<PageLoadingSpinner />}>
                     <ImportPage />
+                  </Suspense>
+                }
+              />
+              <Route
+                path="/reports"
+                element={
+                  <Suspense fallback={<PageLoadingSpinner />}>
+                    <ReportsPage />
                   </Suspense>
                 }
               />

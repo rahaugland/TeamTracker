@@ -48,7 +48,12 @@ export function AuthCallbackPage() {
 
           setIsProcessing(false);
 
-          if (!profile?.role) {
+          // Check if user was in the middle of claiming a player
+          const claimToken = sessionStorage.getItem('claimToken');
+          if (claimToken) {
+            sessionStorage.removeItem('claimToken');
+            navigate(`/claim/${claimToken}`, { replace: true });
+          } else if (!profile?.role) {
             // New user - needs to select role
             navigate('/select-role', { replace: true });
           } else {

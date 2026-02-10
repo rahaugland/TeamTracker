@@ -78,6 +78,8 @@
     "dexie-react-hooks": "^4.2.0",
     "exceljs": "^4.4.0",
     "i18next": "^25.8.0",
+    "jspdf": "^4.1.0",
+    "jspdf-autotable": "^5.0.7",
     "lucide-react": "^0.563.0",
     "papaparse": "^5.5.3",
     "react": "^19.2.3",
