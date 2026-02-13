@@ -1,8 +1,14 @@
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, ChevronDown, ChevronUp } from 'lucide-react';
+import { ArrowLeft, ChevronDown, ChevronUp, Download } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import {
   Table,
   TableBody,
@@ -15,7 +21,7 @@ import { Badge } from '@/components/ui/badge';
 import { StatCard } from '@/components/dashboard/StatCard';
 import { ExportButton } from '@/components/reports/ExportButton';
 import { exportData, type ExportFormat } from '@/services/export.service';
-import { usePostMatchReport } from '@/hooks/usePostMatchReport';
+import { usePostMatchReport, type PlayerStatLine } from '@/hooks/usePostMatchReport';
 import { DetailedStatsSection } from '@/components/reports/DetailedStatsSection';
 import type { GameAwardType } from '@/types/database.types';
 
@@ -32,6 +38,54 @@ const AWARD_KEYS = {
   top_defender: 'reports.postMatch.topDefender',
   top_passer: 'reports.postMatch.topPasser',
 } as const;
+
+function exportPlayerStats(format: ExportFormat, p: PlayerStatLine, eventName: string) {
+  const killPct = p.attackAttempts > 0
+    ? `${((p.kills - p.attackErrors) / p.attackAttempts * 100).toFixed(1)}%`
+    : '\u2014';
+  const acePct = p.serveAttempts > 0
+    ? `${((p.aces / p.serveAttempts) * 100).toFixed(1)}%`
+    : '\u2014';
+  const passRating = p.passAttempts > 0
+    ? (p.passSum / p.passAttempts).toFixed(2)
+    : '\u2014';
+  const setRating = p.setAttempts > 0
+    ? (p.setSum / p.setAttempts).toFixed(2)
+    : '\u2014';
+  const totalBlocks = (p.blockSolos + p.blockAssists * 0.5).toFixed(1);
+
+  exportData(format, {
+    filename: `${eventName}-${p.playerName.replace(/\s+/g, '-').toLowerCase()}`,
+    title: `${p.playerName} \u2014 ${eventName}`,
+    headers: ['Category', 'Stat', 'Value'],
+    rows: [
+      ['Attack', 'Kills', p.kills],
+      ['Attack', 'Errors', p.attackErrors],
+      ['Attack', 'Attempts', p.attackAttempts],
+      ['Attack', 'Kill %', killPct],
+      ['Serve', 'Aces', p.aces],
+      ['Serve', 'Errors', p.serviceErrors],
+      ['Serve', 'Attempts', p.serveAttempts],
+      ['Serve', 'Ace %', acePct],
+      ['Block', 'Solos', p.blockSolos],
+      ['Block', 'Assists', p.blockAssists],
+      ['Block', 'Touches', p.blockTouches],
+      ['Block', 'Total', totalBlocks],
+      ['Defense', 'Digs', p.digs],
+      ['Defense', 'Ball Handling Errors', p.ballHandlingErrors],
+      ['Passing', 'Attempts', p.passAttempts],
+      ['Passing', 'Sum', p.passSum],
+      ['Passing', 'Rating', passRating],
+      ['Setting', 'Attempts', p.setAttempts],
+      ['Setting', 'Sum', p.setSum],
+      ['Setting', 'Errors', p.settingErrors],
+      ['Setting', 'Rating', setRating],
+      ['Playing Time', 'Sets Played', p.setsPlayed],
+      ['Playing Time', 'Rotations', p.rotationsPlayed],
+      ['Playing Time', 'Starting Rotation', p.rotation ?? '\u2014'],
+    ],
+  });
+}
 
 export function PostMatchReport({ eventId, teamId, onBack }: PostMatchReportProps) {
   const { t } = useTranslation();
@@ -266,6 +320,7 @@ export function PostMatchReport({ eventId, teamId, onBack }: PostMatchReportProp
                   <TableHead className="text-center">{t('reports.postMatch.aces')}</TableHead>
                   <TableHead className="text-center">{t('reports.postMatch.digs')}</TableHead>
                   <TableHead className="text-center">{t('reports.postMatch.blocks')}</TableHead>
+                  <TableHead className="w-10" />
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -292,6 +347,26 @@ export function PostMatchReport({ eventId, teamId, onBack }: PostMatchReportProp
                     <TableCell className="text-center font-mono">{p.digs}</TableCell>
                     <TableCell className="text-center font-mono">
                       {p.blockSolos + p.blockAssists}
+                    </TableCell>
+                    <TableCell className="p-1">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="h-7 w-7">
+                            <Download className="w-3.5 h-3.5" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => exportPlayerStats('csv', p, event.opponent ?? 'game')}>
+                            {t('reports.export.csv')}
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => exportPlayerStats('excel', p, event.opponent ?? 'game')}>
+                            {t('reports.export.excel')}
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => exportPlayerStats('pdf', p, event.opponent ?? 'game')}>
+                            {t('reports.export.pdf')}
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </TableCell>
                   </TableRow>
                 ))}
