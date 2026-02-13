@@ -76,6 +76,9 @@ export async function getEventAttendance(
 export async function getPlayerAttendance(
   playerId: string
 ): Promise<AttendanceRecord[]> {
+  // Skip Supabase query for temp IDs (player not yet synced)
+  if (playerId.startsWith('temp_')) return [];
+
   const { data, error } = await supabase
     .from('attendance_records')
     .select('*')

@@ -30,6 +30,9 @@ export interface CoachNoteWithAuthor extends CoachNote {
  * Get all notes for a specific player
  */
 export async function getPlayerNotes(playerId: string): Promise<CoachNoteWithAuthor[]> {
+  // Skip Supabase query for temp IDs (player not yet synced)
+  if (playerId.startsWith('temp_')) return [];
+
   const { data, error } = await supabase
     .from('coach_notes')
     .select(`
