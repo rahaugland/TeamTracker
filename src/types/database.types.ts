@@ -174,7 +174,7 @@ export interface Rsvp {
   event_id: string;
   player_id: string;
   status: RsvpStatus;
-  responded_by: string;
+  responded_by: string | null;
   responded_at: string;
   note?: string;
   updated_at: string;

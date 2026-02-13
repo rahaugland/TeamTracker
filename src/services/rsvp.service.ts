@@ -204,7 +204,7 @@ export async function createPendingRSVPsForEvent(
     event_id: eventId,
     player_id: m.player_id,
     status: 'pending' as RsvpStatus,
-    responded_by: respondedBy,
+    responded_by: m.player_id,
     responded_at: now,
   }));
 
