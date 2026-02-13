@@ -1,6 +1,14 @@
+import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Swords, Target, Shield, Circle, Hand, Pointer, Clock } from 'lucide-react';
+import { Swords, Target, Shield, Circle, Hand, Pointer, Clock, Download } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import {
   Table,
   TableBody,
@@ -10,12 +18,14 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { STAT_CATEGORIES, type StatCategory } from '@/components/match-stats/stat-categories';
+import { exportData, type ExportFormat } from '@/services/export.service';
 import type { PlayerStatLine, TeamTotals } from '@/hooks/usePostMatchReport';
 import type { PlayerStatRow } from '@/components/match-stats/types';
 
 interface DetailedStatsSectionProps {
   playerStatLines: PlayerStatLine[];
   teamTotals: TeamTotals;
+  eventName: string;
 }
 
 const ICON_MAP: Record<string, React.ElementType> = {
@@ -87,26 +97,96 @@ function buildTotalsRow(totals: TeamTotals): PlayerStatRow {
   };
 }
 
+function CardExportButton({ onExport }: { onExport: (format: ExportFormat) => void }) {
+  const { t } = useTranslation();
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size="icon" className="h-7 w-7">
+          <Download className="w-3.5 h-3.5" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuItem onClick={() => onExport('csv')}>
+          {t('reports.export.csv')}
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => onExport('excel')}>
+          {t('reports.export.excel')}
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={() => onExport('pdf')}>
+          {t('reports.export.pdf')}
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
+
+function exportCategory(
+  format: ExportFormat,
+  category: StatCategory,
+  players: PlayerStatRow[],
+  totalsRow: PlayerStatRow,
+  totalsLabel: string,
+  eventName: string,
+) {
+  const headers = [
+    'Player',
+    ...category.stats.map((s) => s.label),
+    ...(category.calculated ? [category.calculated.label] : []),
+  ];
+
+  const playerRows = players.map((p) => [
+    p.playerName,
+    ...category.stats.map((s) => p[s.field] as number),
+    ...(category.calculated ? [category.calculated.compute(p)] : []),
+  ]);
+
+  const totalsRowData = [
+    totalsLabel,
+    ...category.stats.map((s) => totalsRow[s.field] as number),
+    ...(category.calculated ? [category.calculated.compute(totalsRow)] : []),
+  ];
+
+  exportData(format, {
+    filename: `${eventName}-${category.id}`,
+    title: `${category.title} Stats — ${eventName}`,
+    headers,
+    rows: [...playerRows, totalsRowData],
+  });
+}
+
 function CategoryCard({
   category,
   players,
   totalsRow,
   totalsLabel,
+  eventName,
 }: {
   category: StatCategory;
   players: PlayerStatRow[];
   totalsRow: PlayerStatRow;
   totalsLabel: string;
+  eventName: string;
 }) {
   const Icon = ICON_MAP[category.icon];
+
+  const handleExport = useCallback(
+    (format: ExportFormat) => {
+      exportCategory(format, category, players, totalsRow, totalsLabel, eventName);
+    },
+    [category, players, totalsRow, totalsLabel, eventName],
+  );
 
   return (
     <Card className="overflow-hidden">
       <div className="h-1" style={{ backgroundColor: category.color }} />
       <CardHeader className="pb-2">
         <CardTitle className="flex items-center gap-2 text-sm">
-          {Icon && <Icon className="w-4 h-4" style={{ color: category.color }} />}
-          {category.title}
+          <span className="flex items-center gap-2 flex-1">
+            {Icon && <Icon className="w-4 h-4" style={{ color: category.color }} />}
+            {category.title}
+          </span>
+          <CardExportButton onExport={handleExport} />
         </CardTitle>
       </CardHeader>
       <CardContent className="p-0">
@@ -172,11 +252,35 @@ function CategoryCard({
   );
 }
 
-export function DetailedStatsSection({ playerStatLines, teamTotals }: DetailedStatsSectionProps) {
+export function DetailedStatsSection({ playerStatLines, teamTotals, eventName }: DetailedStatsSectionProps) {
   const { t } = useTranslation();
   const players = playerStatLines.map(toStatRow);
   const totalsRow = buildTotalsRow(teamTotals);
   const totalsLabel = t('reports.postMatch.teamTotals');
+
+  const handlePlayingTimeExport = useCallback(
+    (format: ExportFormat) => {
+      const headers = [
+        'Player',
+        t('reports.postMatch.setsPlayed'),
+        t('reports.postMatch.rotationsPlayed'),
+        t('reports.postMatch.startingRotation'),
+      ];
+      const rows = playerStatLines.map((p) => [
+        p.playerName,
+        p.setsPlayed,
+        p.rotationsPlayed,
+        p.rotation != null ? p.rotation : '\u2014',
+      ]);
+      exportData(format, {
+        filename: `${eventName}-playing-time`,
+        title: `Playing Time — ${eventName}`,
+        headers,
+        rows,
+      });
+    },
+    [playerStatLines, eventName, t],
+  );
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -187,6 +291,7 @@ export function DetailedStatsSection({ playerStatLines, teamTotals }: DetailedSt
           players={players}
           totalsRow={totalsRow}
           totalsLabel={totalsLabel}
+          eventName={eventName}
         />
       ))}
 
@@ -195,8 +300,11 @@ export function DetailedStatsSection({ playerStatLines, teamTotals }: DetailedSt
         <div className="h-1 bg-gray-500" />
         <CardHeader className="pb-2">
           <CardTitle className="flex items-center gap-2 text-sm">
-            <Clock className="w-4 h-4 text-gray-400" />
-            {t('reports.postMatch.playingTime')}
+            <span className="flex items-center gap-2 flex-1">
+              <Clock className="w-4 h-4 text-gray-400" />
+              {t('reports.postMatch.playingTime')}
+            </span>
+            <CardExportButton onExport={handlePlayingTimeExport} />
           </CardTitle>
         </CardHeader>
         <CardContent className="p-0">

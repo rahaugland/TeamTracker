@@ -330,6 +330,7 @@ export function PostMatchReport({ eventId, teamId, onBack }: PostMatchReportProp
             <DetailedStatsSection
               playerStatLines={playerStatLines}
               teamTotals={teamTotals}
+              eventName={event.opponent ?? 'game'}
             />
           )}
         </>
