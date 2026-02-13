@@ -9,14 +9,17 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { format } from 'date-fns';
-import { ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
-import type { GameStatLine } from '@/services/player-stats.service';
+import { ArrowUpDown, ArrowUp, ArrowDown, TrendingUp, TrendingDown } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { calculatePlayerRating, type GameStatLine, type StatEntryWithEvent } from '@/services/player-stats.service';
+import type { VolleyballPosition } from '@/types/database.types';
 
 interface GameLogTableProps {
   gameStats: GameStatLine[];
+  position?: VolleyballPosition;
 }
 
-type SortField = 'date' | 'kills' | 'killPct' | 'aces' | 'digs' | 'blocks' | 'blockTouches' | 'passRating' | 'setRating' | 'setsPlayed';
+type SortField = 'date' | 'kills' | 'killPct' | 'aces' | 'digs' | 'blocks' | 'blockTouches' | 'passRating' | 'setRating' | 'setsPlayed' | 'result' | 'rating' | 'ratingChange';
 type SortDirection = 'asc' | 'desc';
 
 function SortIcon({ field, sortField, sortDirection }: { field: SortField; sortField: SortField; sortDirection: SortDirection }) {
@@ -33,7 +36,7 @@ function SortIcon({ field, sortField, sortDirection }: { field: SortField; sortF
 /**
  * Sortable table showing full stat line per game
  */
-export function GameLogTable({ gameStats }: GameLogTableProps) {
+export function GameLogTable({ gameStats, position }: GameLogTableProps) {
   const [sortField, setSortField] = useState<SortField>('date');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
 
@@ -45,6 +48,29 @@ export function GameLogTable({ gameStats }: GameLogTableProps) {
       setSortDirection('desc');
     }
   };
+
+  // Compute cumulative player rating after each game and the delta from the previous game
+  const ratingMap = useMemo(() => {
+    if (!position) return new Map<string, { rating: number; delta: number | null }>();
+
+    const byDate = [...gameStats].sort(
+      (a, b) => a.event.start_time.localeCompare(b.event.start_time)
+    );
+
+    const map = new Map<string, { rating: number; delta: number | null }>();
+    let prevRating: number | null = null;
+
+    for (let i = 0; i < byDate.length; i++) {
+      // All games up to and including the current one
+      const gamesUpToNow = byDate.slice(0, i + 1) as unknown as StatEntryWithEvent[];
+      const cumulativeRating = calculatePlayerRating(gamesUpToNow, position);
+      const delta = prevRating != null ? cumulativeRating.overall - prevRating : null;
+      map.set(byDate[i].id, { rating: cumulativeRating.overall, delta });
+      prevRating = cumulativeRating.overall;
+    }
+
+    return map;
+  }, [gameStats, position]);
 
   const sortedStats = useMemo(() => {
     return [...gameStats].sort((a, b) => {
@@ -92,6 +118,18 @@ export function GameLogTable({ gameStats }: GameLogTableProps) {
           aValue = a.setRating ?? 0;
           bValue = b.setRating ?? 0;
           break;
+        case 'result':
+          aValue = (a.event.sets_won ?? 0) - (a.event.sets_lost ?? 0);
+          bValue = (b.event.sets_won ?? 0) - (b.event.sets_lost ?? 0);
+          break;
+        case 'rating':
+          aValue = ratingMap.get(a.id)?.rating ?? 0;
+          bValue = ratingMap.get(b.id)?.rating ?? 0;
+          break;
+        case 'ratingChange':
+          aValue = ratingMap.get(a.id)?.delta ?? 0;
+          bValue = ratingMap.get(b.id)?.delta ?? 0;
+          break;
         default:
           return 0;
       }
@@ -102,7 +140,7 @@ export function GameLogTable({ gameStats }: GameLogTableProps) {
         return aValue < bValue ? 1 : -1;
       }
     });
-  }, [gameStats, sortField, sortDirection]);
+  }, [gameStats, sortField, sortDirection, ratingMap]);
 
   if (gameStats.length === 0) {
     return (
@@ -137,6 +175,13 @@ export function GameLogTable({ gameStats }: GameLogTableProps) {
                   <SortIcon sortField={sortField} sortDirection={sortDirection} field="date" />
                 </TableHead>
                 <TableHead>Opponent</TableHead>
+                <TableHead
+                  className="cursor-pointer hover:bg-muted/50 select-none text-center"
+                  onClick={() => handleSort('result')}
+                >
+                  Result
+                  <SortIcon sortField={sortField} sortDirection={sortDirection} field="result" />
+                </TableHead>
                 <TableHead
                   className="cursor-pointer hover:bg-muted/50 select-none text-right"
                   onClick={() => handleSort('kills')}
@@ -203,46 +248,108 @@ export function GameLogTable({ gameStats }: GameLogTableProps) {
                   Sets
                   <SortIcon sortField={sortField} sortDirection={sortDirection} field="setsPlayed" />
                 </TableHead>
+                {position && (
+                  <>
+                    <TableHead
+                      className="cursor-pointer hover:bg-muted/50 select-none text-right"
+                      onClick={() => handleSort('rating')}
+                    >
+                      Rating
+                      <SortIcon sortField={sortField} sortDirection={sortDirection} field="rating" />
+                    </TableHead>
+                    <TableHead
+                      className="cursor-pointer hover:bg-muted/50 select-none text-right"
+                      onClick={() => handleSort('ratingChange')}
+                    >
+                      +/-
+                      <SortIcon sortField={sortField} sortDirection={sortDirection} field="ratingChange" />
+                    </TableHead>
+                  </>
+                )}
               </TableRow>
             </TableHeader>
             <TableBody>
-              {sortedStats.map((game) => (
-                <TableRow key={game.id}>
-                  <TableCell className="font-medium">
-                    {format(new Date(game.event.start_time), 'MMM d, yyyy')}
-                  </TableCell>
-                  <TableCell>
-                    <div>
-                      {game.event.opponent || 'Unknown'}
-                      {game.event.opponent_tier && (
-                        <span className="ml-1 text-xs text-muted-foreground">
-                          ({'\u2605'.repeat(game.event.opponent_tier)})
+              {sortedStats.map((game) => {
+                const setsWon = game.event.sets_won;
+                const setsLost = game.event.sets_lost;
+                const hasResult = setsWon != null && setsLost != null;
+                const isWin = hasResult && setsWon > setsLost;
+                const ratingInfo = ratingMap.get(game.id);
+
+                return (
+                  <TableRow key={game.id}>
+                    <TableCell className="font-medium">
+                      {format(new Date(game.event.start_time), 'MMM d, yyyy')}
+                    </TableCell>
+                    <TableCell>
+                      <div>
+                        {game.event.opponent || 'Unknown'}
+                        {game.event.opponent_tier && (
+                          <span className="ml-1 text-xs text-muted-foreground">
+                            ({'\u2605'.repeat(game.event.opponent_tier)})
+                          </span>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-center">
+                      {hasResult ? (
+                        <span className={cn(
+                          'font-mono text-sm font-semibold',
+                          isWin ? 'text-emerald-400' : 'text-club-primary'
+                        )}>
+                          {isWin ? 'W' : 'L'} {setsWon}-{setsLost}
                         </span>
+                      ) : (
+                        <span className="text-muted-foreground">-</span>
                       )}
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-right font-semibold">{game.kills}</TableCell>
-                  <TableCell className="text-right text-muted-foreground">{game.attack_errors}</TableCell>
-                  <TableCell className="text-right text-muted-foreground">{game.attack_attempts}</TableCell>
-                  <TableCell className="text-right font-medium">
-                    {(game.killPercentage * 100).toFixed(1)}%
-                  </TableCell>
-                  <TableCell className="text-right font-semibold text-stat text-emerald-400">{game.aces}</TableCell>
-                  <TableCell className="text-right text-muted-foreground">{game.service_errors}</TableCell>
-                  <TableCell className="text-right font-semibold text-stat text-vq-teal">{game.digs}</TableCell>
-                  <TableCell className="text-right font-medium">{game.totalBlocks.toFixed(1)}</TableCell>
-                  <TableCell className="text-right text-muted-foreground">{game.block_touches}</TableCell>
-                  <TableCell className="text-right font-medium">
-                    {game.passRating > 0 ? game.passRating.toFixed(2) : '-'}
-                  </TableCell>
-                  <TableCell className="text-right font-medium">
-                    {game.setRating && game.setRating > 0 ? game.setRating.toFixed(2) : '-'}
-                  </TableCell>
-                  <TableCell className="text-right text-muted-foreground">
-                    {game.sets_played > 0 ? game.sets_played : '-'}
-                  </TableCell>
-                </TableRow>
-              ))}
+                    </TableCell>
+                    <TableCell className="text-right font-semibold">{game.kills}</TableCell>
+                    <TableCell className="text-right text-muted-foreground">{game.attack_errors}</TableCell>
+                    <TableCell className="text-right text-muted-foreground">{game.attack_attempts}</TableCell>
+                    <TableCell className="text-right font-medium">
+                      {(game.killPercentage * 100).toFixed(1)}%
+                    </TableCell>
+                    <TableCell className="text-right font-semibold text-stat text-emerald-400">{game.aces}</TableCell>
+                    <TableCell className="text-right text-muted-foreground">{game.service_errors}</TableCell>
+                    <TableCell className="text-right font-semibold text-stat text-vq-teal">{game.digs}</TableCell>
+                    <TableCell className="text-right font-medium">{game.totalBlocks.toFixed(1)}</TableCell>
+                    <TableCell className="text-right text-muted-foreground">{game.block_touches}</TableCell>
+                    <TableCell className="text-right font-medium">
+                      {game.passRating > 0 ? game.passRating.toFixed(2) : '-'}
+                    </TableCell>
+                    <TableCell className="text-right font-medium">
+                      {game.setRating && game.setRating > 0 ? game.setRating.toFixed(2) : '-'}
+                    </TableCell>
+                    <TableCell className="text-right text-muted-foreground">
+                      {game.sets_played > 0 ? game.sets_played : '-'}
+                    </TableCell>
+                    {position && (
+                      <>
+                        <TableCell className="text-right font-mono font-semibold">
+                          {ratingInfo ? ratingInfo.rating : <span className="text-muted-foreground">-</span>}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          {ratingInfo?.delta != null && ratingInfo.delta !== 0 ? (
+                            <span className={cn(
+                              'inline-flex items-center text-xs font-mono font-semibold',
+                              ratingInfo.delta > 0 ? 'text-emerald-400' : 'text-club-primary'
+                            )}>
+                              {ratingInfo.delta > 0 ? (
+                                <TrendingUp className="h-3 w-3 mr-0.5" />
+                              ) : (
+                                <TrendingDown className="h-3 w-3 mr-0.5" />
+                              )}
+                              {ratingInfo.delta > 0 ? '+' : ''}{ratingInfo.delta}
+                            </span>
+                          ) : (
+                            <span className="text-muted-foreground">-</span>
+                          )}
+                        </TableCell>
+                      </>
+                    )}
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </Table>
         </div>

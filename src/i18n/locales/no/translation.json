@@ -1152,6 +1152,8 @@
       "aces": "A",
       "digs": "D",
       "blocks": "B",
+      "result": "Resultat",
+      "rating": "Vurdering",
       "provisional": "Foreløpig"
     },
     "postMatch": {

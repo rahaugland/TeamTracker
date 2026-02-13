@@ -266,7 +266,7 @@ export function PlayerStatsPage() {
             />
           </div>
           <div>
-            <GameLogTable gameStats={gameStatLines} />
+            <GameLogTable gameStats={gameStatLines} position={playerPosition} />
           </div>
         </div>
       )}

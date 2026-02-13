@@ -16,10 +16,12 @@ import {
   type GameStatLine,
   type SkillProgressionPoint,
 } from '@/services/player-stats.service';
+import type { VolleyballPosition } from '@/types/database.types';
 
 interface StatsHistoryTabContentProps {
   playerId: string;
   teamId?: string;
+  position?: VolleyballPosition;
 }
 
 type SkillFilter = 'all' | 'attack' | 'serve' | 'receive' | 'block';
@@ -28,7 +30,7 @@ type SkillFilter = 'all' | 'attack' | 'serve' | 'receive' | 'block';
  * Container component for Stats History tab
  * Composes: TimePeriodSelector, SkillProgressionChart, StatSummaryRow (6-card), GameLogTable
  */
-export function StatsHistoryTabContent({ playerId, teamId }: StatsHistoryTabContentProps) {
+export function StatsHistoryTabContent({ playerId, teamId, position }: StatsHistoryTabContentProps) {
   const [period, setPeriod] = useState<TimePeriod>('season');
   const [customRange, setCustomRange] = useState<CustomDateRange | undefined>();
   const [statEntries, setStatEntries] = useState<StatEntryWithEvent[]>([]);
@@ -197,19 +199,7 @@ export function StatsHistoryTabContent({ playerId, teamId }: StatsHistoryTabCont
       />
 
       {/* Game Log Table */}
-      <div className="bg-navy-90 border border-white/[0.06] rounded-lg overflow-hidden">
-        <div className="px-5 py-4 border-b border-white/[0.04] flex items-center justify-between">
-          <h3 className="font-display font-bold text-sm uppercase tracking-wider text-white">
-            Recent Games
-          </h3>
-          <span className="text-xs text-gray-500">
-            {gameStats.length} game{gameStats.length !== 1 ? 's' : ''}
-          </span>
-        </div>
-        <div className="overflow-x-auto">
-          <GameLogTableCompact gameStats={gameStats.slice(0, 10)} />
-        </div>
-      </div>
+      <GameLogTable gameStats={gameStats} position={position} />
     </div>
   );
 }
@@ -241,72 +231,3 @@ function SkillFilterButton({ label, value, selected, onSelect }: SkillFilterButt
   );
 }
 
-// Compact game log table matching wireframe style
-interface GameLogTableCompactProps {
-  gameStats: GameStatLine[];
-}
-
-function GameLogTableCompact({ gameStats }: GameLogTableCompactProps) {
-  if (gameStats.length === 0) {
-    return (
-      <div className="p-8 text-center text-gray-500">
-        No game data available
-      </div>
-    );
-  }
-
-  return (
-    <table className="w-full">
-      <thead className="bg-white/[0.02]">
-        <tr>
-          <th className="px-4 py-3 text-left font-display font-semibold text-[10px] uppercase tracking-wider text-gray-500">
-            Date
-          </th>
-          <th className="px-4 py-3 text-left font-display font-semibold text-[10px] uppercase tracking-wider text-gray-500">
-            Opponent
-          </th>
-          <th className="px-4 py-3 text-right font-display font-semibold text-[10px] uppercase tracking-wider text-gray-500">
-            Kills
-          </th>
-          <th className="px-4 py-3 text-right font-display font-semibold text-[10px] uppercase tracking-wider text-gray-500">
-            Kill %
-          </th>
-          <th className="px-4 py-3 text-right font-display font-semibold text-[10px] uppercase tracking-wider text-gray-500">
-            Aces
-          </th>
-          <th className="px-4 py-3 text-right font-display font-semibold text-[10px] uppercase tracking-wider text-gray-500">
-            Blocks
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        {gameStats.map((game) => {
-          const date = new Date(game.event.start_time);
-          const formattedDate = date.toLocaleDateString('en', { month: 'short', day: 'numeric' });
-
-          return (
-            <tr
-              key={game.id}
-              className="border-b border-white/[0.03] hover:bg-white/[0.02] cursor-pointer transition-colors"
-            >
-              <td className="px-4 py-3 text-sm text-white">{formattedDate}</td>
-              <td className="px-4 py-3 text-sm text-white">
-                {game.event.opponent || 'Unknown'}
-              </td>
-              <td className="px-4 py-3 text-right font-mono font-semibold text-vq-teal">
-                {game.kills}
-              </td>
-              <td className="px-4 py-3 text-right font-mono text-sm">
-                {(game.killPercentage * 100).toFixed(0)}%
-              </td>
-              <td className="px-4 py-3 text-right font-mono text-sm">{game.aces}</td>
-              <td className="px-4 py-3 text-right font-mono text-sm">
-                {game.totalBlocks.toFixed(0)}
-              </td>
-            </tr>
-          );
-        })}
-      </tbody>
-    </table>
-  );
-}

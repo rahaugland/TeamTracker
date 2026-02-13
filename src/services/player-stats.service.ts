@@ -76,6 +76,8 @@ export interface GameStatLine extends StatEntry {
     start_time: string;
     opponent?: string;
     opponent_tier?: number;
+    sets_won?: number;
+    sets_lost?: number;
   };
   killPercentage: number;
   servePercentage: number;
@@ -204,6 +206,8 @@ export async function getPlayerStats(
         type,
         opponent,
         opponent_tier,
+        sets_won,
+        sets_lost,
         team_id
       )
     `)
@@ -428,6 +432,76 @@ export function calculateSubRatings(stats: AggregatedStats): SubRatings {
 }
 
 /**
+ * Calculate 8 skill values as unrounded floats for a set of stat entries.
+ * Uses the same tier-scaling pipeline as calculatePlayerRating but skips rounding,
+ * so cumulative comparisons can detect sub-integer changes.
+ */
+export function calculateRawSkillValues(
+  statEntries: StatEntryWithEvent[]
+): Record<string, number> {
+  if (statEntries.length === 0) {
+    return { serve: 0, receive: 0, set: 0, block: 0, attack: 0, dig: 0, mental: 0, physique: 0 };
+  }
+
+  const agg = aggregateStats(statEntries);
+
+  // Raw sub-ratings WITHOUT rounding (mirrors calculateSubRatings logic)
+  const effectiveAttackEfficiency = agg.totalAttackAttempts > 0
+    ? bayesianRate(agg.totalKills - agg.totalAttackErrors, agg.totalAttackAttempts, 0.30, 15)
+    : 0;
+  const attackRaw = Math.max(1, Math.min(99, effectiveAttackEfficiency * 165));
+
+  const effectiveAceRate = agg.totalServeAttempts > 0
+    ? bayesianRate(agg.totalAces, agg.totalServeAttempts, 0.05, 15)
+    : 0;
+  const effectiveServeErrorRate = agg.totalServeAttempts > 0
+    ? bayesianRate(agg.totalServiceErrors, agg.totalServeAttempts, 0.10, 15)
+    : 0;
+  const serveRaw = Math.max(1, Math.min(99, ((effectiveAceRate * 3) + (1 - effectiveServeErrorRate)) * 76));
+
+  const effectivePassRating = agg.totalPassAttempts > 0
+    ? bayesianRate(agg.totalPassSum, agg.totalPassAttempts, 1.5, 10)
+    : 0;
+  const receptionRaw = Math.max(1, Math.min(99, effectivePassRating * 33));
+
+  const totalErrors = agg.totalAttackErrors + agg.totalServiceErrors + agg.totalBallHandlingErrors;
+  const totalActions = agg.totalAttackAttempts + agg.totalServeAttempts + agg.totalPassAttempts;
+  const effectiveErrorRate = totalActions > 0
+    ? bayesianRate(totalErrors, totalActions, 0.15, 20)
+    : 0.15;
+  const consistencyRaw = Math.max(1, Math.min(99, Math.pow(Math.max(0, 1 - effectiveErrorRate / 0.30), 1.2) * 99));
+
+  // Tier scaling (mirrors calculatePlayerRating logic)
+  let tierWeightSum = 0;
+  let tierWeightedMax = 0;
+  statEntries.forEach(game => {
+    const opponentTier = game.event.opponent_tier || 5;
+    const opponentMax = TIER_MAX_RATING[opponentTier] || 55;
+    const recencyWeight = getRecencyWeight(game.event.start_time);
+    tierWeightSum += recencyWeight;
+    tierWeightedMax += opponentMax * recencyWeight;
+  });
+  const avgOpponentMax = tierWeightedMax / tierWeightSum;
+  const tierScale = avgOpponentMax / 99;
+
+  const attack = attackRaw * tierScale;
+  const serve = serveRaw * tierScale;
+  const reception = receptionRaw * tierScale;
+  const consistency = consistencyRaw * tierScale;
+
+  return {
+    serve,
+    receive: reception,
+    set: consistency * 0.8,
+    block: (attack + consistency) / 2,
+    attack,
+    dig: (reception + consistency) / 2,
+    mental: consistency,
+    physique: (attack + serve) / 2,
+  };
+}
+
+/**
  * Calculate overall rating using per-game ratings with opponent tier ceiling and recency weighting
  */
 export function calculatePlayerRating(
@@ -541,6 +615,8 @@ export function getGameStatLines(statEntries: StatEntryWithEvent[]): GameStatLin
         start_time: stat.event.start_time,
         opponent: stat.event.opponent,
         opponent_tier: stat.event.opponent_tier,
+        sets_won: stat.event.sets_won,
+        sets_lost: stat.event.sets_lost,
       },
       killPercentage,
       servePercentage,
@@ -819,16 +895,28 @@ export async function getSkillProgression(
 
   const points: SkillProgressionPoint[] = [];
 
-  // For each month, calculate skill ratings using the same formulas as calculateSubRatings
-  // and mapPlayerRatingToSkills to match the FIFA card
-  Object.entries(monthlyStats).forEach(([month, monthStats]) => {
-    const agg = aggregateStats(monthStats);
+  // Sort stats chronologically so we can build cumulative sets
+  const sortedStats = [...stats].sort(
+    (a, b) => a.event.start_time.localeCompare(b.event.start_time)
+  );
+
+  // Get ordered list of months
+  const months = Object.keys(monthlyStats).sort();
+
+  // For each month, calculate cumulative player rating (all games up to and including that month)
+  // This matches the player rating approach, not per-match performance
+  let cumulativeStats: StatEntryWithEvent[] = [];
+
+  for (const month of months) {
+    cumulativeStats = cumulativeStats.concat(monthlyStats[month]);
+
+    const agg = aggregateStats(cumulativeStats);
     const rawSubRatings = calculateSubRatings(agg);
 
-    // Calculate opponent tier scale for this month's games (same as calculatePlayerRating)
+    // Calculate opponent tier scale from all cumulative games (same as calculatePlayerRating)
     let tierWeightSum = 0;
     let tierWeightedMax = 0;
-    monthStats.forEach(game => {
+    cumulativeStats.forEach(game => {
       const opponentTier = game.event.opponent_tier || 5;
       const opponentMax = TIER_MAX_RATING[opponentTier] || 55;
       const recencyWeight = getRecencyWeight(game.event.start_time);
@@ -849,30 +937,15 @@ export async function getSkillProgression(
     };
 
     // Use same skill names and derivations as mapPlayerRatingToSkills in FifaPlayerCard.example.tsx
-    // Serve = scaledRatings.serve
     points.push({ date: month, skillTag: 'serve', avgLevel: scaledRatings.serve });
-
-    // Receive = scaledRatings.reception
     points.push({ date: month, skillTag: 'receive', avgLevel: scaledRatings.reception });
-
-    // Set = consistency * 0.8
     points.push({ date: month, skillTag: 'set', avgLevel: Math.round(scaledRatings.consistency * 0.8) });
-
-    // Block = (attack + consistency) / 2
     points.push({ date: month, skillTag: 'block', avgLevel: Math.round((scaledRatings.attack + scaledRatings.consistency) / 2) });
-
-    // Attack = scaledRatings.attack
     points.push({ date: month, skillTag: 'attack', avgLevel: scaledRatings.attack });
-
-    // Dig = (reception + consistency) / 2
     points.push({ date: month, skillTag: 'dig', avgLevel: Math.round((scaledRatings.reception + scaledRatings.consistency) / 2) });
-
-    // Mental = scaledRatings.consistency
     points.push({ date: month, skillTag: 'mental', avgLevel: scaledRatings.consistency });
-
-    // Physique = (attack + serve) / 2
     points.push({ date: month, skillTag: 'physique', avgLevel: Math.round((scaledRatings.attack + scaledRatings.serve) / 2) });
-  });
+  }
 
   return points.sort((a, b) => a.date.localeCompare(b.date));
 }

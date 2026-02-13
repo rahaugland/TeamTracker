@@ -236,7 +236,7 @@ export function PlayerDetailPage() {
 
   const activeTeams = player.team_memberships.filter((m) => m.is_active);
   const pastTeams = player.team_memberships.filter((m) => !m.is_active);
-  const primaryPosition = player.positions[0];
+  const primaryPosition = player.positions[0] || 'all_around';
   const jerseyNumber = activeTeams[0]?.jersey_number;
 
   return (
@@ -540,7 +540,7 @@ export function PlayerDetailPage() {
       )}
 
       {activeTab === 'stats-history' && id && (
-        <StatsHistoryTabContent playerId={id} teamId={activeTeamId || undefined} />
+        <StatsHistoryTabContent playerId={id} teamId={activeTeamId || undefined} position={primaryPosition} />
       )}
 
       {activeTab === 'attendance' && id && (
