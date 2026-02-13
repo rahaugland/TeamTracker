@@ -25,10 +25,21 @@ export interface PlayerStatLine {
   killPct: number;
   aces: number;
   serviceErrors: number;
+  serveAttempts: number;
   digs: number;
   blockSolos: number;
   blockAssists: number;
+  blockTouches: number;
+  ballHandlingErrors: number;
+  passAttempts: number;
+  passSum: number;
   passRating: number;
+  setAttempts: number;
+  setSum: number;
+  settingErrors: number;
+  setsPlayed: number;
+  rotationsPlayed: number;
+  rotation: number | null;
   isMvp: boolean;
 }
 
@@ -43,7 +54,16 @@ export interface TeamTotals {
   servePct: number;
   digs: number;
   blocks: number;
+  blockSolos: number;
+  blockAssists: number;
+  blockTouches: number;
+  ballHandlingErrors: number;
+  passAttempts: number;
+  passSum: number;
   passRating: number;
+  setAttempts: number;
+  setSum: number;
+  settingErrors: number;
 }
 
 export interface PostMatchReportData {
@@ -59,8 +79,9 @@ export interface PostMatchReportData {
 
 function deriveTeamTotals(entries: StatEntry[]): TeamTotals {
   let kills = 0, attackAttempts = 0, attackErrors = 0, aces = 0, serviceErrors = 0;
-  let serveAttempts = 0, digs = 0, blockSolos = 0, blockAssists = 0;
-  let passSum = 0, passAttempts = 0;
+  let serveAttempts = 0, digs = 0, blockSolos = 0, blockAssists = 0, blockTouches = 0;
+  let ballHandlingErrors = 0, passSum = 0, passAttempts = 0;
+  let setAttempts = 0, setSum = 0, settingErrors = 0;
 
   for (const e of entries) {
     kills += e.kills;
@@ -72,8 +93,13 @@ function deriveTeamTotals(entries: StatEntry[]): TeamTotals {
     digs += e.digs;
     blockSolos += e.block_solos;
     blockAssists += e.block_assists;
+    blockTouches += e.block_touches;
+    ballHandlingErrors += e.ball_handling_errors;
     passSum += e.pass_sum;
     passAttempts += e.pass_attempts;
+    setAttempts += e.set_attempts;
+    setSum += e.set_sum;
+    settingErrors += e.setting_errors;
   }
 
   return {
@@ -87,7 +113,16 @@ function deriveTeamTotals(entries: StatEntry[]): TeamTotals {
     servePct: serveAttempts > 0 ? (serveAttempts - serviceErrors) / serveAttempts : 0,
     digs,
     blocks: blockSolos + blockAssists * 0.5,
+    blockSolos,
+    blockAssists,
+    blockTouches,
+    ballHandlingErrors,
+    passAttempts,
+    passSum,
     passRating: passAttempts > 0 ? passSum / passAttempts : 0,
+    setAttempts,
+    setSum,
+    settingErrors,
   };
 }
 
@@ -219,10 +254,21 @@ export function usePostMatchReport(
         killPct,
         aces: e.aces,
         serviceErrors: e.service_errors,
+        serveAttempts: e.serve_attempts,
         digs: e.digs,
         blockSolos: e.block_solos,
         blockAssists: e.block_assists,
+        blockTouches: e.block_touches,
+        ballHandlingErrors: e.ball_handling_errors,
+        passAttempts: e.pass_attempts,
+        passSum: e.pass_sum,
         passRating,
+        setAttempts: e.set_attempts,
+        setSum: e.set_sum,
+        settingErrors: e.setting_errors,
+        setsPlayed: e.sets_played,
+        rotationsPlayed: e.rotations_played,
+        rotation: e.rotation ?? null,
         isMvp: e.player_id === mvpPlayerId,
       };
     }).sort((a, b) => b.kills - a.kills);

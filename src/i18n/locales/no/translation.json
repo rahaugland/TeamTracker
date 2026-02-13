@@ -1178,7 +1178,14 @@
       "blocks": "B",
       "vs": "mot",
       "won": "V",
-      "lost": "T"
+      "lost": "T",
+      "showDetailedStats": "Vis Detaljert Statistikk",
+      "hideDetailedStats": "Skjul Detaljert Statistikk",
+      "playingTime": "Spilletid",
+      "setsPlayed": "Sett Spilt",
+      "rotationsPlayed": "Rotasjoner",
+      "startingRotation": "Startrotasjon",
+      "teamTotals": "Lagtotaler"
     },
     "export": {
       "title": "Eksporter",

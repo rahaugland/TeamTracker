@@ -1260,7 +1260,14 @@
       "blocks": "B",
       "vs": "vs",
       "won": "W",
-      "lost": "L"
+      "lost": "L",
+      "showDetailedStats": "Show Detailed Stats",
+      "hideDetailedStats": "Hide Detailed Stats",
+      "playingTime": "Playing Time",
+      "setsPlayed": "Sets Played",
+      "rotationsPlayed": "Rotations",
+      "startingRotation": "Starting Rotation",
+      "teamTotals": "Team Totals"
     },
     "export": {
       "title": "Export",
