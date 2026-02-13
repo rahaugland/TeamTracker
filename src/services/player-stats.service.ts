@@ -189,6 +189,9 @@ export async function getPlayerStats(
   teamId?: string,
   seasonId?: string
 ): Promise<StatEntryWithEvent[]> {
+  // Skip Supabase query for temp IDs (player not yet synced)
+  if (playerId.startsWith('temp_')) return [];
+
   const query = supabase
     .from('stat_entries')
     .select(`

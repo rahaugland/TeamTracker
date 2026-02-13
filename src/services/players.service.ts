@@ -141,8 +141,8 @@ export async function getPlayer(id: string): Promise<PlayerWithMemberships | nul
         team_memberships: membershipsWithTeams.filter(m => m.team) as any,
       };
 
-      // Background sync if online
-      if (isOnline()) {
+      // Background sync if online (skip for temp IDs)
+      if (isOnline() && !id.startsWith('temp_')) {
         syncPlayerFromRemote(id).catch(err =>
           console.warn('Background sync failed:', err)
         );
@@ -151,8 +151,8 @@ export async function getPlayer(id: string): Promise<PlayerWithMemberships | nul
       return player;
     }
 
-    // If not in local DB and online, fetch from Supabase
-    if (isOnline()) {
+    // If not in local DB and online, fetch from Supabase (skip for temp IDs)
+    if (isOnline() && !id.startsWith('temp_')) {
       const { data, error } = await supabase
         .from('players')
         .select(`
@@ -382,14 +382,9 @@ export async function createPlayer(input: CreatePlayerInput): Promise<Player> {
 
         return data;
       } catch (error: any) {
-        // If it's an RLS/auth error, propagate it instead of falling back to offline
-        if (error?.code === '42501' || error?.code === '403') {
-          await db.players.delete(tempId);
-          throw error;
-        }
-        console.error('Error syncing to Supabase, keeping offline record:', error);
-        // Keep the offline record for later sync
-        return newPlayer;
+        // Clean up local temp record and propagate error when online
+        await db.players.delete(tempId);
+        throw error;
       }
     }
 
@@ -527,6 +522,9 @@ async function syncPlayersFromRemote(): Promise<void> {
  * Background sync: Pull single player from Supabase to local DB
  */
 async function syncPlayerFromRemote(id: string): Promise<void> {
+  // Skip sync for temp IDs — they haven't been pushed to Supabase yet
+  if (id.startsWith('temp_')) return;
+
   try {
     const { data, error } = await supabase
       .from('players')
@@ -657,9 +655,9 @@ export async function addPlayerToTeam(
 
         return data;
       } catch (error) {
-        console.error('Error syncing to Supabase, keeping offline record:', error);
-        // Keep the offline record for later sync
-        return newMembership;
+        // Clean up local temp record and propagate error when online
+        await db.team_memberships.delete(tempId);
+        throw error;
       }
     }
 
