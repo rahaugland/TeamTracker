@@ -1,6 +1,6 @@
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -16,6 +16,7 @@ import { StatCard } from '@/components/dashboard/StatCard';
 import { ExportButton } from '@/components/reports/ExportButton';
 import { exportData, type ExportFormat } from '@/services/export.service';
 import { usePostMatchReport } from '@/hooks/usePostMatchReport';
+import { DetailedStatsSection } from '@/components/reports/DetailedStatsSection';
 import type { GameAwardType } from '@/types/database.types';
 
 interface PostMatchReportProps {
@@ -34,6 +35,7 @@ const AWARD_KEYS = {
 
 export function PostMatchReport({ eventId, teamId, onBack }: PostMatchReportProps) {
   const { t } = useTranslation();
+  const [showDetailed, setShowDetailed] = useState(false);
   const { event, teamTotals, playerStatLines, awards, playerMap, keyTakeaways, isLoading, error } =
     usePostMatchReport(eventId, teamId);
 
@@ -301,6 +303,36 @@ export function PostMatchReport({ eventId, teamId, onBack }: PostMatchReportProp
         <div className="text-center py-8 text-muted-foreground">
           {t('reports.postMatch.noStats')}
         </div>
+      )}
+
+      {/* Detailed Stats Toggle */}
+      {playerStatLines.length > 0 && teamTotals && (
+        <>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setShowDetailed((v) => !v)}
+            className="w-full gap-2"
+          >
+            {showDetailed ? (
+              <>
+                <ChevronUp className="w-4 h-4" />
+                {t('reports.postMatch.hideDetailedStats')}
+              </>
+            ) : (
+              <>
+                <ChevronDown className="w-4 h-4" />
+                {t('reports.postMatch.showDetailedStats')}
+              </>
+            )}
+          </Button>
+          {showDetailed && (
+            <DetailedStatsSection
+              playerStatLines={playerStatLines}
+              teamTotals={teamTotals}
+            />
+          )}
+        </>
       )}
 
       {/* Key Takeaways */}
