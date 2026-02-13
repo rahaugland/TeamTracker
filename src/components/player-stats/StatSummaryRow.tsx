@@ -211,7 +211,7 @@ function StatBox({ value, label, delta, valueColor }: StatBoxProps) {
           'font-mono text-[10px] mt-1',
           delta > 0 ? 'text-green-400' : delta < 0 ? 'text-red-400' : 'text-gray-500'
         )}>
-          {delta > 0 ? '+' : ''}{delta} vs last period
+          {delta > 0 ? '+' : ''}{delta} vs last month
         </p>
       )}
     </div>

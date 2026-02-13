@@ -1234,6 +1234,8 @@
       "aces": "A",
       "digs": "D",
       "blocks": "B",
+      "result": "Result",
+      "rating": "Rating",
       "provisional": "Provisional"
     },
     "postMatch": {

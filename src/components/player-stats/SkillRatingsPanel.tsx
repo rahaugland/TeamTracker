@@ -3,7 +3,9 @@ import { cn } from '@/lib/utils';
 import {
   getPlayerStats,
   calculatePlayerRating,
+  calculateRawSkillValues,
   type PlayerRating,
+  type StatEntryWithEvent,
 } from '@/services/player-stats.service';
 import { getPlayer } from '@/services/players.service';
 import { mapPlayerRatingToSkills } from '@/components/player/FifaPlayerCard.example';
@@ -60,7 +62,7 @@ export function SkillRatingsPanel({ playerId, teamId }: SkillRatingsPanelProps) 
         }
         const primaryPosition = player.positions[0] || 'all_around';
 
-        // Get game stats - same data source as FIFA card
+        // Get all game stats (career) - same data source as FIFA card
         const gameStats = await getPlayerStats(playerId, 'career', undefined, teamId);
 
         if (gameStats.length === 0) {
@@ -71,23 +73,43 @@ export function SkillRatingsPanel({ playerId, teamId }: SkillRatingsPanelProps) 
           return;
         }
 
-        // Calculate player rating - same calculation as FIFA card
+        // Calculate current player rating from all games (displayed value)
         const playerRating = calculatePlayerRating(gameStats, primaryPosition);
 
-        // Map to skills - same mapping as FIFA card
+        // Map career rating to skills (main displayed values — rounded integers)
         const cardSkills = mapPlayerRatingToSkills(playerRating);
 
+        // Compute cumulative deltas: today's rating vs rating 1 month ago
+        // Uses unrounded raw values so sub-integer changes are captured
+        const oneMonthAgo = new Date();
+        oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+        const statsOneMonthAgo = gameStats.filter(
+          (s: StatEntryWithEvent) => new Date(s.event.start_time) < oneMonthAgo
+        );
+
+        const currentRaw = calculateRawSkillValues(gameStats);
+        const previousRaw = statsOneMonthAgo.length > 0
+          ? calculateRawSkillValues(statsOneMonthAgo)
+          : null;
+
         // Convert to SkillRatingWithHistory format
-        const skillsWithHistory: SkillRatingWithHistory[] = cardSkills.map(skill => ({
-          type: skill.type,
-          label: skill.label,
-          abbr: skill.abbr,
-          value: skill.value,
-          previousValue: null,
-          change: 0,
-          trend: skill.trend === 'up' ? 'up' : skill.trend === 'down' ? 'down' : 'stable',
-          color: SKILL_COLORS[skill.type] || '#666',
-        }));
+        const skillsWithHistory: SkillRatingWithHistory[] = cardSkills.map(skill => {
+          const curVal = currentRaw[skill.type] ?? 0;
+          const prevVal = previousRaw?.[skill.type] ?? null;
+          const change = prevVal != null ? Math.round(curVal - prevVal) : 0;
+          const trend: 'up' | 'down' | 'stable' = change > 0 ? 'up' : change < 0 ? 'down' : 'stable';
+
+          return {
+            type: skill.type,
+            label: skill.label,
+            abbr: skill.abbr,
+            value: skill.value,
+            previousValue: prevVal != null ? Math.round(prevVal) : null,
+            change,
+            trend,
+            color: SKILL_COLORS[skill.type] || '#666',
+          };
+        });
 
         if (!cancelled) {
           setSkills(skillsWithHistory);
@@ -135,7 +157,7 @@ export function SkillRatingsPanel({ playerId, teamId }: SkillRatingsPanelProps) 
           Skill Ratings
         </h3>
         <span className="text-xs text-gray-500">
-          Last updated: {lastUpdated} &bull; Changes vs 2 weeks ago
+          Last updated: {lastUpdated} &bull; Changes vs last month
         </span>
       </div>
 
