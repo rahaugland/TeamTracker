@@ -1285,7 +1285,8 @@
       "notableMilestones": "Notable Milestones",
       "previousGame": "Previous Game",
       "nextGame": "Next Game",
-      "vsAvg": "vs avg"
+      "vsAvg": "vs avg",
+      "rating": "Rtg"
     },
     "export": {
       "title": "Export",

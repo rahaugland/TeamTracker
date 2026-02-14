@@ -305,6 +305,26 @@ export async function getTeamByInviteCode(code: string): Promise<TeamWithSeason 
 }
 
 /**
+ * Join a team by invite code using an atomic RPC.
+ * Creates player record (or reuses existing) + team membership in one call.
+ * Bypasses RLS via SECURITY DEFINER.
+ */
+export async function joinTeamByCode(
+  inviteCode: string,
+  playerName: string,
+  playerEmail?: string
+): Promise<{ player_id: string; team_id: string; membership_id: string }> {
+  const { data, error } = await supabase.rpc('join_team_by_code', {
+    p_invite_code: inviteCode,
+    p_player_name: playerName,
+    p_player_email: playerEmail ?? null,
+  });
+
+  if (error) throw error;
+  return data;
+}
+
+/**
  * Regenerate invite code for a team
  */
 export async function regenerateInviteCode(teamId: string): Promise<Team> {

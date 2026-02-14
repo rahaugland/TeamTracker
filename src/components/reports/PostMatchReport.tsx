@@ -97,6 +97,7 @@ function exportPlayerStats(format: ExportFormat, p: PlayerStatLine, eventName: s
       ['Playing Time', 'Sets Played', p.setsPlayed],
       ['Playing Time', 'Rotations', p.rotationsPlayed],
       ['Playing Time', 'Starting Rotation', p.rotation ?? '\u2014'],
+      ['Rating', 'Game Rating', p.gameRating],
     ],
   });
 }
@@ -140,6 +141,7 @@ export function PostMatchReport({ eventId, teamId, onBack, previousGameId, nextG
           t('reports.postMatch.aces'),
           t('reports.postMatch.digs'),
           t('reports.postMatch.blocks'),
+          t('reports.postMatch.rating'),
         ],
         rows: playerStatLines.map((p) => [
           p.playerName,
@@ -150,6 +152,7 @@ export function PostMatchReport({ eventId, teamId, onBack, previousGameId, nextG
           p.aces,
           p.digs,
           p.blockSolos + p.blockAssists,
+          p.gameRating,
         ]),
       });
     },
@@ -208,6 +211,11 @@ export function PostMatchReport({ eventId, teamId, onBack, previousGameId, nextG
           <span className="uppercase tracking-wide">{teamName}</span>
           <span className="text-muted-foreground">{t('reports.postMatch.vs')}</span>
           <span className="uppercase tracking-wide">{event.opponent ?? 'Unknown'}</span>
+          {event.opponent_tier != null && (
+            <span className="text-xs text-muted-foreground font-normal tabular-nums">
+              T{event.opponent_tier}
+            </span>
+          )}
         </div>
         <div className="font-mono text-5xl font-bold tracking-tight">
           {event.sets_won ?? 0} : {event.sets_lost ?? 0}
@@ -418,6 +426,7 @@ export function PostMatchReport({ eventId, teamId, onBack, previousGameId, nextG
                   <TableHead className="text-center">{t('reports.postMatch.aces')}</TableHead>
                   <TableHead className="text-center">{t('reports.postMatch.digs')}</TableHead>
                   <TableHead className="text-center">{t('reports.postMatch.blocks')}</TableHead>
+                  <TableHead className="text-center">{t('reports.postMatch.rating')}</TableHead>
                   <TableHead className="w-10" />
                 </TableRow>
               </TableHeader>
@@ -445,6 +454,15 @@ export function PostMatchReport({ eventId, teamId, onBack, previousGameId, nextG
                     <TableCell className="text-center font-mono">{p.digs}</TableCell>
                     <TableCell className="text-center font-mono">
                       {p.blockSolos + p.blockAssists}
+                    </TableCell>
+                    <TableCell className="text-center font-mono font-semibold">
+                      <span className={
+                        p.gameRating >= 70 ? 'text-emerald-400' :
+                        p.gameRating >= 40 ? 'text-amber-400' :
+                        'text-muted-foreground'
+                      }>
+                        {p.gameRating}
+                      </span>
                     </TableCell>
                     <TableCell className="p-1">
                       <DropdownMenu>

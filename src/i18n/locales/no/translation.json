@@ -1203,7 +1203,8 @@
       "notableMilestones": "Viktige Milepæler",
       "previousGame": "Forrige Kamp",
       "nextGame": "Neste Kamp",
-      "vsAvg": "vs snitt"
+      "vsAvg": "vs snitt",
+      "rating": "Rtg"
     },
     "export": {
       "title": "Eksporter",

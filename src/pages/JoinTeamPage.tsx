@@ -2,9 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useUI } from '@/store';
-import { getTeamByInviteCode } from '@/services/teams.service';
-import { createPlayer } from '@/services/players.service';
-import { addPlayerToTeam } from '@/services/players.service';
+import { getTeamByInviteCode, joinTeamByCode } from '@/services/teams.service';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -57,25 +55,7 @@ export function JoinTeamPage() {
     setError(null);
 
     try {
-      // Debug: check auth state
-      const { supabase } = await import('@/lib/supabase');
-      const { data: { session } } = await supabase.auth.getSession();
-      console.log('DEBUG join - session user:', session?.user?.id, 'role:', session?.user?.role, 'user_id being sent:', user.id);
-
-      // Create player record for the user
-      const player = await createPlayer({
-        name: user.name,
-        email: user.email,
-        user_id: user.id,
-        created_by: user.id,
-      });
-
-      // Add player to team
-      await addPlayerToTeam({
-        player_id: player.id,
-        team_id: validatedTeam.id,
-        role: 'player',
-      });
+      await joinTeamByCode(inviteCode.trim(), user.name, user.email);
 
       addNotification({
         id: Date.now().toString(),
@@ -89,9 +69,7 @@ export function JoinTeamPage() {
     } catch (err: any) {
       console.error('Error joining team:', err);
 
-      // Check if already a member
-      if (err.code === '23505') {
-        // Unique constraint violation
+      if (err.code === '23505' || err.code === 'P0002') {
         setError(t('joinTeam.alreadyMember'));
       } else {
         setError(t('joinTeam.joinError'));

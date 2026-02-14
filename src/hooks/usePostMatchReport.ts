@@ -1,13 +1,13 @@
 import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '@/lib/supabase';
-import { getStatEntriesForEvent } from '@/services/player-stats.service';
+import { getStatEntriesForEvent, calculateSingleGameRating } from '@/services/player-stats.service';
 import {
   getAwardsForEvent,
   calculateMatchAwards,
   type CalculatedAward,
 } from '@/services/game-awards.service';
 import { getTeamGameStats } from '@/services/team-stats.service';
-import type { Event, StatEntry, GameAward } from '@/types/database.types';
+import type { Event, StatEntry, GameAward, VolleyballPosition } from '@/types/database.types';
 
 export interface PlayerInfo {
   id: string;
@@ -43,6 +43,7 @@ export interface PlayerStatLine {
   rotationsPlayed: number;
   rotation: number | null;
   isMvp: boolean;
+  gameRating: number;
 }
 
 export interface TeamTotals {
@@ -292,10 +293,13 @@ export function usePostMatchReport(
   }, [awards]);
 
   const playerStatLines = useMemo((): PlayerStatLine[] => {
+    const opponentTier = event?.opponent_tier ?? 5;
     return statEntries.map((e) => {
       const info = playerMap.get(e.player_id);
       const killPct = e.attack_attempts > 0 ? (e.kills - e.attack_errors) / e.attack_attempts : 0;
       const passRating = e.pass_attempts > 0 ? e.pass_sum / e.pass_attempts : 0;
+      const position = (info?.positions?.[0] as VolleyballPosition) ?? 'all_around';
+      const gameRating = calculateSingleGameRating(e, opponentTier, position);
 
       return {
         playerId: e.player_id,
@@ -323,9 +327,10 @@ export function usePostMatchReport(
         rotationsPlayed: e.rotations_played,
         rotation: e.rotation ?? null,
         isMvp: e.player_id === mvpPlayerId,
+        gameRating,
       };
-    }).sort((a, b) => b.kills - a.kills);
-  }, [statEntries, playerMap, mvpPlayerId]);
+    }).sort((a, b) => b.gameRating - a.gameRating);
+  }, [statEntries, playerMap, mvpPlayerId, event]);
 
   const categorizedTakeaways = useMemo(() => {
     if (!teamTotals || !event) return [];

@@ -585,6 +585,32 @@ export function calculatePlayerRating(
 }
 
 /**
+ * Calculate a per-game performance rating (1-99 scale) for a single game.
+ * Uses position-weighted sub-ratings scaled by opponent tier ceiling.
+ */
+export function calculateSingleGameRating(
+  stat: StatEntry,
+  opponentTier: number,
+  position: VolleyballPosition
+): number {
+  const fakeEntry = { ...stat, event: { start_time: new Date().toISOString() } } as unknown as StatEntryWithEvent;
+  const gameAgg = aggregateStats([fakeEntry]);
+  const gameSubRatings = calculateSubRatings(gameAgg);
+
+  const weights = POSITION_WEIGHTS[position];
+  const performanceScore =
+    gameSubRatings.attack * weights.attack +
+    gameSubRatings.serve * weights.serve +
+    gameSubRatings.reception * weights.reception +
+    gameSubRatings.consistency * weights.consistency;
+
+  const opponentMax = TIER_MAX_RATING[opponentTier] || 55;
+  const gameRating = opponentMax * (performanceScore / 99);
+
+  return Math.max(1, Math.min(99, Math.round(gameRating)));
+}
+
+/**
  * Get game-by-game stat lines
  */
 export function getGameStatLines(statEntries: StatEntryWithEvent[]): GameStatLine[] {
