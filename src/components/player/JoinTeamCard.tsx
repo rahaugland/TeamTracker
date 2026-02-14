@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/store';
-import { getTeamByInviteCode } from '@/services/teams.service';
-import { createPlayer, addPlayerToTeam } from '@/services/players.service';
+import { getTeamByInviteCode, joinTeamByCode } from '@/services/teams.service';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -51,25 +50,14 @@ export function JoinTeamCard({ onJoined }: JoinTeamCardProps) {
     setError(null);
 
     try {
-      const player = await createPlayer({
-        name: user.name,
-        email: user.email,
-        user_id: user.id,
-        created_by: user.id,
-      });
-
-      await addPlayerToTeam({
-        player_id: player.id,
-        team_id: validatedTeam.id,
-        role: 'player',
-      });
+      await joinTeamByCode(inviteCode.trim(), user.name, user.email);
 
       setSuccess(t('joinTeam.joinPending', { teamName: validatedTeam.name }));
       setValidatedTeam(null);
       setInviteCode('');
       onJoined?.();
     } catch (err: any) {
-      if (err.code === '23505' || err.message === 'ALREADY_MEMBER') {
+      if (err.code === '23505' || err.code === 'P0002') {
         setError(t('joinTeam.alreadyMember'));
       } else {
         setError(t('joinTeam.joinError'));

@@ -22,9 +22,9 @@ interface GamesListViewProps {
 type ResultFilter = 'all' | 'wins' | 'losses';
 
 function getTierLabel(tier: number): { label: string; className: string } {
-  if (tier >= 7) return { label: 'Tier A', className: 'bg-red-500/20 text-red-400 border-red-500/30' };
-  if (tier >= 4) return { label: 'Tier B', className: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30' };
-  return { label: 'Tier C', className: 'bg-blue-500/20 text-blue-400 border-blue-500/30' };
+  if (tier >= 7) return { label: `T${tier}`, className: 'bg-red-500/20 text-red-400 border-red-500/30' };
+  if (tier >= 4) return { label: `T${tier}`, className: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30' };
+  return { label: `T${tier}`, className: 'bg-blue-500/20 text-blue-400 border-blue-500/30' };
 }
 
 export function GamesListView({ teamId, dateRange, onSelectGame }: GamesListViewProps) {
