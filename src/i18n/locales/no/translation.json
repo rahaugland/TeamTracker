@@ -1119,7 +1119,15 @@
       "avgKillPct": "Snitt Angrep %",
       "opponentHistory": "Motstanderhistorikk",
       "gamesPlayed": "Kamper",
-      "lastPlayed": "Sist Spilt"
+      "lastPlayed": "Sist Spilt",
+      "upcoming": "Kommende",
+      "completed": "Fullført",
+      "allResults": "Alle Resultater",
+      "winsOnly": "Seirer",
+      "lossesOnly": "Tap",
+      "allOpponents": "Alle Motstandere",
+      "viewReport": "Se Rapport",
+      "noReport": "Ingen rapport ennå"
     },
     "players": {
       "searchPlaceholder": "Søk spillere...",
@@ -1187,7 +1195,15 @@
       "setsPlayed": "Sett Spilt",
       "rotationsPlayed": "Rotasjoner",
       "startingRotation": "Startrotasjon",
-      "teamTotals": "Lagtotaler"
+      "teamTotals": "Lagtotaler",
+      "victory": "SEIER",
+      "defeat": "TAP",
+      "whatWentWell": "Hva Gikk Bra",
+      "areasToAddress": "Forbedringsområder",
+      "notableMilestones": "Viktige Milepæler",
+      "previousGame": "Forrige Kamp",
+      "nextGame": "Neste Kamp",
+      "vsAvg": "vs snitt"
     },
     "export": {
       "title": "Eksporter",

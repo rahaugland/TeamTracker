@@ -6,6 +6,7 @@ import {
   calculateMatchAwards,
   type CalculatedAward,
 } from '@/services/game-awards.service';
+import { getTeamGameStats } from '@/services/team-stats.service';
 import type { Event, StatEntry, GameAward } from '@/types/database.types';
 
 export interface PlayerInfo {
@@ -13,6 +14,7 @@ export interface PlayerInfo {
   name: string;
   photo_url?: string;
   positions?: string[];
+  jerseyNumber?: number;
 }
 
 export interface PlayerStatLine {
@@ -66,13 +68,31 @@ export interface TeamTotals {
   settingErrors: number;
 }
 
+export interface SeasonAverages {
+  killPct: number;
+  servePct: number;
+  passRating: number;
+  kills: number;
+  aces: number;
+  digs: number;
+}
+
+export type TakeawayCategory = 'positive' | 'improvement' | 'milestone';
+
+export interface CategorizedTakeaway {
+  text: string;
+  category: TakeawayCategory;
+}
+
 export interface PostMatchReportData {
   event: Event | null;
   teamTotals: TeamTotals | null;
+  seasonAverages: SeasonAverages | null;
   playerStatLines: PlayerStatLine[];
   awards: (GameAward | CalculatedAward)[];
   playerMap: Map<string, PlayerInfo>;
   keyTakeaways: string[];
+  categorizedTakeaways: CategorizedTakeaway[];
   isLoading: boolean;
   error: string | null;
 }
@@ -126,39 +146,51 @@ function deriveTeamTotals(entries: StatEntry[]): TeamTotals {
   };
 }
 
-function deriveKeyTakeaways(totals: TeamTotals, event: Event): string[] {
-  const takeaways: string[] = [];
+function deriveCategorizedTakeaways(totals: TeamTotals, event: Event): CategorizedTakeaway[] {
+  const takeaways: CategorizedTakeaway[] = [];
   const won = (event.sets_won ?? 0) > (event.sets_lost ?? 0);
 
+  // Positive takeaways
   if (totals.killPct >= 0.3) {
-    takeaways.push('Strong attack efficiency — kill percentage above 30%');
-  } else if (totals.killPct < 0.15 && totals.attackAttempts > 0) {
-    takeaways.push('Attack efficiency needs work — kill percentage below 15%');
+    takeaways.push({ text: 'Strong attack efficiency — kill percentage above 30%', category: 'positive' });
   }
-
   if (totals.servePct >= 0.92) {
-    takeaways.push('Excellent serving consistency with low error rate');
-  } else if (totals.servePct < 0.85 && totals.serveAttempts > 0) {
-    takeaways.push('Too many service errors — focus on serve accuracy');
+    takeaways.push({ text: 'Excellent serving consistency with low error rate', category: 'positive' });
   }
-
   if (totals.passRating >= 2.2) {
-    takeaways.push('Strong passing game with pass rating above 2.2');
-  } else if (totals.passRating > 0 && totals.passRating < 1.5) {
-    takeaways.push('Passing needs improvement — rating below 1.5');
+    takeaways.push({ text: 'Strong passing game with pass rating above 2.2', category: 'positive' });
   }
-
   if (totals.aces >= 8) {
-    takeaways.push(`Great serving pressure with ${totals.aces} aces`);
+    takeaways.push({ text: `Great serving pressure with ${totals.aces} aces`, category: 'positive' });
   }
 
+  // Areas to address
+  if (totals.killPct < 0.15 && totals.attackAttempts > 0) {
+    takeaways.push({ text: 'Attack efficiency needs work — kill percentage below 15%', category: 'improvement' });
+  }
+  if (totals.servePct < 0.85 && totals.serveAttempts > 0) {
+    takeaways.push({ text: 'Too many service errors — focus on serve accuracy', category: 'improvement' });
+  }
+  if (totals.passRating > 0 && totals.passRating < 1.5) {
+    takeaways.push({ text: 'Passing needs improvement — rating below 1.5', category: 'improvement' });
+  }
+
+  // Milestones
   if (won) {
-    takeaways.push('Team secured the win — momentum heading into next match');
+    takeaways.push({ text: 'Team secured the win — momentum heading into next match', category: 'milestone' });
   } else {
-    takeaways.push('Loss provides learning opportunities for the next match');
+    takeaways.push({ text: 'Loss provides learning opportunities for the next match', category: 'milestone' });
   }
 
-  return takeaways.slice(0, 4);
+  const setsWon = event.sets_won ?? 0;
+  const setsLost = event.sets_lost ?? 0;
+  if (setsWon === 3 && setsLost === 0) {
+    takeaways.push({ text: 'Clean sweep — dominant 3-0 victory', category: 'milestone' });
+  } else if (won && setsLost >= 2) {
+    takeaways.push({ text: 'Comeback resilience — won after trailing in sets', category: 'milestone' });
+  }
+
+  return takeaways;
 }
 
 export function usePostMatchReport(
@@ -169,6 +201,7 @@ export function usePostMatchReport(
   const [statEntries, setStatEntries] = useState<StatEntry[]>([]);
   const [savedAwards, setSavedAwards] = useState<GameAward[]>([]);
   const [playerMap, setPlayerMap] = useState<Map<string, PlayerInfo>>(new Map());
+  const [seasonAverages, setSeasonAverages] = useState<SeasonAverages | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -188,7 +221,7 @@ export function usePostMatchReport(
       getAwardsForEvent(eventId).catch(() => []),
       supabase
         .from('team_memberships')
-        .select('player_id, player:players(id, name, photo_url, positions)')
+        .select('player_id, jersey_number, player:players(id, name, photo_url, positions)')
         .eq('team_id', teamId)
         .then(({ data }) => {
           const map = new Map<string, PlayerInfo>();
@@ -199,17 +232,37 @@ export function usePostMatchReport(
                 name: m.player.name,
                 photo_url: m.player.photo_url,
                 positions: m.player.positions,
+                jerseyNumber: m.jersey_number,
               });
             }
           }
           return map;
         }),
-    ]).then(([ev, stats, awards, pMap]) => {
+      getTeamGameStats(teamId).catch(() => []),
+    ]).then(([ev, stats, awards, pMap, allGameStats]) => {
       if (!cancelled) {
         setEvent(ev);
         setStatEntries(stats);
         setSavedAwards(awards);
         setPlayerMap(pMap);
+
+        // Calculate season averages from all completed games
+        const now = new Date().toISOString();
+        const completedGames = allGameStats.filter((g) => g.date <= now);
+        if (completedGames.length > 0) {
+          const avgKillPct = completedGames.reduce((s, g) => s + g.killPercentage, 0) / completedGames.length;
+          const avgServePct = completedGames.reduce((s, g) => s + g.servePercentage, 0) / completedGames.length;
+          const avgPassRating = completedGames.reduce((s, g) => s + g.passRating, 0) / completedGames.length;
+          setSeasonAverages({
+            killPct: avgKillPct,
+            servePct: avgServePct,
+            passRating: avgPassRating,
+            kills: 0,
+            aces: 0,
+            digs: 0,
+          });
+        }
+
         setIsLoading(false);
       }
     }).catch((err) => {
@@ -274,10 +327,14 @@ export function usePostMatchReport(
     }).sort((a, b) => b.kills - a.kills);
   }, [statEntries, playerMap, mvpPlayerId]);
 
-  const keyTakeaways = useMemo(() => {
+  const categorizedTakeaways = useMemo(() => {
     if (!teamTotals || !event) return [];
-    return deriveKeyTakeaways(teamTotals, event);
+    return deriveCategorizedTakeaways(teamTotals, event);
   }, [teamTotals, event]);
 
-  return { event, teamTotals, playerStatLines, awards, playerMap, keyTakeaways, isLoading, error };
+  const keyTakeaways = useMemo(() => {
+    return categorizedTakeaways.map((t) => t.text);
+  }, [categorizedTakeaways]);
+
+  return { event, teamTotals, seasonAverages, playerStatLines, awards, playerMap, keyTakeaways, categorizedTakeaways, isLoading, error };
 }
