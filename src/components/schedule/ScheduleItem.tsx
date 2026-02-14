@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { cn } from '@/lib/utils';
 
-export type ScheduleItemType = 'match' | 'practice';
+export type ScheduleItemType = 'match' | 'practice' | 'tournament';
 
 export interface ScheduleItemProps {
   day: string;
@@ -76,10 +76,12 @@ export function ScheduleItem({
           type === 'match' &&
             'bg-club-primary/[0.15] text-club-primary',
           type === 'practice' && 'bg-vq-teal/[0.12] text-vq-teal',
+          type === 'tournament' &&
+            'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
           isToday && 'bg-white/90 text-club-primary'
         )}
       >
-        {isToday ? 'Today' : type === 'match' ? 'Match' : 'Practice'}
+        {isToday ? 'Today' : type === 'match' ? 'Match' : type === 'tournament' ? 'Tournament' : 'Practice'}
       </span>
 
       {/* Optional actions slot (e.g. RSVP buttons) */}

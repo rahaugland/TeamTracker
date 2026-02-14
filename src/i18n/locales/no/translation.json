@@ -934,8 +934,35 @@
       "nextEvent": "Neste Hendelse",
       "viewAllEvents": "Vis Alle Hendelser"
     },
+    "schedule": {
+      "eventsThisMonth": "Hendelser denne måneden",
+      "confirmed": "Bekreftet",
+      "pendingRsvp": "Venter på svar",
+      "cantAttend": "Kan ikke delta"
+    },
     "stats": {
-      "activeTeams": "Aktive lag"
+      "activeTeams": "Aktive lag",
+      "seasonStatistics": "Sesongstatistikk",
+      "ratingProgression": "Vurderingsprogresjon",
+      "chartComingSoon": "Diagram kommer snart",
+      "totalKills": "Totale kills",
+      "killPct": "Kill %",
+      "totalBlocks": "Totale blokkeringer",
+      "digs": "Redninger",
+      "aces": "Ess",
+      "passRating": "Mottaksvurdering",
+      "attendancePct": "Oppmøte %",
+      "periods": {
+        "season": "Sesong",
+        "career": "Karriere"
+      }
+    },
+    "profile": {
+      "careerStatistics": "Karrierestatistikk",
+      "totalGames": "Totale kamper",
+      "careerKills": "Karriere kills",
+      "careerAces": "Karriere ess",
+      "careerBlocks": "Karriere blokkeringer"
     },
     "announcements": {
       "title": "Kunngjøringer",

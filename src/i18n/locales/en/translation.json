@@ -1016,8 +1016,35 @@
       "nextEvent": "Next Event",
       "viewAllEvents": "View All Events"
     },
+    "schedule": {
+      "eventsThisMonth": "Events This Month",
+      "confirmed": "Confirmed",
+      "pendingRsvp": "Pending RSVP",
+      "cantAttend": "Can't Attend"
+    },
     "stats": {
-      "activeTeams": "Active teams"
+      "activeTeams": "Active teams",
+      "seasonStatistics": "Season Statistics",
+      "ratingProgression": "Rating Progression",
+      "chartComingSoon": "Chart coming soon",
+      "totalKills": "Total Kills",
+      "killPct": "Kill %",
+      "totalBlocks": "Total Blocks",
+      "digs": "Digs",
+      "aces": "Aces",
+      "passRating": "Pass Rating",
+      "attendancePct": "Attendance %",
+      "periods": {
+        "season": "Season",
+        "career": "Career"
+      }
+    },
+    "profile": {
+      "careerStatistics": "Career Statistics",
+      "totalGames": "Total Games",
+      "careerKills": "Career Kills",
+      "careerAces": "Career Aces",
+      "careerBlocks": "Career Blocks"
     },
     "announcements": {
       "title": "Announcements",
