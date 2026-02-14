@@ -70,6 +70,9 @@ export function PlayerDashboardPage() {
   const teamIds = activeMemberships.map((tm) => tm.team_id);
   const hasActiveTeams = teamIds.length > 0;
 
+  const pendingMemberships = player?.team_memberships?.filter((tm) => tm.status === 'pending') || [];
+  const hasPendingTeams = pendingMemberships.length > 0;
+
   const { announcements, pinnedAnnouncements } = useAnnouncements(teamIds);
   const { feedback } = usePlayerFeedback(player?.id);
   const { assessments, submitAssessment } = useSelfAssessments(player?.id);
@@ -205,11 +208,14 @@ export function PlayerDashboardPage() {
           <p className="text-muted-foreground mt-1 font-display tracking-wide">{t('player.singular')}</p>
         </div>
         <div className="space-y-6">
+          {player && hasPendingTeams && (
+            <PendingMemberships refreshKey={refreshKey} />
+          )}
           <JoinTeamCard onJoined={() => {
             setRefreshKey((k) => k + 1);
             loadDashboardData();
           }} />
-          <PendingMemberships refreshKey={refreshKey} />
+          {!hasPendingTeams && <PendingMemberships refreshKey={refreshKey} />}
         </div>
       </div>
     );

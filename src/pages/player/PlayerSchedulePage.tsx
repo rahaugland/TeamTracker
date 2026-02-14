@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { format, isToday, startOfMonth, endOfMonth, addMonths, subMonths } from 'date-fns';
 import { ChevronLeft, ChevronRight, ChevronsDown } from 'lucide-react';
 import { usePlayerContext } from '@/hooks/usePlayerContext';
+import { PendingMemberships } from '@/components/player/PendingMemberships';
 import { getUpcomingEvents } from '@/services/events.service';
 import { getPlayerRSVPs } from '@/services/rsvp.service';
 import { ScheduleItem } from '@/components/schedule/ScheduleItem';
@@ -61,7 +62,7 @@ function RsvpSummaryCards({
 export function PlayerSchedulePage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { player, teamIds, isLoading: playerLoading } = usePlayerContext();
+  const { player, teamIds, isLoading: playerLoading, hasActiveTeams, hasPendingTeams } = usePlayerContext();
 
   const [events, setEvents] = useState<Event[]>([]);
   const [rsvps, setRsvps] = useState<Rsvp[]>([]);
@@ -121,6 +122,14 @@ export function PlayerSchedulePage() {
     return (
       <div className="flex items-center justify-center h-64">
         <p className="text-muted-foreground">{t('common.messages.loading')}</p>
+      </div>
+    );
+  }
+
+  if (!hasActiveTeams && hasPendingTeams) {
+    return (
+      <div className="max-w-lg mx-auto space-y-6 py-6">
+        <PendingMemberships />
       </div>
     );
   }

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useUI } from '@/store';
 import { getTeamByInviteCode, joinTeamByCode } from '@/services/teams.service';
+import { performSync } from '@/services/sync.service';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -16,7 +17,7 @@ import type { TeamWithSeason } from '@/services/teams.service';
 export function JoinTeamPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, syncSession } = useAuth();
   const { addNotification } = useUI();
 
   const [inviteCode, setInviteCode] = useState('');
@@ -56,6 +57,10 @@ export function JoinTeamPage() {
 
     try {
       await joinTeamByCode(inviteCode.trim(), user.name, user.email);
+
+      // Sync session and pull new data into IndexedDB
+      await syncSession();
+      await performSync(user.id);
 
       addNotification({
         id: Date.now().toString(),

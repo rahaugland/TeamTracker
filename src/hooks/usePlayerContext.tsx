@@ -7,6 +7,7 @@ interface PlayerContextValue {
   teamIds: string[];
   isLoading: boolean;
   hasActiveTeams: boolean;
+  hasPendingTeams: boolean;
   refreshPlayer: () => Promise<void>;
 }
 
@@ -53,9 +54,14 @@ export function PlayerContextProvider({ children }: { children: ReactNode }) {
   const teamIds = activeMemberships.map((tm) => tm.team_id);
   const hasActiveTeams = teamIds.length > 0;
 
+  const pendingMemberships = player?.team_memberships?.filter(
+    (tm) => tm.status === 'pending'
+  ) || [];
+  const hasPendingTeams = pendingMemberships.length > 0;
+
   return (
     <PlayerContext.Provider
-      value={{ player, teamIds, isLoading, hasActiveTeams, refreshPlayer: loadPlayer }}
+      value={{ player, teamIds, isLoading, hasActiveTeams, hasPendingTeams, refreshPlayer: loadPlayer }}
     >
       {children}
     </PlayerContext.Provider>
