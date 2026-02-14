@@ -3,7 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ChevronRight } from 'lucide-react';
 import { useAuth, useUI } from '@/store';
-import { getEvent } from '@/services/events.service';
+import { getEvent, updateEvent, finalizeGame } from '@/services/events.service';
 import { getEventAttendance } from '@/services/attendance.service';
 import { getPlayersByTeam } from '@/services/players.service';
 import {
@@ -11,7 +11,6 @@ import {
   createStatEntry,
   updateStatEntry,
 } from '@/services/player-stats.service';
-import { updateEvent } from '@/services/events.service';
 import type { EventWithDetails } from '@/services/events.service';
 import type { AttendanceRecordWithPlayer } from '@/services/attendance.service';
 import type { PlayerWithMemberships } from '@/services/players.service';
@@ -276,11 +275,11 @@ export function RecordStatsPage() {
   };
 
   const handleFinalize = async () => {
-    if (!id) return;
+    if (!id || !user?.id) return;
 
     try {
       await handleSaveAll();
-      await updateEvent(id, { is_finalized: true });
+      await finalizeGame(id, user.id);
       navigate(`/events/${id}`);
     } catch (err) {
       console.error('Error finalizing match:', err);

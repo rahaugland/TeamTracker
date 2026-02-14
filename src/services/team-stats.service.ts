@@ -19,6 +19,7 @@ export interface TeamGameStat {
   eventTitle: string;
   date: string;
   opponent?: string;
+  opponentTier?: number;
   result: 'W' | 'L' | 'D';
   setsWon: number;
   setsLost: number;
@@ -219,6 +220,7 @@ export async function getTeamGameStats(teamId: string): Promise<TeamGameStat[]> 
           eventTitle: event.title,
           date: event.start_time,
           opponent: event.opponent,
+          opponentTier: event.opponent_tier ?? undefined,
           result,
           setsWon,
           setsLost,

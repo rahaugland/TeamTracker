@@ -2,7 +2,7 @@ import { supabase } from '@/lib/supabase';
 import type { Event, EventType, GameAward } from '@/types/database.types';
 import { getStatEntriesForEvent } from '@/services/player-stats.service';
 import { calculateMatchAwards, saveGameAwards } from '@/services/game-awards.service';
-import { createPendingRSVPsForEvent } from '@/services/rsvp.service';
+
 
 /**
  * Event service
@@ -182,11 +182,6 @@ export async function createEvent(input: CreateEventInput): Promise<Event> {
     throw error;
   }
 
-  // Create pending RSVPs for all active team members
-  createPendingRSVPsForEvent(data.id, input.team_id, input.created_by).catch(err =>
-    console.warn('Failed to create pending RSVPs for new event:', err)
-  );
-
   return data;
 }
 
@@ -282,15 +277,6 @@ export async function createRecurringEvents(
   if (error) {
     console.error('Error creating recurring events:', error);
     throw error;
-  }
-
-  // Create pending RSVPs for all active team members for each new event
-  if (data) {
-    for (const event of data) {
-      createPendingRSVPsForEvent(event.id, input.team_id, input.created_by).catch(err =>
-        console.warn('Failed to create pending RSVPs for recurring event:', err)
-      );
-    }
   }
 
   return data || [];

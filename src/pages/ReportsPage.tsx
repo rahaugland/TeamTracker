@@ -11,6 +11,7 @@ import { ExportButton } from '@/components/reports/ExportButton';
 import { exportData, type ExportFormat } from '@/services/export.service';
 import { getTeamPlayerRankings } from '@/services/reports.service';
 import { getTeamGameStats } from '@/services/team-stats.service';
+import { useGameAnalysis } from '@/hooks/useGameAnalysis';
 import type { DateRange } from '@/services/analytics.service';
 import type { VolleyballPosition } from '@/types/database.types';
 
@@ -41,10 +42,31 @@ export function ReportsPage() {
     return undefined;
   }, [activeSeason?.start_date, activeSeason?.end_date]);
 
+  // Fetch game data for prev/next navigation
+  const { gameStats } = useGameAnalysis(activeTeamId ?? undefined, dateRange);
+
+  // Compute previous/next game IDs for navigation
+  const { previousGameId, nextGameId } = useMemo(() => {
+    if (!selectedGameId || gameStats.length === 0) {
+      return { previousGameId: null, nextGameId: null };
+    }
+    const idx = gameStats.findIndex((g) => g.eventId === selectedGameId);
+    if (idx === -1) return { previousGameId: null, nextGameId: null };
+    // gameStats is sorted most recent first, so "previous" is the next index (older) and "next" is the previous index (newer)
+    return {
+      previousGameId: idx < gameStats.length - 1 ? gameStats[idx + 1].eventId : null,
+      nextGameId: idx > 0 ? gameStats[idx - 1].eventId : null,
+    };
+  }, [selectedGameId, gameStats]);
+
   const handleTabChange = useCallback((value: string) => {
     setActiveTab(value as ReportTab);
     setSelectedPlayer(null);
     setSelectedGameId(null);
+  }, []);
+
+  const handleNavigateGame = useCallback((eventId: string) => {
+    setSelectedGameId(eventId);
   }, []);
 
   const handleExport = useCallback(
@@ -161,6 +183,9 @@ export function ReportsPage() {
               eventId={selectedGameId}
               teamId={activeTeamId}
               onBack={() => setSelectedGameId(null)}
+              previousGameId={previousGameId}
+              nextGameId={nextGameId}
+              onNavigateGame={handleNavigateGame}
             />
           ) : (
             <GamesListView

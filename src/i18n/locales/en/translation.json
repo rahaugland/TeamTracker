@@ -1201,7 +1201,15 @@
       "avgKillPct": "Avg Kill %",
       "opponentHistory": "Opponent History",
       "gamesPlayed": "Games",
-      "lastPlayed": "Last Played"
+      "lastPlayed": "Last Played",
+      "upcoming": "Upcoming",
+      "completed": "Completed",
+      "allResults": "All Results",
+      "winsOnly": "Wins",
+      "lossesOnly": "Losses",
+      "allOpponents": "All Opponents",
+      "viewReport": "View Report",
+      "noReport": "No report yet"
     },
     "players": {
       "searchPlaceholder": "Search players...",
@@ -1269,7 +1277,15 @@
       "setsPlayed": "Sets Played",
       "rotationsPlayed": "Rotations",
       "startingRotation": "Starting Rotation",
-      "teamTotals": "Team Totals"
+      "teamTotals": "Team Totals",
+      "victory": "VICTORY",
+      "defeat": "DEFEAT",
+      "whatWentWell": "What Went Well",
+      "areasToAddress": "Areas to Address",
+      "notableMilestones": "Notable Milestones",
+      "previousGame": "Previous Game",
+      "nextGame": "Next Game",
+      "vsAvg": "vs avg"
     },
     "export": {
       "title": "Export",

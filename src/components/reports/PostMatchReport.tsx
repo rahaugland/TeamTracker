@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, ChevronDown, ChevronUp, Download } from 'lucide-react';
+import { ArrowLeft, ArrowRight, ChevronDown, ChevronUp, Download, MapPin, Calendar, Trophy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -20,15 +20,20 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { StatCard } from '@/components/dashboard/StatCard';
 import { ExportButton } from '@/components/reports/ExportButton';
+import { PlayerAvatar } from '@/components/player/PlayerAvatar';
 import { exportData, type ExportFormat } from '@/services/export.service';
 import { usePostMatchReport, type PlayerStatLine } from '@/hooks/usePostMatchReport';
 import { DetailedStatsSection } from '@/components/reports/DetailedStatsSection';
+import { useTeams } from '@/store';
 import type { GameAwardType } from '@/types/database.types';
 
 interface PostMatchReportProps {
   eventId: string;
   teamId: string;
   onBack: () => void;
+  previousGameId?: string | null;
+  nextGameId?: string | null;
+  onNavigateGame?: (eventId: string) => void;
 }
 
 const AWARD_KEYS = {
@@ -38,6 +43,15 @@ const AWARD_KEYS = {
   top_defender: 'reports.postMatch.topDefender',
   top_passer: 'reports.postMatch.topPasser',
 } as const;
+
+function getInitials(name: string): string {
+  return name
+    .split(' ')
+    .map((n) => n[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2);
+}
 
 function exportPlayerStats(format: ExportFormat, p: PlayerStatLine, eventName: string) {
   const killPct = p.attackAttempts > 0
@@ -87,10 +101,28 @@ function exportPlayerStats(format: ExportFormat, p: PlayerStatLine, eventName: s
   });
 }
 
-export function PostMatchReport({ eventId, teamId, onBack }: PostMatchReportProps) {
+function formatTrendDelta(current: number, avg: number, isPercentage: boolean, vsAvgLabel: string): { text: string; type: 'positive' | 'negative' | 'neutral' } {
+  const diff = current - avg;
+  const absDiff = Math.abs(diff);
+  const formatted = isPercentage
+    ? `${(absDiff * 100).toFixed(1)}%`
+    : absDiff.toFixed(2);
+
+  if (Math.abs(diff) < 0.005) {
+    return { text: `\u2192 ${vsAvgLabel}`, type: 'neutral' };
+  }
+  if (diff > 0) {
+    return { text: `\u2191 +${formatted} ${vsAvgLabel}`, type: 'positive' };
+  }
+  return { text: `\u2193 -${formatted} ${vsAvgLabel}`, type: 'negative' };
+}
+
+export function PostMatchReport({ eventId, teamId, onBack, previousGameId, nextGameId, onNavigateGame }: PostMatchReportProps) {
   const { t } = useTranslation();
+  const { getActiveTeam } = useTeams();
+  const activeTeam = getActiveTeam();
   const [showDetailed, setShowDetailed] = useState(false);
-  const { event, teamTotals, playerStatLines, awards, playerMap, keyTakeaways, isLoading, error } =
+  const { event, teamTotals, seasonAverages, playerStatLines, awards, playerMap, categorizedTakeaways, isLoading, error } =
     usePostMatchReport(eventId, teamId);
 
   const handleExport = useCallback(
@@ -150,80 +182,90 @@ export function PostMatchReport({ eventId, teamId, onBack }: PostMatchReportProp
   }
 
   const won = (event.sets_won ?? 0) > (event.sets_lost ?? 0);
+  const teamName = activeTeam?.name ?? 'Team';
+
+  // Find MVP award and player info
+  const mvpAward = awards.find((a) => a.award_type === 'mvp');
+  const mvpPlayerInfo = mvpAward ? playerMap.get(mvpAward.player_id) : null;
+  const nonMvpAwards = awards.filter((a) => a.award_type !== 'mvp').slice(0, 3);
+
+  // Categorize takeaways
+  const positiveTakeaways = categorizedTakeaways.filter((t) => t.category === 'positive');
+  const improvementTakeaways = categorizedTakeaways.filter((t) => t.category === 'improvement');
+  const milestoneTakeaways = categorizedTakeaways.filter((t) => t.category === 'milestone');
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-start justify-between">
-        <div>
-          <Button variant="ghost" size="sm" onClick={onBack} className="gap-2 mb-2">
-            <ArrowLeft className="w-4 h-4" />
-            {t('reports.postMatch.back')}
-          </Button>
-          <div className="flex items-center gap-3">
-            <h2 className="text-lg font-medium text-muted-foreground">
-              {t('reports.postMatch.vs')}
-            </h2>
-            <h2 className="text-xl font-bold">{event.opponent ?? 'Unknown'}</h2>
-          </div>
-          <div className="flex items-center gap-3 mt-2">
-            <span className="font-mono text-4xl font-bold">
-              {event.sets_won ?? 0}-{event.sets_lost ?? 0}
-            </span>
-            <Badge
-              variant={won ? 'default' : 'destructive'}
-              className={
-                won
-                  ? 'bg-green-500/20 text-green-400 border-green-500/30'
-                  : 'bg-red-500/20 text-red-400 border-red-500/30'
-              }
-            >
-              {won ? t('reports.postMatch.won') : t('reports.postMatch.lost')}
-            </Badge>
-          </div>
-          <p className="text-sm text-muted-foreground mt-1">
+      {/* Back button */}
+      <Button variant="ghost" size="sm" onClick={onBack} className="gap-2">
+        <ArrowLeft className="w-4 h-4" />
+        {t('reports.postMatch.back')}
+      </Button>
+
+      {/* Centered Match Header */}
+      <div className="text-center space-y-3">
+        <div className="flex items-center justify-center gap-4 text-lg font-semibold">
+          <span className="uppercase tracking-wide">{teamName}</span>
+          <span className="text-muted-foreground">{t('reports.postMatch.vs')}</span>
+          <span className="uppercase tracking-wide">{event.opponent ?? 'Unknown'}</span>
+        </div>
+        <div className="font-mono text-5xl font-bold tracking-tight">
+          {event.sets_won ?? 0} : {event.sets_lost ?? 0}
+        </div>
+        <Badge
+          className={
+            won
+              ? 'bg-green-500/20 text-green-400 border-green-500/30 text-sm px-4 py-1 uppercase font-bold tracking-wider'
+              : 'bg-red-500/20 text-red-400 border-red-500/30 text-sm px-4 py-1 uppercase font-bold tracking-wider'
+          }
+        >
+          {won ? t('reports.postMatch.victory') : t('reports.postMatch.defeat')}
+        </Badge>
+        <div className="flex items-center justify-center gap-4 text-sm text-muted-foreground">
+          <span className="flex items-center gap-1">
+            <Calendar className="w-3.5 h-3.5" />
             {new Date(event.start_time).toLocaleDateString(undefined, {
               weekday: 'long',
               year: 'numeric',
               month: 'long',
               day: 'numeric',
             })}
-          </p>
+          </span>
+          {event.location && (
+            <span className="flex items-center gap-1">
+              <MapPin className="w-3.5 h-3.5" />
+              {event.location}
+            </span>
+          )}
         </div>
-        <ExportButton onExport={handleExport} />
       </div>
 
-      {/* Set Scores */}
+      {/* Set Score Cards */}
       {event.set_scores && event.set_scores.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>{t('reports.postMatch.setScores')}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex gap-3 flex-wrap">
-              {event.set_scores.map((set, i) => {
-                if (!Array.isArray(set) || set.length < 2) return null;
-                const [our, their] = set;
-                const setWon = our > their;
-                return (
-                  <div
-                    key={i}
-                    className={`px-4 py-2 rounded-lg border-2 font-mono text-lg font-bold ${
-                      setWon
-                        ? 'border-green-500/40 bg-green-500/10 text-green-400'
-                        : 'border-red-500/40 bg-red-500/10 text-red-400'
-                    }`}
-                  >
-                    {our}-{their}
-                  </div>
-                );
-              })}
-            </div>
-          </CardContent>
-        </Card>
+        <div className="flex justify-center gap-3">
+          {event.set_scores.map((set, i) => {
+            if (!Array.isArray(set) || set.length < 2) return null;
+            const [our, their] = set;
+            const setWon = our > their;
+            return (
+              <div
+                key={i}
+                className="relative bg-navy-90 border border-white/[0.06] rounded-lg p-4 text-center overflow-hidden flex-1 max-w-[140px]"
+              >
+                <div className={`absolute top-0 left-0 right-0 h-[3px] ${setWon ? 'bg-vq-teal' : 'bg-red-500'}`} />
+                <p className="text-xs text-muted-foreground uppercase tracking-wider mb-2">
+                  Set {i + 1}
+                </p>
+                <p className="font-mono text-2xl font-bold">
+                  {our} : {their}
+                </p>
+              </div>
+            );
+          })}
+        </div>
       )}
 
-      {/* Key Stats */}
+      {/* Key Stats with Trend Indicators */}
       {teamTotals && (
         <Card>
           <CardHeader>
@@ -231,50 +273,106 @@ export function PostMatchReport({ eventId, teamId, onBack }: PostMatchReportProp
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              <StatCard
-                label={t('reports.playerReport.killPct')}
-                value={`${Math.round(teamTotals.killPct * 1000) / 10}%`}
-                accent="teal"
-              />
-              <StatCard
-                label="Serve %"
-                value={`${Math.round(teamTotals.servePct * 1000) / 10}%`}
-                accent="primary"
-              />
-              <StatCard
-                label={t('reports.playerReport.passRating')}
-                value={Math.round(teamTotals.passRating * 100) / 100}
-                accent="success"
-              />
-              <StatCard
-                label={t('reports.playerReport.kills')}
-                value={teamTotals.kills}
-                accent="secondary"
-              />
-              <StatCard
-                label={t('reports.playerReport.aces')}
-                value={teamTotals.aces}
-                accent="teal"
-              />
-              <StatCard
-                label={t('reports.playerReport.digs')}
-                value={teamTotals.digs}
-                accent="success"
-              />
+              {(() => {
+                const vsAvgLabel = t('reports.postMatch.vsAvg');
+                const killTrend = seasonAverages ? formatTrendDelta(teamTotals.killPct, seasonAverages.killPct, true, vsAvgLabel) : null;
+                const serveTrend = seasonAverages ? formatTrendDelta(teamTotals.servePct, seasonAverages.servePct, true, vsAvgLabel) : null;
+                const passTrend = seasonAverages ? formatTrendDelta(teamTotals.passRating, seasonAverages.passRating, false, vsAvgLabel) : null;
+                return (
+                  <>
+                    <StatCard
+                      label={t('reports.playerReport.killPct')}
+                      value={`${Math.round(teamTotals.killPct * 1000) / 10}%`}
+                      accent="teal"
+                      delta={killTrend?.text}
+                      deltaType={killTrend?.type}
+                    />
+                    <StatCard
+                      label="Serve %"
+                      value={`${Math.round(teamTotals.servePct * 1000) / 10}%`}
+                      accent="primary"
+                      delta={serveTrend?.text}
+                      deltaType={serveTrend?.type}
+                    />
+                    <StatCard
+                      label={t('reports.playerReport.passRating')}
+                      value={Math.round(teamTotals.passRating * 100) / 100}
+                      accent="success"
+                      delta={passTrend?.text}
+                      deltaType={passTrend?.type}
+                    />
+                    <StatCard
+                      label={t('reports.playerReport.kills')}
+                      value={teamTotals.kills}
+                      accent="secondary"
+                    />
+                    <StatCard
+                      label={t('reports.playerReport.aces')}
+                      value={teamTotals.aces}
+                      accent="teal"
+                    />
+                    <StatCard
+                      label={t('reports.playerReport.digs')}
+                      value={teamTotals.digs}
+                      accent="success"
+                    />
+                  </>
+                );
+              })()}
             </div>
           </CardContent>
         </Card>
       )}
 
-      {/* Top Performers */}
-      {awards.length > 0 && (
+      {/* MVP Card */}
+      {mvpAward && mvpPlayerInfo && (
+        <div className="bg-navy-90 border border-white/[0.06] rounded-lg p-5 border-l-4 border-l-vq-teal">
+          <div className="flex items-center gap-4">
+            <PlayerAvatar
+              initials={getInitials(mvpPlayerInfo.name)}
+              imageUrl={mvpPlayerInfo.photo_url}
+              size="lg"
+            />
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-1">
+                <Trophy className="w-4 h-4 text-vq-teal" />
+                <span className="text-xs font-semibold uppercase tracking-wider text-vq-teal">
+                  {t('reports.postMatch.mvp')}
+                </span>
+              </div>
+              <p className="text-lg font-bold truncate">{mvpPlayerInfo.name}</p>
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                {mvpPlayerInfo.positions?.[0] && (
+                  <span className="capitalize">{mvpPlayerInfo.positions[0].replace(/_/g, ' ')}</span>
+                )}
+                {mvpPlayerInfo.jerseyNumber != null && (
+                  <span>#{mvpPlayerInfo.jerseyNumber}</span>
+                )}
+              </div>
+            </div>
+            {'award_value' in mvpAward && mvpAward.award_value != null && (
+              <div className="text-right">
+                <p className="font-mono text-3xl font-bold text-vq-teal">
+                  {typeof mvpAward.award_value === 'number'
+                    ? Math.round(mvpAward.award_value * 10) / 10
+                    : mvpAward.award_value}
+                </p>
+                <p className="text-xs text-muted-foreground">MVP Score</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Top Performers (non-MVP) */}
+      {nonMvpAwards.length > 0 && (
         <Card>
           <CardHeader>
             <CardTitle>{t('reports.postMatch.topPerformers')}</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {awards.slice(0, 4).map((award) => {
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {nonMvpAwards.map((award) => {
                 const info = playerMap.get(award.player_id);
                 return (
                   <div
@@ -411,24 +509,88 @@ export function PostMatchReport({ eventId, teamId, onBack }: PostMatchReportProp
         </>
       )}
 
-      {/* Key Takeaways */}
-      {keyTakeaways.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle>{t('reports.postMatch.keyTakeaways')}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ul className="space-y-2">
-              {keyTakeaways.map((takeaway, i) => (
-                <li key={i} className="flex items-start gap-2 text-sm">
-                  <span className="text-vq-teal mt-0.5">&#8226;</span>
-                  <span>{takeaway}</span>
-                </li>
-              ))}
-            </ul>
-          </CardContent>
-        </Card>
+      {/* Categorized Takeaways */}
+      {categorizedTakeaways.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* What Went Well */}
+          {positiveTakeaways.length > 0 && (
+            <div className="bg-navy-90 border border-white/[0.06] rounded-lg p-5 border-l-4 border-l-green-500">
+              <h4 className="text-xs font-semibold uppercase tracking-wider text-green-400 mb-3">
+                {t('reports.postMatch.whatWentWell')}
+              </h4>
+              <ul className="space-y-2">
+                {positiveTakeaways.map((tw, i) => (
+                  <li key={i} className="flex items-start gap-2 text-sm">
+                    <span className="text-green-400 mt-0.5">&#8226;</span>
+                    <span>{tw.text}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Areas to Address */}
+          {improvementTakeaways.length > 0 && (
+            <div className="bg-navy-90 border border-white/[0.06] rounded-lg p-5 border-l-4 border-l-yellow-500">
+              <h4 className="text-xs font-semibold uppercase tracking-wider text-yellow-400 mb-3">
+                {t('reports.postMatch.areasToAddress')}
+              </h4>
+              <ul className="space-y-2">
+                {improvementTakeaways.map((tw, i) => (
+                  <li key={i} className="flex items-start gap-2 text-sm">
+                    <span className="text-yellow-400 mt-0.5">&#8226;</span>
+                    <span>{tw.text}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Notable Milestones */}
+          {milestoneTakeaways.length > 0 && (
+            <div className="bg-navy-90 border border-white/[0.06] rounded-lg p-5 border-l-4 border-l-blue-500">
+              <h4 className="text-xs font-semibold uppercase tracking-wider text-blue-400 mb-3">
+                {t('reports.postMatch.notableMilestones')}
+              </h4>
+              <ul className="space-y-2">
+                {milestoneTakeaways.map((tw, i) => (
+                  <li key={i} className="flex items-start gap-2 text-sm">
+                    <span className="text-blue-400 mt-0.5">&#8226;</span>
+                    <span>{tw.text}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
       )}
+
+      {/* Footer Navigation */}
+      <div className="flex items-center justify-between pt-4 border-t border-white/[0.06]">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="gap-2"
+          disabled={!previousGameId}
+          onClick={() => previousGameId && onNavigateGame?.(previousGameId)}
+        >
+          <ArrowLeft className="w-4 h-4" />
+          {t('reports.postMatch.previousGame')}
+        </Button>
+
+        <ExportButton onExport={handleExport} />
+
+        <Button
+          variant="ghost"
+          size="sm"
+          className="gap-2"
+          disabled={!nextGameId}
+          onClick={() => nextGameId && onNavigateGame?.(nextGameId)}
+        >
+          {t('reports.postMatch.nextGame')}
+          <ArrowRight className="w-4 h-4" />
+        </Button>
+      </div>
     </div>
   );
 }
