@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/store';
 import { getClaimTokenDetails, claimPlayer } from '@/services/claim.service';
+import { performSync } from '@/services/sync.service';
 import type { ClaimTokenDetails } from '@/services/claim.service';
 import {
   Card,
@@ -28,7 +29,7 @@ export function ClaimPlayerPage() {
   const { token } = useParams<{ token: string }>();
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { user, isAuthenticated, isLoading: isAuthLoading, signInWithGoogle } = useAuth();
+  const { user, isAuthenticated, isLoading: isAuthLoading, signInWithGoogle, syncSession } = useAuth();
 
   const [pageState, setPageState] = useState<PageState>('loading');
   const [details, setDetails] = useState<ClaimTokenDetails | null>(null);
@@ -95,6 +96,17 @@ export function ClaimPlayerPage() {
 
     try {
       await claimPlayer(token);
+
+      // Refresh the auth store so the new role ('player') is picked up
+      await syncSession();
+
+      // Pull all team/player data into IndexedDB so the dashboard has data
+      if (user?.id) {
+        performSync(user.id).catch((err) =>
+          console.error('Post-claim sync error:', err)
+        );
+      }
+
       setPageState('success');
     } catch (err: any) {
       console.error('Claim error:', err);
