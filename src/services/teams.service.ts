@@ -287,14 +287,9 @@ export async function getTeamCoaches(teamId: string): Promise<CoachAssignment[]>
  * Get team by invite code
  */
 export async function getTeamByInviteCode(code: string): Promise<TeamWithSeason | null> {
-  const { data, error } = await supabase
-    .from('teams')
-    .select(`
-      *,
-      season:seasons(*)
-    `)
-    .eq('invite_code', code.toUpperCase())
-    .maybeSingle();
+  const { data, error } = await supabase.rpc('get_team_by_invite_code', {
+    p_invite_code: code,
+  });
 
   if (error) {
     console.error('Error fetching team by invite code:', error);
