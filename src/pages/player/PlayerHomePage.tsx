@@ -23,7 +23,7 @@ import type { PlayerRating } from '@/services/player-stats.service';
 export function PlayerHomePage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { player, teamIds, isLoading: playerLoading, hasActiveTeams, refreshPlayer } = usePlayerContext();
+  const { player, teamIds, isLoading: playerLoading, hasActiveTeams, hasPendingTeams, refreshPlayer } = usePlayerContext();
 
   const [events, setEvents] = useState<Event[]>([]);
   const [rsvps, setRsvps] = useState<Rsvp[]>([]);
@@ -127,8 +127,11 @@ export function PlayerHomePage() {
         <h1 className="text-2xl font-display font-bold uppercase tracking-wider">
           {t('auth.profile.welcome', { name: player?.name || '' })}
         </h1>
+        {player && hasPendingTeams && (
+          <PendingMemberships refreshKey={refreshKey} />
+        )}
         <JoinTeamCard onJoined={() => { setRefreshKey((k) => k + 1); refreshPlayer(); }} />
-        <PendingMemberships refreshKey={refreshKey} />
+        {!hasPendingTeams && <PendingMemberships refreshKey={refreshKey} />}
       </div>
     );
   }

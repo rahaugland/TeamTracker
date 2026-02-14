@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { usePlayerContext } from '@/hooks/usePlayerContext';
+import { PendingMemberships } from '@/components/player/PendingMemberships';
 import { usePlayerStats } from '@/hooks/usePlayerStats';
 import { FifaCardCompact } from '@/components/player-stats/FifaCardCompact';
 import { GameLogCards } from '@/components/player-stats/GameLogCards';
@@ -13,7 +14,7 @@ type PeriodFilter = 'season' | 'career';
 
 export function PlayerStatsTabPage() {
   const { t } = useTranslation();
-  const { player, teamIds, isLoading: playerLoading } = usePlayerContext();
+  const { player, teamIds, isLoading: playerLoading, hasActiveTeams, hasPendingTeams } = usePlayerContext();
   const [periodFilter, setPeriodFilter] = useState<PeriodFilter>('season');
 
   const position: VolleyballPosition = player?.positions?.[0] || 'all_around';
@@ -59,10 +60,16 @@ export function PlayerStatsTabPage() {
     );
   }
 
-  if (!player) {
+  if (!player || (!hasActiveTeams && hasPendingTeams)) {
     return (
-      <div className="text-center py-12 text-white/50">
-        <p>{t('dashboard.player.noPlayerProfile')}</p>
+      <div className="max-w-lg mx-auto space-y-6 py-6">
+        {player && hasPendingTeams ? (
+          <PendingMemberships />
+        ) : (
+          <div className="text-center py-12 text-white/50">
+            <p>{t('dashboard.player.noPlayerProfile')}</p>
+          </div>
+        )}
       </div>
     );
   }

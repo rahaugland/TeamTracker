@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/store';
 import { usePlayerContext } from '@/hooks/usePlayerContext';
+import { PendingMemberships } from '@/components/player/PendingMemberships';
 import { usePlayerFeedback } from '@/hooks/usePlayerFeedback';
 import { useSelfAssessments } from '@/hooks/useSelfAssessments';
 import { getPlayerGoals, createPlayerGoal, toggleGoalCompletion, deletePlayerGoal } from '@/services/player-goals.service';
@@ -19,7 +20,7 @@ import type { AttendanceStats } from '@/services/player-stats.service';
 export function PlayerGoalsPage() {
   const { t } = useTranslation();
   const { user } = useAuth();
-  const { player, teamIds, isLoading: playerLoading } = usePlayerContext();
+  const { player, teamIds, isLoading: playerLoading, hasActiveTeams, hasPendingTeams } = usePlayerContext();
   const { feedback } = usePlayerFeedback(player?.id);
   const { assessments, submitAssessment } = useSelfAssessments(player?.id);
 
@@ -69,10 +70,16 @@ export function PlayerGoalsPage() {
     );
   }
 
-  if (!player) {
+  if (!player || (!hasActiveTeams && hasPendingTeams)) {
     return (
-      <div className="text-center py-12 text-white/50">
-        <p>{t('dashboard.player.noPlayerProfile')}</p>
+      <div className="max-w-lg mx-auto space-y-6 py-6">
+        {player && hasPendingTeams ? (
+          <PendingMemberships />
+        ) : (
+          <div className="text-center py-12 text-white/50">
+            <p>{t('dashboard.player.noPlayerProfile')}</p>
+          </div>
+        )}
       </div>
     );
   }

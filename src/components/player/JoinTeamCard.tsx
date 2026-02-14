@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '@/store';
 import { getTeamByInviteCode, joinTeamByCode } from '@/services/teams.service';
+import { performSync } from '@/services/sync.service';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,7 +16,7 @@ interface JoinTeamCardProps {
 
 export function JoinTeamCard({ onJoined }: JoinTeamCardProps) {
   const { t } = useTranslation();
-  const { user } = useAuth();
+  const { user, syncSession } = useAuth();
 
   const [inviteCode, setInviteCode] = useState('');
   const [isValidating, setIsValidating] = useState(false);
@@ -51,6 +52,10 @@ export function JoinTeamCard({ onJoined }: JoinTeamCardProps) {
 
     try {
       await joinTeamByCode(inviteCode.trim(), user.name, user.email);
+
+      // Sync session and pull new data into IndexedDB
+      await syncSession();
+      await performSync(user.id);
 
       setSuccess(t('joinTeam.joinPending', { teamName: validatedTeam.name }));
       setValidatedTeam(null);
