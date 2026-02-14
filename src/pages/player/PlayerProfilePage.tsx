@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAuth, useUI } from '@/store';
 import { usePlayerContext } from '@/hooks/usePlayerContext';
 import { getUserById, updateUserProfile, type UserWithTeams } from '@/services/users.service';
-import { getAttendanceStats } from '@/services/player-stats.service';
+import { getAttendanceStats, getPlayerStats, aggregateStats } from '@/services/player-stats.service';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -11,7 +11,9 @@ import { Badge } from '@/components/ui/badge';
 import { User, Mail, Phone, Globe, LogOut } from 'lucide-react';
 import { JoinTeamCard } from '@/components/player/JoinTeamCard';
 import { PendingMemberships } from '@/components/player/PendingMemberships';
-import type { AttendanceStats } from '@/services/player-stats.service';
+import { PlayerAwardsShowcase } from '@/components/player/PlayerAwardsShowcase';
+import type { AttendanceStats, AggregatedStats } from '@/services/player-stats.service';
+import { POSITION_NAMES } from '@/types/database.types';
 
 export function PlayerProfilePage() {
   const { t } = useTranslation();
@@ -21,12 +23,35 @@ export function PlayerProfilePage() {
 
   const [profile, setProfile] = useState<UserWithTeams | null>(null);
   const [attendanceStats, setAttendanceStats] = useState<AttendanceStats | null>(null);
+  const [careerStats, setCareerStats] = useState<AggregatedStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [joinRefreshKey, setJoinRefreshKey] = useState(0);
 
   const [formData, setFormData] = useState({ full_name: '', phone: '', avatar_url: '' });
+
+  // Derive jersey number from the first active team membership
+  const jerseyNumber = useMemo(() => {
+    if (!player?.team_memberships) return undefined;
+    const activeMembership = player.team_memberships.find(
+      (tm) => tm.status === 'active' || !tm.status
+    );
+    return activeMembership?.jersey_number;
+  }, [player?.team_memberships]);
+
+  // Calculate age from birth_date
+  const playerAge = useMemo(() => {
+    if (!player?.birth_date) return undefined;
+    const birth = new Date(player.birth_date);
+    const today = new Date();
+    let age = today.getFullYear() - birth.getFullYear();
+    const monthDiff = today.getMonth() - birth.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+      age--;
+    }
+    return age;
+  }, [player?.birth_date]);
 
   useEffect(() => {
     if (currentUser?.id) loadProfile();
@@ -36,12 +61,14 @@ export function PlayerProfilePage() {
     if (!currentUser?.id) return;
     setIsLoading(true);
     try {
-      const [data, attStats] = await Promise.all([
+      const [data, attStats, statEntries] = await Promise.all([
         getUserById(currentUser.id),
         player?.id ? getAttendanceStats(player.id).catch(() => null) : null,
+        player?.id ? getPlayerStats(player.id, 'career').catch(() => []) : [],
       ]);
       setProfile(data);
       setAttendanceStats(attStats);
+      setCareerStats(statEntries.length > 0 ? aggregateStats(statEntries) : null);
       if (data) {
         setFormData({
           full_name: data.full_name || '',
@@ -92,32 +119,73 @@ export function PlayerProfilePage() {
   }
 
   return (
-    <div className="max-w-lg mx-auto space-y-6">
+    <div className="max-w-lg lg:max-w-6xl mx-auto space-y-6">
       {/* Avatar + Name */}
-      <div className="flex flex-col items-center text-center">
+      <div className="flex flex-col items-center text-center lg:flex-row lg:items-start lg:gap-6 lg:text-left">
         {profile?.avatar_url ? (
           <img
             src={profile.avatar_url}
             alt={profile.full_name}
-            className="w-20 h-20 rounded-full object-cover border-2 border-white/20"
+            className="w-20 h-20 rounded-full object-cover border-2 border-white/20 lg:w-32 lg:h-32 lg:rounded-xl"
           />
         ) : (
-          <div className="w-20 h-20 rounded-full bg-navy-80 border-2 border-white/20 flex items-center justify-center">
-            <span className="text-3xl font-bold text-white/50">
+          <div className="w-20 h-20 rounded-full bg-navy-80 border-2 border-white/20 flex items-center justify-center lg:w-32 lg:h-32 lg:rounded-xl">
+            <span className="text-3xl font-bold text-white/50 lg:text-5xl">
               {(profile?.full_name || currentUser?.name || '?').charAt(0).toUpperCase()}
             </span>
           </div>
         )}
-        <h2 className="text-xl font-display font-bold text-white mt-3">
-          {profile?.full_name || currentUser?.name}
-        </h2>
-        <Badge variant="outline" className="mt-1">
-          {t('users.roles.player')}
-        </Badge>
+        <div>
+          <h2 className="text-xl font-display font-bold text-white mt-3 lg:mt-0">
+            {profile?.full_name || currentUser?.name}
+          </h2>
+          <Badge variant="outline" className="mt-1">
+            {t('users.roles.player')}
+          </Badge>
+          {/* Player meta: position, jersey number, age */}
+          {(player?.positions?.length || jerseyNumber != null || playerAge != null) && (
+            <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2 mt-2">
+              {player?.positions?.map((pos) => (
+                <Badge key={pos} variant="secondary" className="text-xs">
+                  {POSITION_NAMES[pos] || pos}
+                </Badge>
+              ))}
+              {jerseyNumber != null && (
+                <Badge variant="secondary" className="text-xs">
+                  #{jerseyNumber}
+                </Badge>
+              )}
+              {playerAge != null && (
+                <Badge variant="secondary" className="text-xs">
+                  {playerAge} yrs
+                </Badge>
+              )}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Career Stats Grid */}
-      {attendanceStats && (
+      {careerStats && careerStats.gamesPlayed > 0 ? (
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          <ProfileStatCard
+            value={String(careerStats.gamesPlayed)}
+            label="Total Games"
+          />
+          <ProfileStatCard
+            value={String(careerStats.totalKills)}
+            label="Career Kills"
+          />
+          <ProfileStatCard
+            value={String(careerStats.totalAces)}
+            label="Career Aces"
+          />
+          <ProfileStatCard
+            value={String(careerStats.totalBlockSolos + careerStats.totalBlockAssists)}
+            label="Career Blocks"
+          />
+        </div>
+      ) : attendanceStats && (
         <div className="grid grid-cols-3 gap-3">
           <ProfileStatCard
             value={`${attendanceStats.attendanceRate}%`}
@@ -132,6 +200,11 @@ export function PlayerProfilePage() {
             label={t('player.stats.attendance.longestStreak')}
           />
         </div>
+      )}
+
+      {/* Awards Showcase */}
+      {player?.id && (
+        <PlayerAwardsShowcase playerId={player.id} />
       )}
 
       {/* Profile Info */}
@@ -246,8 +319,8 @@ export function PlayerProfilePage() {
 function ProfileStatCard({ value, label }: { value: string; label: string }) {
   return (
     <div className="bg-navy-90 border border-white/[0.04] rounded-xl p-3 text-center">
-      <div className="text-lg font-bold text-white">{value}</div>
-      <div className="text-[10px] font-display font-semibold uppercase tracking-wider text-white/50">
+      <div className="text-2xl font-bold text-white">{value}</div>
+      <div className="text-sm text-muted-foreground">
         {label}
       </div>
     </div>

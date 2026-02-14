@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { format, isToday, startOfMonth, endOfMonth, addMonths, subMonths } from 'date-fns';
@@ -10,6 +10,53 @@ import { ScheduleItem } from '@/components/schedule/ScheduleItem';
 import { QuickRSVPButtons } from '@/components/player/QuickRSVPButtons';
 import { cn } from '@/lib/utils';
 import type { Event, Rsvp } from '@/types/database.types';
+
+function RsvpSummaryCards({
+  filteredEvents,
+  rsvpMap,
+}: {
+  filteredEvents: Event[];
+  rsvpMap: Record<string, string>;
+}) {
+  const { total, confirmed, pending, declined } = useMemo(() => {
+    let confirmed = 0;
+    let declined = 0;
+    let pending = 0;
+    for (const event of filteredEvents) {
+      const status = rsvpMap[event.id];
+      if (status === 'attending') {
+        confirmed++;
+      } else if (status === 'not_attending') {
+        declined++;
+      } else {
+        pending++;
+      }
+    }
+    return { total: filteredEvents.length, confirmed, pending, declined };
+  }, [filteredEvents, rsvpMap]);
+
+  const cards = [
+    { label: 'Events This Month', count: total, color: 'bg-blue-500' },
+    { label: 'Confirmed', count: confirmed, color: 'bg-green-500' },
+    { label: 'Pending RSVP', count: pending, color: 'bg-amber-500' },
+    { label: "Can't Attend", count: declined, color: 'bg-red-500' },
+  ] as const;
+
+  return (
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      {cards.map((card) => (
+        <div
+          key={card.label}
+          className="rounded-lg border border-white/[0.06] bg-navy-90 p-3"
+        >
+          <div className={cn('h-1 w-8 rounded-full mb-2', card.color)} />
+          <div className="text-2xl font-bold text-white">{card.count}</div>
+          <div className="text-xs text-white/60 mt-0.5">{card.label}</div>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 export function PlayerSchedulePage() {
   const { t } = useTranslation();
@@ -83,7 +130,7 @@ export function PlayerSchedulePage() {
   const todayStr = format(now, 'yyyy-MM-dd');
 
   return (
-    <div className="max-w-lg mx-auto space-y-4">
+    <div className="max-w-lg lg:max-w-6xl mx-auto space-y-4">
       {/* Month selector */}
       <div className="flex items-center justify-between">
         <button
@@ -121,6 +168,9 @@ export function PlayerSchedulePage() {
         ))}
       </div>
 
+      {/* RSVP Summary Cards */}
+      <RsvpSummaryCards filteredEvents={filteredEvents} rsvpMap={rsvpMap} />
+
       {/* Events list */}
       {filteredEvents.length === 0 ? (
         <div className="text-center py-12 text-white/50">
@@ -131,7 +181,8 @@ export function PlayerSchedulePage() {
           {filteredEvents.map((event) => {
             const dt = new Date(event.start_time);
             const today = isToday(dt);
-            const isMatch = event.type === 'game' || event.type === 'tournament';
+            const isTournament = event.type === 'tournament';
+            const isMatch = event.type === 'game';
             const eventDateStr = format(dt, 'yyyy-MM-dd');
             const isThisWeekMarker = eventDateStr === todayStr;
 
@@ -142,7 +193,7 @@ export function PlayerSchedulePage() {
                   month={format(dt, 'MMM')}
                   title={event.title}
                   meta={`${format(dt, 'HH:mm')}${event.location ? ` · ${event.location}` : ''}`}
-                  type={isMatch ? 'match' : 'practice'}
+                  type={isTournament ? 'tournament' : isMatch ? 'match' : 'practice'}
                   isToday={today}
                   onClick={() => navigate(`/events/${event.id}`)}
                   actions={

@@ -12,6 +12,7 @@ import { StreaksMilestones } from '@/components/player/StreaksMilestones';
 import { GoalTracker } from '@/components/player-stats/GoalTracker';
 import { FeedbackSpotlight } from '@/components/player/FeedbackSpotlight';
 import { SelfAssessmentForm } from '@/components/player/SelfAssessmentForm';
+import { ProgressJourney } from '@/components/player/ProgressJourney';
 import type { PlayerGoal, Event } from '@/types/database.types';
 import type { AttendanceStats } from '@/services/player-stats.service';
 
@@ -77,7 +78,7 @@ export function PlayerGoalsPage() {
   }
 
   return (
-    <div className="max-w-lg mx-auto space-y-6">
+    <div className="max-w-lg lg:max-w-6xl mx-auto space-y-6">
       <StreaksMilestones
         goals={goals}
         feedback={feedback}
@@ -85,29 +86,38 @@ export function PlayerGoalsPage() {
         attendanceStats={attendanceStats}
       />
 
-      <GoalTracker
-        goals={goals}
-        onCreateGoal={async (data: PlayerGoalFormData) => {
-          await createPlayerGoal({ ...data, player_id: player.id, team_id: teamIds[0], created_by: user?.id || '' });
-          await loadGoalsData();
-        }}
-        onToggleComplete={async (goalId: string, isCompleted: boolean) => {
-          await toggleGoalCompletion(goalId, isCompleted);
-          await loadGoalsData();
-        }}
-        onDeleteGoal={async (goalId: string) => {
-          await deletePlayerGoal(goalId);
-          await loadGoalsData();
-        }}
-      />
+      <div className="lg:grid lg:grid-cols-2 lg:gap-6">
+        <GoalTracker
+          goals={goals}
+          onCreateGoal={async (data: PlayerGoalFormData) => {
+            await createPlayerGoal({ ...data, player_id: player.id, team_id: teamIds[0], created_by: user?.id || '' });
+            await loadGoalsData();
+          }}
+          onToggleComplete={async (goalId: string, isCompleted: boolean) => {
+            await toggleGoalCompletion(goalId, isCompleted);
+            await loadGoalsData();
+          }}
+          onDeleteGoal={async (goalId: string) => {
+            await deletePlayerGoal(goalId);
+            await loadGoalsData();
+          }}
+        />
 
-      <FeedbackSpotlight feedback={feedback} />
+        <FeedbackSpotlight feedback={feedback} />
+      </div>
 
       <SelfAssessmentForm
         events={recentEvents}
         playerId={player.id}
         existingAssessments={assessments}
         onSubmit={submitAssessment}
+      />
+
+      <ProgressJourney
+        goals={goals}
+        feedback={feedback}
+        assessments={assessments}
+        playerId={player.id}
       />
     </div>
   );

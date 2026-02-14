@@ -137,41 +137,49 @@ export function PlayerHomePage() {
   const activeGoals = goals.filter((g) => !g.completed_at).length;
 
   return (
-    <div className="max-w-lg mx-auto space-y-5">
-      {/* FIFA Card Compact */}
-      {rating && (
-        <FifaCardCompact
-          overallRating={rating.overall}
-          subRatings={rating.subRatings}
-          position={player.positions?.[0] || 'all_around'}
-          playerName={player.name}
-          photoUrl={player.photo_url || undefined}
-          isProvisional={rating.isProvisional}
-        />
-      )}
+    <div className="max-w-lg lg:max-w-6xl mx-auto space-y-5">
+      {/* Hero Grid: FIFA Card left, event info right on desktop */}
+      <div className="lg:grid lg:grid-cols-[300px_1fr] lg:gap-8">
+        {/* Left column: FIFA Card */}
+        <div>
+          {rating && (
+            <FifaCardCompact
+              overallRating={rating.overall}
+              subRatings={rating.subRatings}
+              position={player.positions?.[0] || 'all_around'}
+              playerName={player.name}
+              photoUrl={player.photo_url || undefined}
+              isProvisional={rating.isProvisional}
+            />
+          )}
+        </div>
 
-      {/* Pinned Announcements */}
-      {pinnedAnnouncements.length > 0 && (
-        <AnnouncementsFeed announcements={pinnedAnnouncements} showPinnedOnly />
-      )}
+        {/* Right column: Pinned Announcements, Next Event, Quick Stats */}
+        <div className="space-y-5">
+          {/* Pinned Announcements */}
+          {pinnedAnnouncements.length > 0 && (
+            <AnnouncementsFeed announcements={pinnedAnnouncements} showPinnedOnly />
+          )}
 
-      {/* Next Event Hero */}
-      {nextEvent && (
-        <NextEventHero
-          event={nextEvent}
-          playerId={player.id}
-          currentRsvpStatus={rsvpMap[nextEvent.id]}
-          onRsvpChange={loadHomeData}
-        />
-      )}
+          {/* Next Event Hero */}
+          {nextEvent && (
+            <NextEventHero
+              event={nextEvent}
+              playerId={player.id}
+              currentRsvpStatus={rsvpMap[nextEvent.id]}
+              onRsvpChange={loadHomeData}
+            />
+          )}
 
-      {/* Quick Stats Grid */}
-      <QuickStatsGrid
-        streak={streak}
-        attendanceRate={attendanceRate}
-        activeGoals={activeGoals}
-        gamesPlayed={gamesPlayed}
-      />
+          {/* Quick Stats Grid */}
+          <QuickStatsGrid
+            streak={streak}
+            attendanceRate={attendanceRate}
+            activeGoals={activeGoals}
+            gamesPlayed={gamesPlayed}
+          />
+        </div>
+      </div>
 
       {/* Schedule Preview */}
       {events.length > 1 && (
@@ -182,7 +190,7 @@ export function PlayerHomePage() {
           <div className="space-y-2">
             {events.slice(1, 5).map((event) => {
               const dt = new Date(event.start_time);
-              const isMatch = event.type === 'game' || event.type === 'tournament';
+              const scheduleType = event.type === 'tournament' ? 'tournament' : event.type === 'game' ? 'match' : 'practice';
               return (
                 <ScheduleItem
                   key={event.id}
@@ -190,7 +198,7 @@ export function PlayerHomePage() {
                   month={format(dt, 'MMM')}
                   title={event.title}
                   meta={`${format(dt, 'HH:mm')}${event.location ? ` · ${event.location}` : ''}`}
-                  type={isMatch ? 'match' : 'practice'}
+                  type={scheduleType}
                   onClick={() => navigate(`/events/${event.id}`)}
                   actions={
                     <QuickRSVPButtons
