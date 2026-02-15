@@ -112,11 +112,16 @@ export const createAuthSlice: StateCreator<AuthSlice> = (set, get) => ({
     }
 
     try {
-      // Update profile in Supabase
+      // Upsert profile in Supabase (creates profile if missing due to OAuth trigger failure)
       const { error } = await supabase
         .from('profiles')
-        .update({ role })
-        .eq('id', currentUser.id);
+        .upsert({
+          id: currentUser.id,
+          email: currentUser.email,
+          full_name: currentUser.name,
+          avatar_url: currentUser.avatarUrl,
+          role,
+        }, { onConflict: 'id' });
 
       if (error) throw error;
 
