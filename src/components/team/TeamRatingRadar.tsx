@@ -26,12 +26,12 @@ export function TeamRatingRadar({ teamRating, isLoading = false }: TeamRatingRad
           value: teamRating.subRatings.serve,
         },
         {
-          category: t('team.dashboard.reception'),
-          value: teamRating.subRatings.reception,
+          category: 'Receive',
+          value: teamRating.subRatings.receive,
         },
         {
-          category: t('team.dashboard.consistency'),
-          value: teamRating.subRatings.consistency,
+          category: 'Mental',
+          value: teamRating.subRatings.mental,
         },
       ]
     : [];
@@ -108,15 +108,15 @@ export function TeamRatingRadar({ teamRating, isLoading = false }: TeamRatingRad
           </div>
           <div className="text-center">
             <div className="text-sm text-muted-foreground">
-              {t('team.dashboard.reception')}
+              Receive
             </div>
-            <div className="text-2xl font-bold">{teamRating.subRatings.reception}</div>
+            <div className="text-2xl font-bold">{teamRating.subRatings.receive}</div>
           </div>
           <div className="text-center">
             <div className="text-sm text-muted-foreground">
-              {t('team.dashboard.consistency')}
+              Mental
             </div>
-            <div className="text-2xl font-bold">{teamRating.subRatings.consistency}</div>
+            <div className="text-2xl font-bold">{teamRating.subRatings.mental}</div>
           </div>
         </div>
       </CardContent>

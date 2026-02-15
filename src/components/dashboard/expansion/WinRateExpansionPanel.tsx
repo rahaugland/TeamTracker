@@ -74,8 +74,8 @@ export function WinRateExpansionPanel({ teamId }: WinRateExpansionPanelProps) {
   const radarData = teamRating ? [
     { stat: 'Attack', value: teamRating.subRatings.attack },
     { stat: 'Serve', value: teamRating.subRatings.serve },
-    { stat: 'Reception', value: teamRating.subRatings.reception },
-    { stat: 'Consistency', value: teamRating.subRatings.consistency },
+    { stat: 'Receive', value: teamRating.subRatings.receive },
+    { stat: 'Mental', value: teamRating.subRatings.mental },
   ] : [];
 
   const last3Games = gameStats.slice(0, 3);

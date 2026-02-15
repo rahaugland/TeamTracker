@@ -39,12 +39,16 @@ export function FifaCard({
   const positionAbbr = getPositionAbbr(position);
   const positionName = getPositionName(position);
 
-  // Prepare data for radar chart (4 axes)
+  // Prepare data for radar chart (8 axes)
   const radarData = [
-    { stat: 'ATK', value: subRatings.attack },
     { stat: 'SRV', value: subRatings.serve },
-    { stat: 'REC', value: subRatings.reception },
-    { stat: 'CON', value: subRatings.consistency },
+    { stat: 'RCV', value: subRatings.receive },
+    { stat: 'SET', value: subRatings.set },
+    { stat: 'BLK', value: subRatings.block },
+    { stat: 'ATK', value: subRatings.attack },
+    { stat: 'DIG', value: subRatings.dig },
+    { stat: 'MNT', value: subRatings.mental },
+    { stat: 'PHY', value: subRatings.physique },
   ];
 
   return (
@@ -115,11 +119,15 @@ export function FifaCard({
         </div>
 
         {/* Sub-stats grid */}
-        <div className="grid grid-cols-2 gap-3 mb-4">
-          <StatBadge label="ATK" value={subRatings.attack} />
+        <div className="grid grid-cols-4 gap-2 mb-4">
           <StatBadge label="SRV" value={subRatings.serve} />
-          <StatBadge label="REC" value={subRatings.reception} />
-          <StatBadge label="CON" value={subRatings.consistency} />
+          <StatBadge label="RCV" value={subRatings.receive} />
+          <StatBadge label="SET" value={subRatings.set} />
+          <StatBadge label="BLK" value={subRatings.block} />
+          <StatBadge label="ATK" value={subRatings.attack} />
+          <StatBadge label="DIG" value={subRatings.dig} />
+          <StatBadge label="MNT" value={subRatings.mental} />
+          <StatBadge label="PHY" value={subRatings.physique} />
         </div>
 
         {/* Radar chart */}

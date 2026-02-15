@@ -78,7 +78,7 @@ export async function getTeamRating(teamId: string): Promise<TeamRating> {
     if (!memberships || memberships.length === 0) {
       return {
         overall: 1,
-        subRatings: { attack: 1, serve: 1, reception: 1, consistency: 1 },
+        subRatings: { serve: 1, receive: 1, set: 1, block: 1, attack: 1, dig: 1, mental: 1, physique: 1 },
         playerCount: 0,
         isProvisional: true,
       };
@@ -104,7 +104,7 @@ export async function getTeamRating(teamId: string): Promise<TeamRating> {
     if (validRatings.length === 0) {
       return {
         overall: 1,
-        subRatings: { attack: 1, serve: 1, reception: 1, consistency: 1 },
+        subRatings: { serve: 1, receive: 1, set: 1, block: 1, attack: 1, dig: 1, mental: 1, physique: 1 },
         playerCount: memberships.length,
         isProvisional: true,
       };
@@ -114,26 +114,20 @@ export async function getTeamRating(teamId: string): Promise<TeamRating> {
     const avgOverall =
       validRatings.reduce((sum, r) => sum + r!.overall, 0) / validRatings.length;
 
-    const avgSubRatings: SubRatings = {
-      attack:
-        validRatings.reduce((sum, r) => sum + r!.subRatings.attack, 0) / validRatings.length,
-      serve:
-        validRatings.reduce((sum, r) => sum + r!.subRatings.serve, 0) / validRatings.length,
-      reception:
-        validRatings.reduce((sum, r) => sum + r!.subRatings.reception, 0) / validRatings.length,
-      consistency:
-        validRatings.reduce((sum, r) => sum + r!.subRatings.consistency, 0) /
-        validRatings.length,
-    };
+    const skillKeys = ['serve', 'receive', 'set', 'block', 'attack', 'dig', 'mental', 'physique'] as const;
+    const avgSubRatings = {} as SubRatings;
+    for (const key of skillKeys) {
+      avgSubRatings[key] = validRatings.reduce((sum, r) => sum + r!.subRatings[key], 0) / validRatings.length;
+    }
+
+    const roundedSubRatings = {} as SubRatings;
+    for (const key of skillKeys) {
+      roundedSubRatings[key] = Math.round(avgSubRatings[key]);
+    }
 
     return {
       overall: Math.round(avgOverall),
-      subRatings: {
-        attack: Math.round(avgSubRatings.attack),
-        serve: Math.round(avgSubRatings.serve),
-        reception: Math.round(avgSubRatings.reception),
-        consistency: Math.round(avgSubRatings.consistency),
-      },
+      subRatings: roundedSubRatings,
       playerCount: validRatings.length,
       isProvisional: validRatings.length < 3,
     };

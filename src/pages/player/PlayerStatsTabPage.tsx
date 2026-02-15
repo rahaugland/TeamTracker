@@ -4,13 +4,38 @@ import { usePlayerContext } from '@/hooks/usePlayerContext';
 import { PendingMemberships } from '@/components/player/PendingMemberships';
 import { usePlayerStats } from '@/hooks/usePlayerStats';
 import { FifaCardCompact } from '@/components/player-stats/FifaCardCompact';
+import { SkillBarEnhanced } from '@/components/player-stats/SkillBarEnhanced';
 import { GameLogCards } from '@/components/player-stats/GameLogCards';
 import { GameLogTable } from '@/components/player-stats/GameLogTable';
 import { BarChart3 } from 'lucide-react';
 import type { VolleyballPosition } from '@/types/database.types';
 import type { TimePeriod } from '@/services/player-stats.service';
 
-type PeriodFilter = 'season' | 'career';
+type PeriodFilter = 'last30' | 'season' | 'career';
+
+/** Skill display configuration with gradient color keys */
+const SKILL_CONFIG = [
+  { key: 'serve',    label: 'Serve',    color: 'red' },
+  { key: 'receive',  label: 'Receive',  color: 'teal' },
+  { key: 'set',      label: 'Set',      color: 'gold' },
+  { key: 'block',    label: 'Block',    color: 'purple' },
+  { key: 'attack',   label: 'Attack',   color: 'red' },
+  { key: 'dig',      label: 'Dig',      color: 'teal' },
+  { key: 'mental',   label: 'Mental',   color: 'pink' },
+  { key: 'physique', label: 'Physique', color: 'gold' },
+] as const;
+
+/** Stat card color classes keyed by stat name */
+const STAT_COLORS: Record<string, string> = {
+  games: 'text-teal-400',
+  kills: 'text-amber-400',
+  killPct: 'text-emerald-400',
+  aces: 'text-red-400',
+  passRating: 'text-teal-400',
+  blocks: 'text-amber-400',
+  digs: 'text-emerald-400',
+  attendance: 'text-red-400',
+};
 
 export function PlayerStatsTabPage() {
   const { t } = useTranslation();
@@ -76,30 +101,29 @@ export function PlayerStatsTabPage() {
 
   return (
     <div className="max-w-lg lg:max-w-6xl mx-auto space-y-5">
-      {/* Period Filter */}
+      {/* Period Filter - 3 buttons */}
       <div className="flex gap-2">
-        <button
-          type="button"
-          onClick={() => setPeriodFilter('season')}
-          className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
-            periodFilter === 'season'
-              ? 'bg-primary text-primary-foreground'
-              : 'bg-muted text-muted-foreground'
-          }`}
-        >
-          Season
-        </button>
-        <button
-          type="button"
-          onClick={() => setPeriodFilter('career')}
-          className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${
-            periodFilter === 'career'
-              ? 'bg-primary text-primary-foreground'
-              : 'bg-muted text-muted-foreground'
-          }`}
-        >
-          Career
-        </button>
+        {(['last30', 'season', 'career'] as const).map((period) => {
+          const labels: Record<PeriodFilter, string> = {
+            last30: t('dashboard.filters.last30Days'),
+            season: t('playerExperience.stats.periods.season'),
+            career: t('playerExperience.stats.periods.career'),
+          };
+          return (
+            <button
+              key={period}
+              type="button"
+              onClick={() => setPeriodFilter(period)}
+              className={`px-4 py-1.5 rounded-lg text-xs font-display font-semibold uppercase tracking-wider transition-colors ${
+                periodFilter === period
+                  ? 'bg-primary text-primary-foreground'
+                  : 'bg-muted text-muted-foreground'
+              }`}
+            >
+              {labels[period]}
+            </button>
+          );
+        })}
       </div>
 
       {/* Two-column grid on desktop: FIFA Card + Skills | Rating Progression placeholder */}
@@ -118,17 +142,21 @@ export function PlayerStatsTabPage() {
             />
           )}
 
-          {/* Skill Bars */}
+          {/* Skill Ratings Card */}
           {rating && (
-            <div className="space-y-3">
-              <h3 className="text-sm font-display font-bold uppercase tracking-wider text-white/50">
-                {t('player.stats.subRatings')}
+            <div className="bg-navy-90 border border-white/[0.06] rounded-xl p-4">
+              <h3 className="text-sm font-display font-bold uppercase tracking-wider text-white mb-4">
+                {t('playerExperience.skills.title')}
               </h3>
-              <div className="space-y-2">
-                <SkillBar label={t('player.stats.attack')} value={rating.subRatings.attack} />
-                <SkillBar label={t('player.stats.serve')} value={rating.subRatings.serve} />
-                <SkillBar label={t('player.stats.reception')} value={rating.subRatings.reception} />
-                <SkillBar label={t('player.stats.consistency')} value={rating.subRatings.consistency} />
+              <div className="space-y-2.5">
+                {SKILL_CONFIG.map(({ key, label, color }) => (
+                  <SkillBarEnhanced
+                    key={key}
+                    label={label}
+                    value={rating.subRatings[key]}
+                    color={color}
+                  />
+                ))}
               </div>
             </div>
           )}
@@ -157,29 +185,32 @@ export function PlayerStatsTabPage() {
         </div>
       )}
 
-      {/* Season Statistics */}
+      {/* Season Statistics with color-coded values */}
       {seasonStats && (
         <div>
           <h3 className="text-sm font-display font-bold uppercase tracking-wider text-white/50 mb-3">
-            {periodFilter === 'season' ? 'Season' : 'Career'} Statistics
+            {t('playerExperience.stats.seasonStatistics')}
           </h3>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-            <SeasonStatCard value={String(seasonStats.gamesPlayed)} label="Games Played" />
-            <SeasonStatCard value={String(seasonStats.totalKills)} label="Total Kills" />
+            <SeasonStatCard value={String(seasonStats.gamesPlayed)} label={t('player.stats.gamesPlayed')} colorClass={STAT_COLORS.games} />
+            <SeasonStatCard value={String(seasonStats.totalKills)} label={t('playerExperience.stats.totalKills')} colorClass={STAT_COLORS.kills} />
             <SeasonStatCard
               value={`${(seasonStats.killPercentage * 100).toFixed(1)}%`}
-              label="Kill %"
+              label={t('playerExperience.stats.killPct')}
+              colorClass={STAT_COLORS.killPct}
             />
-            <SeasonStatCard value={String(seasonStats.totalAces)} label="Aces" />
+            <SeasonStatCard value={String(seasonStats.totalAces)} label={t('playerExperience.stats.aces')} colorClass={STAT_COLORS.aces} />
             <SeasonStatCard
               value={seasonStats.passRating > 0 ? seasonStats.passRating.toFixed(2) : '-'}
-              label="Pass Rating"
+              label={t('playerExperience.stats.passRating')}
+              colorClass={STAT_COLORS.passRating}
             />
-            <SeasonStatCard value={seasonStats.totalBlocks.toFixed(1)} label="Total Blocks" />
-            <SeasonStatCard value={String(seasonStats.totalDigs)} label="Digs" />
+            <SeasonStatCard value={seasonStats.totalBlocks.toFixed(1)} label={t('playerExperience.stats.totalBlocks')} colorClass={STAT_COLORS.blocks} />
+            <SeasonStatCard value={String(seasonStats.totalDigs)} label={t('playerExperience.stats.digs')} colorClass={STAT_COLORS.digs} />
             <SeasonStatCard
               value={seasonStats.attendanceRate != null ? `${seasonStats.attendanceRate}%` : '-'}
-              label="Attendance %"
+              label={t('playerExperience.stats.attendancePct')}
+              colorClass={STAT_COLORS.attendance}
             />
           </div>
         </div>
@@ -210,7 +241,7 @@ export function PlayerStatsTabPage() {
           </h3>
           <div className="grid grid-cols-3 gap-3">
             <StatCard
-              value={`${attendanceStats.attendanceRate}%`}
+              value={`${Math.round(attendanceStats.attendanceRate * 100)}%`}
               label={t('player.stats.attendance.attendanceRate')}
             />
             <StatCard
@@ -235,21 +266,6 @@ export function PlayerStatsTabPage() {
   );
 }
 
-function SkillBar({ label, value }: { label: string; value: number }) {
-  return (
-    <div className="flex items-center gap-3">
-      <span className="text-xs text-white/60 w-16 font-medium">{label}</span>
-      <div className="flex-1 h-2 bg-white/[0.06] rounded-full overflow-hidden">
-        <div
-          className="h-full bg-club-primary rounded-full transition-all"
-          style={{ width: `${value}%` }}
-        />
-      </div>
-      <span className="text-xs font-bold text-white w-8 text-right">{value}</span>
-    </div>
-  );
-}
-
 function StatCard({ value, label }: { value: string; label: string }) {
   return (
     <div className="bg-navy-90 border border-white/[0.04] rounded-xl p-3 text-center">
@@ -261,10 +277,10 @@ function StatCard({ value, label }: { value: string; label: string }) {
   );
 }
 
-function SeasonStatCard({ value, label }: { value: string; label: string }) {
+function SeasonStatCard({ value, label, colorClass }: { value: string; label: string; colorClass?: string }) {
   return (
     <div className="bg-navy-90 border border-white/[0.04] rounded-xl p-4 text-center">
-      <div className="text-2xl font-bold text-white">{value}</div>
+      <div className={`text-2xl font-mono font-bold ${colorClass || 'text-white'}`}>{value}</div>
       <div className="text-sm text-muted-foreground mt-1">{label}</div>
     </div>
   );

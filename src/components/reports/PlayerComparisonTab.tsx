@@ -87,10 +87,14 @@ export function PlayerComparisonTab({ teamId, dateRange }: PlayerComparisonTabPr
 
   const radarData = bothSelected
     ? [
-        { category: t('team.dashboard.attack'), player1: p1.rating!.subRatings.attack, player2: p2.rating!.subRatings.attack },
-        { category: t('team.dashboard.serve'), player1: p1.rating!.subRatings.serve, player2: p2.rating!.subRatings.serve },
-        { category: t('team.dashboard.reception'), player1: p1.rating!.subRatings.reception, player2: p2.rating!.subRatings.reception },
-        { category: t('team.dashboard.consistency'), player1: p1.rating!.subRatings.consistency, player2: p2.rating!.subRatings.consistency },
+        { category: t('playerExperience.skills.attack'), player1: p1.rating!.subRatings.attack, player2: p2.rating!.subRatings.attack },
+        { category: t('playerExperience.skills.serve'), player1: p1.rating!.subRatings.serve, player2: p2.rating!.subRatings.serve },
+        { category: t('playerExperience.skills.receive'), player1: p1.rating!.subRatings.receive, player2: p2.rating!.subRatings.receive },
+        { category: t('playerExperience.skills.set'), player1: p1.rating!.subRatings.set, player2: p2.rating!.subRatings.set },
+        { category: t('playerExperience.skills.block'), player1: p1.rating!.subRatings.block, player2: p2.rating!.subRatings.block },
+        { category: t('playerExperience.skills.dig'), player1: p1.rating!.subRatings.dig, player2: p2.rating!.subRatings.dig },
+        { category: t('playerExperience.skills.mental'), player1: p1.rating!.subRatings.mental, player2: p2.rating!.subRatings.mental },
+        { category: t('playerExperience.skills.physique'), player1: p1.rating!.subRatings.physique, player2: p2.rating!.subRatings.physique },
       ]
     : [];
 

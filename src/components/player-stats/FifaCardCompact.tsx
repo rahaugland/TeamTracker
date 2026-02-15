@@ -69,11 +69,15 @@ export function FifaCardCompact({
         </div>
 
         {/* Mini stat badges */}
-        <div className="grid grid-cols-2 gap-1.5 flex-shrink-0">
-          <MiniStatBadge label="ATK" value={subRatings.attack} />
+        <div className="grid grid-cols-2 gap-1 flex-shrink-0">
           <MiniStatBadge label="SRV" value={subRatings.serve} />
-          <MiniStatBadge label="REC" value={subRatings.reception} />
-          <MiniStatBadge label="CON" value={subRatings.consistency} />
+          <MiniStatBadge label="RCV" value={subRatings.receive} />
+          <MiniStatBadge label="SET" value={subRatings.set} />
+          <MiniStatBadge label="BLK" value={subRatings.block} />
+          <MiniStatBadge label="ATK" value={subRatings.attack} />
+          <MiniStatBadge label="DIG" value={subRatings.dig} />
+          <MiniStatBadge label="MNT" value={subRatings.mental} />
+          <MiniStatBadge label="PHY" value={subRatings.physique} />
         </div>
       </div>
     </div>

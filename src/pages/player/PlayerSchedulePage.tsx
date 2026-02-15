@@ -2,13 +2,14 @@ import { useState, useEffect, useRef, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { format, isToday, startOfMonth, endOfMonth, addMonths, subMonths } from 'date-fns';
-import { ChevronLeft, ChevronRight, ChevronsDown } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ChevronsDown, CalendarDays, List } from 'lucide-react';
 import { usePlayerContext } from '@/hooks/usePlayerContext';
 import { PendingMemberships } from '@/components/player/PendingMemberships';
 import { getUpcomingEvents } from '@/services/events.service';
 import { getPlayerRSVPs } from '@/services/rsvp.service';
 import { ScheduleItem } from '@/components/schedule/ScheduleItem';
 import { QuickRSVPButtons } from '@/components/player/QuickRSVPButtons';
+import { CalendarView } from '@/components/calendar/CalendarView';
 import { cn } from '@/lib/utils';
 import type { Event, Rsvp } from '@/types/database.types';
 
@@ -19,6 +20,7 @@ function RsvpSummaryCards({
   filteredEvents: Event[];
   rsvpMap: Record<string, string>;
 }) {
+  const { t } = useTranslation();
   const { total, confirmed, pending, declined } = useMemo(() => {
     let confirmed = 0;
     let declined = 0;
@@ -37,10 +39,10 @@ function RsvpSummaryCards({
   }, [filteredEvents, rsvpMap]);
 
   const cards = [
-    { label: 'Events This Month', count: total, color: 'bg-blue-500' },
-    { label: 'Confirmed', count: confirmed, color: 'bg-green-500' },
-    { label: 'Pending RSVP', count: pending, color: 'bg-amber-500' },
-    { label: "Can't Attend", count: declined, color: 'bg-red-500' },
+    { label: t('playerExperience.schedule.eventsThisMonth'), count: total, valueColor: 'text-vq-teal', barColor: 'bg-vq-teal' },
+    { label: t('playerExperience.schedule.confirmed'), count: confirmed, valueColor: 'text-emerald-400', barColor: 'bg-emerald-500' },
+    { label: t('playerExperience.schedule.pendingRsvp'), count: pending, valueColor: 'text-amber-400', barColor: 'bg-amber-500' },
+    { label: t('playerExperience.schedule.cantAttend'), count: declined, valueColor: 'text-red-400', barColor: 'bg-red-500' },
   ] as const;
 
   return (
@@ -50,9 +52,9 @@ function RsvpSummaryCards({
           key={card.label}
           className="rounded-lg border border-white/[0.06] bg-navy-90 p-3"
         >
-          <div className={cn('h-1 w-8 rounded-full mb-2', card.color)} />
-          <div className="text-2xl font-bold text-white">{card.count}</div>
-          <div className="text-xs text-white/60 mt-0.5">{card.label}</div>
+          <div className={cn('h-1 w-8 rounded-full mb-2', card.barColor)} />
+          <div className={cn('text-2xl font-mono font-bold', card.valueColor)}>{card.count}</div>
+          <div className="text-xs font-display text-white/60 mt-0.5">{card.label}</div>
         </div>
       ))}
     </div>
@@ -68,6 +70,7 @@ export function PlayerSchedulePage() {
   const [rsvps, setRsvps] = useState<Rsvp[]>([]);
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [filterType, setFilterType] = useState<'all' | 'game' | 'practice'>('all');
+  const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
   const [isLoading, setIsLoading] = useState(true);
   const thisWeekRef = useRef<HTMLDivElement>(null);
 
@@ -159,8 +162,8 @@ export function PlayerSchedulePage() {
         </button>
       </div>
 
-      {/* Filter tabs */}
-      <div className="flex gap-2">
+      {/* Filter tabs + Calendar toggle */}
+      <div className="flex items-center gap-2">
         {(['all', 'game', 'practice'] as const).map((type) => (
           <button
             key={type}
@@ -175,54 +178,83 @@ export function PlayerSchedulePage() {
             {type === 'all' ? t('common.labels.all') : t(`event.types.${type}`)}
           </button>
         ))}
+
+        <button
+          onClick={() => setViewMode(viewMode === 'list' ? 'calendar' : 'list')}
+          className="ml-auto flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-display font-bold uppercase tracking-wide bg-white/[0.06] text-white/50 hover:text-white/70 transition-all"
+        >
+          {viewMode === 'list' ? (
+            <>
+              <CalendarDays className="w-3.5 h-3.5" />
+              {t('calendar.calendarView')}
+            </>
+          ) : (
+            <>
+              <List className="w-3.5 h-3.5" />
+              {t('calendar.listView')}
+            </>
+          )}
+        </button>
       </div>
 
       {/* RSVP Summary Cards */}
       <RsvpSummaryCards filteredEvents={filteredEvents} rsvpMap={rsvpMap} />
 
-      {/* Events list */}
-      {filteredEvents.length === 0 ? (
-        <div className="text-center py-12 text-white/50">
-          <p className="text-sm">{t('event.noEvents')}</p>
-        </div>
+      {/* Calendar View */}
+      {viewMode === 'calendar' ? (
+        <CalendarView events={filteredEvents} />
       ) : (
-        <div className="space-y-2 scroll-smooth">
-          {filteredEvents.map((event) => {
-            const dt = new Date(event.start_time);
-            const today = isToday(dt);
-            const isTournament = event.type === 'tournament';
-            const isMatch = event.type === 'game';
-            const eventDateStr = format(dt, 'yyyy-MM-dd');
-            const isThisWeekMarker = eventDateStr === todayStr;
+        <>
+          {/* Events list */}
+          {filteredEvents.length === 0 ? (
+            <div className="text-center py-12 text-white/50">
+              <p className="text-sm">{t('event.noEvents')}</p>
+            </div>
+          ) : (
+            <div className="space-y-2 scroll-smooth">
+              {filteredEvents.map((event) => {
+                const dt = new Date(event.start_time);
+                const today = isToday(dt);
+                const isTournament = event.type === 'tournament';
+                const isMatch = event.type === 'game';
+                const eventDateStr = format(dt, 'yyyy-MM-dd');
+                const isThisWeekMarker = eventDateStr === todayStr;
+                const isDeclined = rsvpMap[event.id] === 'not_attending';
 
-            return (
-              <div key={event.id} ref={isThisWeekMarker ? thisWeekRef : undefined}>
-                <ScheduleItem
-                  day={format(dt, 'd')}
-                  month={format(dt, 'MMM')}
-                  title={event.title}
-                  meta={`${format(dt, 'HH:mm')}${event.location ? ` · ${event.location}` : ''}`}
-                  type={isTournament ? 'tournament' : isMatch ? 'match' : 'practice'}
-                  isToday={today}
-                  onClick={() => navigate(`/events/${event.id}`)}
-                  actions={
-                    player ? (
-                      <QuickRSVPButtons
-                        eventId={event.id}
-                        playerId={player.id}
-                        currentStatus={rsvpMap[event.id]}
-                      />
-                    ) : undefined
-                  }
-                />
-              </div>
-            );
-          })}
-        </div>
+                return (
+                  <div
+                    key={event.id}
+                    ref={isThisWeekMarker ? thisWeekRef : undefined}
+                    className={cn(isDeclined && 'opacity-60')}
+                  >
+                    <ScheduleItem
+                      day={format(dt, 'd')}
+                      month={format(dt, 'MMM')}
+                      title={event.title}
+                      meta={`${format(dt, 'HH:mm')}${event.location ? ` · ${event.location}` : ''}`}
+                      type={isTournament ? 'tournament' : isMatch ? 'match' : 'practice'}
+                      isToday={today}
+                      onClick={() => navigate(`/events/${event.id}`)}
+                      actions={
+                        player ? (
+                          <QuickRSVPButtons
+                            eventId={event.id}
+                            playerId={player.id}
+                            currentStatus={rsvpMap[event.id]}
+                          />
+                        ) : undefined
+                      }
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </>
       )}
 
       {/* Floating "This Week" button */}
-      {filteredEvents.some((e) => isToday(new Date(e.start_time))) && (
+      {viewMode === 'list' && filteredEvents.some((e) => isToday(new Date(e.start_time))) && (
         <button
           onClick={scrollToThisWeek}
           className="fixed bottom-20 right-4 lg:bottom-6 bg-club-primary text-white px-4 py-2 rounded-full shadow-lg flex items-center gap-1.5 text-xs font-display font-bold uppercase tracking-wide z-30"

@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 
 export type ScheduleItemType = 'match' | 'practice' | 'tournament';
@@ -26,6 +27,7 @@ export function ScheduleItem({
   onClick,
   actions,
 }: ScheduleItemProps) {
+  const { t } = useTranslation();
   const isClickable = !!onClick;
 
   return (
@@ -74,14 +76,14 @@ export function ScheduleItem({
         className={cn(
           'font-display font-bold text-[9px] uppercase tracking-wide px-2.5 py-1 rounded-full',
           type === 'match' &&
-            'bg-club-primary/[0.15] text-club-primary',
-          type === 'practice' && 'bg-vq-teal/[0.12] text-vq-teal',
+            'bg-[rgba(230,57,70,0.15)] text-club-primary',
+          type === 'practice' && 'bg-[rgba(46,196,182,0.15)] text-vq-teal',
           type === 'tournament' &&
-            'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
+            'bg-[rgba(255,183,3,0.15)] text-club-secondary',
           isToday && 'bg-white/90 text-club-primary'
         )}
       >
-        {isToday ? 'Today' : type === 'match' ? 'Match' : type === 'tournament' ? 'Tournament' : 'Practice'}
+        {isToday ? t('calendar.today') : type === 'match' ? t('event.types.game') : type === 'tournament' ? t('event.types.tournament') : t('event.types.practice')}
       </span>
 
       {/* Optional actions slot (e.g. RSVP buttons) */}
