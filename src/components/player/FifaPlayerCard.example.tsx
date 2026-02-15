@@ -1,4 +1,4 @@
-import { FifaPlayerCard, createDefaultSkills, type PlayerTier, type SkillRating } from './FifaPlayerCard';
+import { FifaPlayerCard, createDefaultSkills, type PlayerTier, type SkillRating, type VolleyballSkill } from './FifaPlayerCard';
 import type { PlayerWithMemberships } from '@/services/players.service';
 import type { PlayerRating } from '@/services/player-stats.service';
 
@@ -41,7 +41,8 @@ function calculateRatingChange(
 }
 
 /**
- * Convert PlayerRating from service to SkillRating array for the card
+ * Convert PlayerRating from service to SkillRating array for the card.
+ * SubRatings now has all 8 skills directly computed.
  */
 function mapPlayerRatingToSkills(
   playerRating: PlayerRating,
@@ -50,93 +51,30 @@ function mapPlayerRatingToSkills(
   const current = playerRating.subRatings;
   const previous = previousRating?.subRatings;
 
-  const skills: SkillRating[] = [
-    {
-      type: 'serve',
-      value: current.serve,
-      trend: previous
-        ? current.serve > previous.serve
-          ? 'up'
-          : current.serve < previous.serve
-          ? 'down'
-          : undefined
-        : undefined,
-      label: 'Serve',
-      abbr: 'SRV',
-    },
-    {
-      type: 'receive',
-      value: current.reception,
-      trend: previous
-        ? current.reception > previous.reception
-          ? 'up'
-          : current.reception < previous.reception
-          ? 'down'
-          : undefined
-        : undefined,
-      label: 'Receive',
-      abbr: 'RCV',
-    },
-    {
-      type: 'set',
-      value: Math.round(current.consistency * 0.8), // Derive from consistency
-      label: 'Set',
-      abbr: 'SET',
-    },
-    {
-      type: 'block',
-      value: Math.round((current.attack + current.consistency) / 2), // Approximate from other stats
-      trend: previous
-        ? current.attack > previous.attack
-          ? 'up'
-          : current.attack < previous.attack
-          ? 'down'
-          : undefined
-        : undefined,
-      label: 'Block',
-      abbr: 'BLK',
-    },
-    {
-      type: 'attack',
-      value: current.attack,
-      trend: previous
-        ? current.attack > previous.attack
-          ? 'up'
-          : current.attack < previous.attack
-          ? 'down'
-          : undefined
-        : undefined,
-      label: 'Attack',
-      abbr: 'ATK',
-    },
-    {
-      type: 'dig',
-      value: Math.round((current.reception + current.consistency) / 2), // Approximate
-      label: 'Dig',
-      abbr: 'DIG',
-    },
-    {
-      type: 'mental',
-      value: current.consistency,
-      trend: previous
-        ? current.consistency > previous.consistency
-          ? 'up'
-          : current.consistency < previous.consistency
-          ? 'down'
-          : undefined
-        : undefined,
-      label: 'Mental',
-      abbr: 'MNT',
-    },
-    {
-      type: 'physique',
-      value: Math.round((current.attack + current.serve) / 2), // Approximate from power stats
-      label: 'Physique',
-      abbr: 'PHY',
-    },
+  const skillDefs: Array<{ type: VolleyballSkill; key: keyof typeof current; label: string; abbr: string }> = [
+    { type: 'serve',    key: 'serve',    label: 'Serve',    abbr: 'SRV' },
+    { type: 'receive',  key: 'receive',  label: 'Receive',  abbr: 'RCV' },
+    { type: 'set',      key: 'set',      label: 'Set',      abbr: 'SET' },
+    { type: 'block',    key: 'block',    label: 'Block',    abbr: 'BLK' },
+    { type: 'attack',   key: 'attack',   label: 'Attack',   abbr: 'ATK' },
+    { type: 'dig',      key: 'dig',      label: 'Dig',      abbr: 'DIG' },
+    { type: 'mental',   key: 'mental',   label: 'Mental',   abbr: 'MNT' },
+    { type: 'physique', key: 'physique', label: 'Physique', abbr: 'PHY' },
   ];
 
-  return skills;
+  return skillDefs.map(({ type, key, label, abbr }) => ({
+    type,
+    value: current[key],
+    trend: previous
+      ? current[key] > previous[key]
+        ? ('up' as const)
+        : current[key] < previous[key]
+        ? ('down' as const)
+        : undefined
+      : undefined,
+    label,
+    abbr,
+  }));
 }
 
 /**

@@ -55,10 +55,14 @@ export interface RotationStats {
 }
 
 export interface SubRatings {
-  attack: number;    // 1-99
-  serve: number;     // 1-99
-  reception: number; // 1-99
-  consistency: number; // 1-99
+  serve: number;      // 1-99
+  receive: number;    // 1-99
+  set: number;        // 1-99
+  block: number;      // 1-99
+  attack: number;     // 1-99
+  dig: number;        // 1-99
+  mental: number;     // 1-99
+  physique: number;   // 1-99
 }
 
 export interface PlayerRating {
@@ -134,22 +138,23 @@ export interface TrainingVolumePoint {
   [skillTag: string]: number | string;
 }
 
-export type TimePeriod = 'game' | 'season' | 'career' | 'custom' | 'last5';
+export type TimePeriod = 'game' | 'season' | 'career' | 'custom' | 'last5' | 'last30';
 
 export interface CustomDateRange {
   startDate: string;
   endDate: string;
 }
 
-// Position weight profiles for rating calculation
-const POSITION_WEIGHTS: Record<VolleyballPosition, { attack: number; serve: number; reception: number; consistency: number }> = {
-  outside_hitter: { attack: 0.35, serve: 0.20, reception: 0.25, consistency: 0.20 },
-  opposite: { attack: 0.40, serve: 0.20, reception: 0.15, consistency: 0.25 },
-  middle_blocker: { attack: 0.35, serve: 0.15, reception: 0.15, consistency: 0.35 },
-  setter: { attack: 0.10, serve: 0.20, reception: 0.40, consistency: 0.30 },
-  libero: { attack: 0.00, serve: 0.00, reception: 0.60, consistency: 0.40 },
-  defensive_specialist: { attack: 0.05, serve: 0.15, reception: 0.50, consistency: 0.30 },
-  all_around: { attack: 0.25, serve: 0.25, reception: 0.25, consistency: 0.25 },
+// Position weight profiles for overall rating calculation (8 skills)
+type PositionWeights = { serve: number; receive: number; set: number; block: number; attack: number; dig: number; mental: number; physique: number };
+const POSITION_WEIGHTS: Record<VolleyballPosition, PositionWeights> = {
+  outside_hitter:      { serve: 0.12, receive: 0.15, set: 0.05, block: 0.08, attack: 0.25, dig: 0.10, mental: 0.15, physique: 0.10 },
+  opposite:            { serve: 0.12, receive: 0.08, set: 0.05, block: 0.10, attack: 0.30, dig: 0.05, mental: 0.15, physique: 0.15 },
+  middle_blocker:      { serve: 0.08, receive: 0.05, set: 0.05, block: 0.25, attack: 0.22, dig: 0.05, mental: 0.15, physique: 0.15 },
+  setter:              { serve: 0.10, receive: 0.15, set: 0.30, block: 0.05, attack: 0.05, dig: 0.10, mental: 0.15, physique: 0.10 },
+  libero:              { serve: 0.00, receive: 0.30, set: 0.10, block: 0.00, attack: 0.00, dig: 0.30, mental: 0.20, physique: 0.10 },
+  defensive_specialist:{ serve: 0.10, receive: 0.25, set: 0.08, block: 0.02, attack: 0.05, dig: 0.25, mental: 0.15, physique: 0.10 },
+  all_around:          { serve: 0.12, receive: 0.12, set: 0.12, block: 0.12, attack: 0.14, dig: 0.12, mental: 0.14, physique: 0.12 },
 };
 
 // Opponent tier maximum rating ceiling
@@ -240,6 +245,17 @@ export async function getPlayerStats(
   // For 'last5', limit to 5 results
   if (period === 'last5') {
     results = results.slice(0, 5);
+  }
+
+  // For 'last30', filter to last 30 days
+  if (period === 'last30') {
+    const cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - 30);
+    const cutoffISO = cutoff.toISOString();
+    results = results.filter(r => {
+      const eventDate = r.event?.start_time;
+      return eventDate && eventDate >= cutoffISO;
+    });
   }
 
   return results;
@@ -382,18 +398,10 @@ export function aggregateStats(statEntries: StatEntryWithEvent[]): AggregatedSta
 }
 
 /**
- * Calculate sub-ratings (1-99 scale) using new Bayesian formulas
+ * Calculate sub-ratings (1-99 scale) using Bayesian formulas for all 8 skill categories
  */
 export function calculateSubRatings(stats: AggregatedStats): SubRatings {
-  // Attack (efficiency-based, errors drag score down)
-  // Apply Bayesian prior: 15 prior attempts, 30% baseline efficiency
-  const effectiveAttackEfficiency = stats.totalAttackAttempts > 0
-    ? bayesianRate(stats.totalKills - stats.totalAttackErrors, stats.totalAttackAttempts, 0.30, 15)
-    : 0;
-  // Map to 1-99: 0.600 efficiency = 99, 0.0 = 1
-  const attack = Math.max(1, Math.min(99, Math.round(effectiveAttackEfficiency * 165)));
-
-  // Serve (aces rewarded, errors punished)
+  // --- Serve: aces rewarded, errors punished ---
   const effectiveAceRate = stats.totalServeAttempts > 0
     ? bayesianRate(stats.totalAces, stats.totalServeAttempts, 0.05, 15)
     : 0;
@@ -401,34 +409,63 @@ export function calculateSubRatings(stats: AggregatedStats): SubRatings {
     ? bayesianRate(stats.totalServiceErrors, stats.totalServeAttempts, 0.10, 15)
     : 0;
   const serveScore = (effectiveAceRate * 3) + (1 - effectiveServeErrorRate); // range ~0 to ~1.3
-  // Map to 1-99: 1.3 = 99
   const serve = Math.max(1, Math.min(99, Math.round(serveScore * 76)));
 
-  // Reception (pass rating 0-3 scale)
+  // --- Receive: pass rating 0-3 scale ---
   const effectivePassRating = stats.totalPassAttempts > 0
-    ? bayesianRate(stats.totalPassSum, stats.totalPassAttempts, 1.5, 10) // prior: 1.5 avg, 10 attempts weight
+    ? bayesianRate(stats.totalPassSum, stats.totalPassAttempts, 1.5, 10)
     : 0;
-  // Map to 1-99: 3.0 = 99
-  const reception = Math.max(1, Math.min(99, Math.round(effectivePassRating * 33)));
+  const receive = Math.max(1, Math.min(99, Math.round(effectivePassRating * 33)));
 
-  // Consistency (low errors = high rating)
-  // errorRate of 0% = 99, 15% = 50, 30%+ = ~1
-  // Formula: 99 × (1 - errorRate/0.30)^1.2 — steeper curve, 30% errors = 1
+  // --- Set: assists-based rating (set_sum represents successful sets) ---
+  const effectiveSetRating = stats.totalSetAttempts > 0
+    ? bayesianRate(stats.totalSetSum, stats.totalSetAttempts, 1.5, 10)
+    : 0;
+  const setErrorPenalty = stats.totalSetAttempts > 0
+    ? bayesianRate(stats.totalSettingErrors, stats.totalSetAttempts, 0.10, 10)
+    : 0;
+  const setScore = (effectiveSetRating / 3) * 0.8 + (1 - setErrorPenalty) * 0.2; // 0-1 range
+  const set = Math.max(1, Math.min(99, Math.round(setScore * 99)));
+
+  // --- Block: solos worth 2x, assists 1x, scaled ---
+  const totalBlockPoints = stats.totalBlockSolos * 2 + stats.totalBlockAssists;
+  const blockPerGame = stats.gamesPlayed > 0 ? totalBlockPoints / stats.gamesPlayed : 0;
+  // 6+ block points per game = 99
+  const block = Math.max(1, Math.min(99, Math.round(Math.min(blockPerGame / 6, 1) * 99)));
+
+  // --- Attack: kill efficiency-based ---
+  const effectiveAttackEfficiency = stats.totalAttackAttempts > 0
+    ? bayesianRate(stats.totalKills - stats.totalAttackErrors, stats.totalAttackAttempts, 0.30, 15)
+    : 0;
+  const attack = Math.max(1, Math.min(99, Math.round(effectiveAttackEfficiency * 165)));
+
+  // --- Dig: digs per game based ---
+  const digsPerGame = stats.gamesPlayed > 0 ? stats.totalDigs / stats.gamesPlayed : 0;
+  // 15+ digs per game = 99
+  const dig = Math.max(1, Math.min(99, Math.round(Math.min(digsPerGame / 15, 1) * 99)));
+
+  // --- Mental: low error rate = high rating ---
   const totalErrors = stats.totalAttackErrors + stats.totalServiceErrors + stats.totalBallHandlingErrors;
   const totalActions = stats.totalAttackAttempts + stats.totalServeAttempts + stats.totalPassAttempts;
-  // Apply Bayesian prior: assume 15% error rate baseline, 20 prior actions
   const effectiveErrorRate = totalActions > 0
     ? bayesianRate(totalErrors, totalActions, 0.15, 20)
     : 0.15;
-  const consistencyRaw = Math.pow(Math.max(0, 1 - effectiveErrorRate / 0.30), 1.2) * 99;
-  const consistency = Math.max(1, Math.min(99, Math.round(consistencyRaw)));
+  const mentalRaw = Math.pow(Math.max(0, 1 - effectiveErrorRate / 0.30), 1.2) * 99;
+  const mental = Math.max(1, Math.min(99, Math.round(mentalRaw)));
 
-  return {
-    attack,
-    serve,
-    reception,
-    consistency,
-  };
+  // --- Physique: attendance-based if available, otherwise derived from power stats ---
+  // Since we don't have attendance data in aggregated stats, derive from endurance indicators
+  // High serve attempts + attack attempts per game indicates physical endurance
+  const actionsPerGame = stats.gamesPlayed > 0
+    ? (stats.totalServeAttempts + stats.totalAttackAttempts + stats.totalDigs) / stats.gamesPlayed
+    : 0;
+  // 30+ actions per game = 99, with floor at 50 (baseline fitness)
+  const physiqueRaw = Math.min(actionsPerGame / 30, 1) * 49 + 50;
+  const physique = stats.gamesPlayed > 0
+    ? Math.max(1, Math.min(99, Math.round(physiqueRaw)))
+    : 70; // Default to 70 if no data
+
+  return { serve, receive, set, block, attack, dig, mental, physique };
 }
 
 /**
@@ -446,11 +483,7 @@ export function calculateRawSkillValues(
   const agg = aggregateStats(statEntries);
 
   // Raw sub-ratings WITHOUT rounding (mirrors calculateSubRatings logic)
-  const effectiveAttackEfficiency = agg.totalAttackAttempts > 0
-    ? bayesianRate(agg.totalKills - agg.totalAttackErrors, agg.totalAttackAttempts, 0.30, 15)
-    : 0;
-  const attackRaw = Math.max(1, Math.min(99, effectiveAttackEfficiency * 165));
-
+  // Serve
   const effectiveAceRate = agg.totalServeAttempts > 0
     ? bayesianRate(agg.totalAces, agg.totalServeAttempts, 0.05, 15)
     : 0;
@@ -459,17 +492,51 @@ export function calculateRawSkillValues(
     : 0;
   const serveRaw = Math.max(1, Math.min(99, ((effectiveAceRate * 3) + (1 - effectiveServeErrorRate)) * 76));
 
+  // Receive
   const effectivePassRating = agg.totalPassAttempts > 0
     ? bayesianRate(agg.totalPassSum, agg.totalPassAttempts, 1.5, 10)
     : 0;
-  const receptionRaw = Math.max(1, Math.min(99, effectivePassRating * 33));
+  const receiveRaw = Math.max(1, Math.min(99, effectivePassRating * 33));
 
+  // Set
+  const effectiveSetRating = agg.totalSetAttempts > 0
+    ? bayesianRate(agg.totalSetSum, agg.totalSetAttempts, 1.5, 10)
+    : 0;
+  const setErrorPenalty = agg.totalSetAttempts > 0
+    ? bayesianRate(agg.totalSettingErrors, agg.totalSetAttempts, 0.10, 10)
+    : 0;
+  const setRaw = Math.max(1, Math.min(99, ((effectiveSetRating / 3) * 0.8 + (1 - setErrorPenalty) * 0.2) * 99));
+
+  // Block
+  const totalBlockPoints = agg.totalBlockSolos * 2 + agg.totalBlockAssists;
+  const blockPerGame = agg.gamesPlayed > 0 ? totalBlockPoints / agg.gamesPlayed : 0;
+  const blockRaw = Math.max(1, Math.min(99, Math.min(blockPerGame / 6, 1) * 99));
+
+  // Attack
+  const effectiveAttackEfficiency = agg.totalAttackAttempts > 0
+    ? bayesianRate(agg.totalKills - agg.totalAttackErrors, agg.totalAttackAttempts, 0.30, 15)
+    : 0;
+  const attackRaw = Math.max(1, Math.min(99, effectiveAttackEfficiency * 165));
+
+  // Dig
+  const digsPerGame = agg.gamesPlayed > 0 ? agg.totalDigs / agg.gamesPlayed : 0;
+  const digRaw = Math.max(1, Math.min(99, Math.min(digsPerGame / 15, 1) * 99));
+
+  // Mental
   const totalErrors = agg.totalAttackErrors + agg.totalServiceErrors + agg.totalBallHandlingErrors;
   const totalActions = agg.totalAttackAttempts + agg.totalServeAttempts + agg.totalPassAttempts;
   const effectiveErrorRate = totalActions > 0
     ? bayesianRate(totalErrors, totalActions, 0.15, 20)
     : 0.15;
-  const consistencyRaw = Math.max(1, Math.min(99, Math.pow(Math.max(0, 1 - effectiveErrorRate / 0.30), 1.2) * 99));
+  const mentalRaw = Math.max(1, Math.min(99, Math.pow(Math.max(0, 1 - effectiveErrorRate / 0.30), 1.2) * 99));
+
+  // Physique
+  const actionsPerGame = agg.gamesPlayed > 0
+    ? (agg.totalServeAttempts + agg.totalAttackAttempts + agg.totalDigs) / agg.gamesPlayed
+    : 0;
+  const physiqueRaw = agg.gamesPlayed > 0
+    ? Math.max(1, Math.min(99, Math.min(actionsPerGame / 30, 1) * 49 + 50))
+    : 70;
 
   // Tier scaling (mirrors calculatePlayerRating logic)
   let tierWeightSum = 0;
@@ -484,20 +551,15 @@ export function calculateRawSkillValues(
   const avgOpponentMax = tierWeightedMax / tierWeightSum;
   const tierScale = avgOpponentMax / 99;
 
-  const attack = attackRaw * tierScale;
-  const serve = serveRaw * tierScale;
-  const reception = receptionRaw * tierScale;
-  const consistency = consistencyRaw * tierScale;
-
   return {
-    serve,
-    receive: reception,
-    set: consistency * 0.8,
-    block: (attack + consistency) / 2,
-    attack,
-    dig: (reception + consistency) / 2,
-    mental: consistency,
-    physique: (attack + serve) / 2,
+    serve: serveRaw * tierScale,
+    receive: receiveRaw * tierScale,
+    set: setRaw * tierScale,
+    block: blockRaw * tierScale,
+    attack: attackRaw * tierScale,
+    dig: digRaw * tierScale,
+    mental: mentalRaw * tierScale,
+    physique: physiqueRaw * tierScale,
   };
 }
 
@@ -535,12 +597,16 @@ export function calculatePlayerRating(
     const gameAggregated = aggregateStats([game]);
     const gameSubRatings = calculateSubRatings(gameAggregated);
 
-    // Calculate weighted performance score (1-99)
+    // Calculate weighted performance score (1-99) using 8 skill weights
     const performanceScore =
-      gameSubRatings.attack * weights.attack +
       gameSubRatings.serve * weights.serve +
-      gameSubRatings.reception * weights.reception +
-      gameSubRatings.consistency * weights.consistency;
+      gameSubRatings.receive * weights.receive +
+      gameSubRatings.set * weights.set +
+      gameSubRatings.block * weights.block +
+      gameSubRatings.attack * weights.attack +
+      gameSubRatings.dig * weights.dig +
+      gameSubRatings.mental * weights.mental +
+      gameSubRatings.physique * weights.physique;
 
     // Get opponent tier maximum rating (default to tier 5 = 55 if not set)
     const opponentTier = game.event.opponent_tier || 5;
@@ -569,10 +635,14 @@ export function calculatePlayerRating(
   const avgOpponentMax = tierWeightedMax / tierWeightSum;
   const tierScale = avgOpponentMax / 99;
   const subRatings: SubRatings = {
-    attack: Math.max(1, Math.min(99, Math.round(rawSubRatings.attack * tierScale))),
     serve: Math.max(1, Math.min(99, Math.round(rawSubRatings.serve * tierScale))),
-    reception: Math.max(1, Math.min(99, Math.round(rawSubRatings.reception * tierScale))),
-    consistency: Math.max(1, Math.min(99, Math.round(rawSubRatings.consistency * tierScale))),
+    receive: Math.max(1, Math.min(99, Math.round(rawSubRatings.receive * tierScale))),
+    set: Math.max(1, Math.min(99, Math.round(rawSubRatings.set * tierScale))),
+    block: Math.max(1, Math.min(99, Math.round(rawSubRatings.block * tierScale))),
+    attack: Math.max(1, Math.min(99, Math.round(rawSubRatings.attack * tierScale))),
+    dig: Math.max(1, Math.min(99, Math.round(rawSubRatings.dig * tierScale))),
+    mental: Math.max(1, Math.min(99, Math.round(rawSubRatings.mental * tierScale))),
+    physique: Math.max(1, Math.min(99, Math.round(rawSubRatings.physique * tierScale))),
   };
 
   return {
@@ -599,10 +669,14 @@ export function calculateSingleGameRating(
 
   const weights = POSITION_WEIGHTS[position];
   const performanceScore =
-    gameSubRatings.attack * weights.attack +
     gameSubRatings.serve * weights.serve +
-    gameSubRatings.reception * weights.reception +
-    gameSubRatings.consistency * weights.consistency;
+    gameSubRatings.receive * weights.receive +
+    gameSubRatings.set * weights.set +
+    gameSubRatings.block * weights.block +
+    gameSubRatings.attack * weights.attack +
+    gameSubRatings.dig * weights.dig +
+    gameSubRatings.mental * weights.mental +
+    gameSubRatings.physique * weights.physique;
 
   const opponentMax = TIER_MAX_RATING[opponentTier] || 55;
   const gameRating = opponentMax * (performanceScore / 99);
@@ -954,23 +1028,12 @@ export async function getSkillProgression(
     const avgOpponentMax = tierWeightSum > 0 ? tierWeightedMax / tierWeightSum : 55;
     const tierScale = avgOpponentMax / 99;
 
-    // Scale the raw ratings
-    const scaledRatings = {
-      attack: Math.max(1, Math.min(99, Math.round(rawSubRatings.attack * tierScale))),
-      serve: Math.max(1, Math.min(99, Math.round(rawSubRatings.serve * tierScale))),
-      reception: Math.max(1, Math.min(99, Math.round(rawSubRatings.reception * tierScale))),
-      consistency: Math.max(1, Math.min(99, Math.round(rawSubRatings.consistency * tierScale))),
-    };
-
-    // Use same skill names and derivations as mapPlayerRatingToSkills in FifaPlayerCard.example.tsx
-    points.push({ date: month, skillTag: 'serve', avgLevel: scaledRatings.serve });
-    points.push({ date: month, skillTag: 'receive', avgLevel: scaledRatings.reception });
-    points.push({ date: month, skillTag: 'set', avgLevel: Math.round(scaledRatings.consistency * 0.8) });
-    points.push({ date: month, skillTag: 'block', avgLevel: Math.round((scaledRatings.attack + scaledRatings.consistency) / 2) });
-    points.push({ date: month, skillTag: 'attack', avgLevel: scaledRatings.attack });
-    points.push({ date: month, skillTag: 'dig', avgLevel: Math.round((scaledRatings.reception + scaledRatings.consistency) / 2) });
-    points.push({ date: month, skillTag: 'mental', avgLevel: scaledRatings.consistency });
-    points.push({ date: month, skillTag: 'physique', avgLevel: Math.round((scaledRatings.attack + scaledRatings.serve) / 2) });
+    // Scale all 8 raw ratings
+    const skillKeys = ['serve', 'receive', 'set', 'block', 'attack', 'dig', 'mental', 'physique'] as const;
+    for (const key of skillKeys) {
+      const scaled = Math.max(1, Math.min(99, Math.round(rawSubRatings[key] * tierScale)));
+      points.push({ date: month, skillTag: key, avgLevel: scaled });
+    }
   }
 
   return points.sort((a, b) => a.date.localeCompare(b.date));

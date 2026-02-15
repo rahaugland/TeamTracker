@@ -188,12 +188,18 @@ export function TeamOverviewTab({ teamId, dateRange }: TeamOverviewTabProps) {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {(['attack', 'serve', 'reception', 'consistency'] as const).map((key) => (
-                <div key={key} className="text-center p-3 border rounded-lg border-white/10">
-                  <div className="text-2xl font-bold">{teamRating.subRatings[key]}</div>
-                  <div className="text-xs text-muted-foreground capitalize">{t(`team.dashboard.${key}`)}</div>
-                </div>
-              ))}
+              {(['serve', 'receive', 'set', 'block', 'attack', 'dig', 'mental', 'physique'] as const).map((key) => {
+                const labels: Record<string, string> = {
+                  serve: 'Serve', receive: 'Receive', set: 'Set', block: 'Block',
+                  attack: 'Attack', dig: 'Dig', mental: 'Mental', physique: 'Physique',
+                };
+                return (
+                  <div key={key} className="text-center p-3 border rounded-lg border-white/10">
+                    <div className="text-2xl font-bold">{teamRating.subRatings[key]}</div>
+                    <div className="text-xs text-muted-foreground">{labels[key]}</div>
+                  </div>
+                );
+              })}
             </div>
           </CardContent>
         </Card>

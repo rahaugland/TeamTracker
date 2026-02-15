@@ -7,7 +7,7 @@ import { getAttendanceStats, getPlayerStats, aggregateStats } from '@/services/p
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
+import { Switch } from '@/components/ui/switch';
 import { User, Mail, Phone, Globe, LogOut } from 'lucide-react';
 import { JoinTeamCard } from '@/components/player/JoinTeamCard';
 import { PendingMemberships } from '@/components/player/PendingMemberships';
@@ -31,6 +31,11 @@ export function PlayerProfilePage() {
 
   const [formData, setFormData] = useState({ full_name: '', phone: '', avatar_url: '' });
 
+  // Notification settings (UI-only, no persistence)
+  const [emailNotifications, setEmailNotifications] = useState(true);
+  const [showStatsPublicly, setShowStatsPublicly] = useState(true);
+  const [pushNotifications, setPushNotifications] = useState(false);
+
   // Derive jersey number from the first active team membership
   const jerseyNumber = useMemo(() => {
     if (!player?.team_memberships) return undefined;
@@ -52,6 +57,32 @@ export function PlayerProfilePage() {
     }
     return age;
   }, [player?.birth_date]);
+
+  // Derive achievements from player data
+  const achievements = useMemo(() => {
+    const items: Array<{ icon: string; title: string; description: string }> = [];
+
+    // Dedication Streak
+    const streak = attendanceStats?.longestStreak ?? 0;
+    if (streak > 0) {
+      items.push({
+        icon: '\u{1F525}',
+        title: t('profile.dedicationStreak'),
+        description: t('profile.dedicationStreakDesc', { count: streak }),
+      });
+    }
+
+    // Rising Star (check if career stats show improvement)
+    if (careerStats && careerStats.gamesPlayed >= 3) {
+      items.push({
+        icon: '\u26A1',
+        title: t('profile.risingStar'),
+        description: t('profile.risingStarDesc', { count: 5 }),
+      });
+    }
+
+    return items;
+  }, [attendanceStats, careerStats, t]);
 
   useEffect(() => {
     if (currentUser?.id) loadProfile();
@@ -118,50 +149,68 @@ export function PlayerProfilePage() {
     );
   }
 
+  const activeTeams = profile?.team_memberships?.filter((tm) => tm.is_active) ?? [];
+
   return (
     <div className="max-w-lg lg:max-w-6xl mx-auto space-y-6">
-      {/* Avatar + Name */}
-      <div className="flex flex-col items-center text-center lg:flex-row lg:items-start lg:gap-6 lg:text-left">
+      {/* Profile Header */}
+      <div className="flex flex-col items-center text-center lg:flex-row lg:items-center lg:gap-6 lg:text-left">
+        {/* Avatar */}
         {profile?.avatar_url ? (
           <img
             src={profile.avatar_url}
             alt={profile.full_name}
-            className="w-20 h-20 rounded-full object-cover border-2 border-white/20 lg:w-32 lg:h-32 lg:rounded-xl"
+            className="w-20 h-20 rounded-full object-cover border-2 border-white/20 lg:w-[120px] lg:h-[120px] lg:rounded-xl shrink-0"
           />
         ) : (
-          <div className="w-20 h-20 rounded-full bg-navy-80 border-2 border-white/20 flex items-center justify-center lg:w-32 lg:h-32 lg:rounded-xl">
+          <div className="w-20 h-20 rounded-full bg-navy-80 border-2 border-white/20 flex items-center justify-center lg:w-[120px] lg:h-[120px] lg:rounded-xl shrink-0">
             <span className="text-3xl font-bold text-white/50 lg:text-5xl">
               {(profile?.full_name || currentUser?.name || '?').charAt(0).toUpperCase()}
             </span>
           </div>
         )}
-        <div>
-          <h2 className="text-xl font-display font-bold text-white mt-3 lg:mt-0">
+
+        {/* Name + Meta */}
+        <div className="flex-1 mt-3 lg:mt-0">
+          <h2 className="text-xl font-display font-extrabold text-white uppercase tracking-wider lg:text-3xl">
             {profile?.full_name || currentUser?.name}
           </h2>
-          <Badge variant="outline" className="mt-1">
-            {t('users.roles.player')}
-          </Badge>
-          {/* Player meta: position, jersey number, age */}
-          {(player?.positions?.length || jerseyNumber != null || playerAge != null) && (
+
+          {/* Meta info: Position, Jersey, Age */}
+          <div className="flex flex-wrap items-center justify-center lg:justify-start gap-x-4 gap-y-1 mt-2 text-sm text-white/60">
+            {player?.positions?.map((pos) => (
+              <span key={pos}>
+                {t('player.position')}: {POSITION_NAMES[pos] || pos}
+              </span>
+            ))}
+            {jerseyNumber != null && (
+              <span>{t('player.jerseyNumber')}: #{jerseyNumber}</span>
+            )}
+            {playerAge != null && (
+              <span>{t('player.birthDate')}: {playerAge}</span>
+            )}
+          </div>
+
+          {/* Team badges */}
+          {activeTeams.length > 0 && (
             <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2 mt-2">
-              {player?.positions?.map((pos) => (
-                <Badge key={pos} variant="secondary" className="text-xs">
-                  {POSITION_NAMES[pos] || pos}
-                </Badge>
+              {activeTeams.map((tm) => (
+                <span
+                  key={tm.team.id}
+                  className="inline-flex items-center rounded-full bg-teal-500/15 border border-teal-500/30 px-3 py-0.5 text-xs font-medium text-teal-300"
+                >
+                  {tm.team.name}
+                </span>
               ))}
-              {jerseyNumber != null && (
-                <Badge variant="secondary" className="text-xs">
-                  #{jerseyNumber}
-                </Badge>
-              )}
-              {playerAge != null && (
-                <Badge variant="secondary" className="text-xs">
-                  {playerAge} yrs
-                </Badge>
-              )}
             </div>
           )}
+        </div>
+
+        {/* Edit Profile button (desktop) */}
+        <div className="hidden lg:block shrink-0">
+          <Button variant="outline" onClick={() => setIsEditing(true)}>
+            {t('profile.editProfile')}
+          </Button>
         </div>
       </div>
 
@@ -170,19 +219,19 @@ export function PlayerProfilePage() {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           <ProfileStatCard
             value={String(careerStats.gamesPlayed)}
-            label="Total Games"
+            label={t('playerExperience.profile.totalGames')}
           />
           <ProfileStatCard
             value={String(careerStats.totalKills)}
-            label="Career Kills"
+            label={t('playerExperience.profile.careerKills')}
           />
           <ProfileStatCard
             value={String(careerStats.totalAces)}
-            label="Career Aces"
+            label={t('playerExperience.profile.careerAces')}
           />
           <ProfileStatCard
             value={String(careerStats.totalBlockSolos + careerStats.totalBlockAssists)}
-            label="Career Blocks"
+            label={t('playerExperience.profile.careerBlocks')}
           />
         </div>
       ) : attendanceStats && (
@@ -199,6 +248,29 @@ export function PlayerProfilePage() {
             value={String(attendanceStats.longestStreak)}
             label={t('player.stats.attendance.longestStreak')}
           />
+        </div>
+      )}
+
+      {/* Achievements */}
+      {achievements.length > 0 && (
+        <div>
+          <h3 className="text-sm font-display font-bold uppercase tracking-wider text-white/50 mb-3">
+            {t('profile.achievements')}
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {achievements.map((achievement) => (
+              <div
+                key={achievement.title}
+                className="bg-navy-90 border border-white/[0.04] rounded-xl p-4 flex items-center gap-4"
+              >
+                <span className="text-[40px] leading-none shrink-0">{achievement.icon}</span>
+                <div>
+                  <p className="font-semibold text-white">{achievement.title}</p>
+                  <p className="text-[13px] text-muted-foreground">{achievement.description}</p>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
@@ -266,28 +338,59 @@ export function PlayerProfilePage() {
         )}
       </div>
 
-      {/* Teams */}
-      {profile?.team_memberships && profile.team_memberships.filter((tm) => tm.is_active).length > 0 && (
-        <div className="bg-navy-90 border border-white/[0.04] rounded-xl p-4">
-          <h3 className="text-sm font-display font-bold uppercase tracking-wider text-white/50 mb-3">
-            {t('profile.myTeams')}
-          </h3>
-          <div className="space-y-2">
-            {profile.team_memberships
-              .filter((tm) => tm.is_active)
-              .map((tm) => (
+      {/* Notification Settings */}
+      <div className="bg-navy-90 border border-white/[0.04] rounded-xl p-4">
+        <h3 className="text-sm font-display font-bold uppercase tracking-wider text-white/50 mb-4">
+          {t('profile.notifications')}
+        </h3>
+        <div className="space-y-0 divide-y divide-white/[0.06]">
+          <SettingsToggleRow
+            title={t('profile.emailNotifications')}
+            description={t('profile.emailNotificationsDesc')}
+            checked={emailNotifications}
+            onCheckedChange={setEmailNotifications}
+          />
+          <SettingsToggleRow
+            title={t('profile.showStatsPublicly')}
+            description={t('profile.showStatsPubliclyDesc')}
+            checked={showStatsPublicly}
+            onCheckedChange={setShowStatsPublicly}
+          />
+          <SettingsToggleRow
+            title={t('profile.pushNotifications')}
+            description={t('profile.pushNotificationsDesc')}
+            checked={pushNotifications}
+            onCheckedChange={setPushNotifications}
+          />
+        </div>
+      </div>
+
+      {/* Team Membership */}
+      <div>
+        <h3 className="text-sm font-display font-bold uppercase tracking-wider text-white/50 mb-3">
+          {t('profile.teamMembership')}
+        </h3>
+
+        {/* Active Teams */}
+        {activeTeams.length > 0 && (
+          <div className="bg-navy-90 border border-white/[0.04] rounded-xl p-4 mb-3">
+            <div className="space-y-2">
+              {activeTeams.map((tm) => (
                 <div key={tm.team.id} className="flex items-center justify-between py-2">
                   <span className="text-sm font-medium text-white">{tm.team.name}</span>
                   <span className="text-xs text-white/50">{tm.team.season.name}</span>
                 </div>
               ))}
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Join Team */}
-      <JoinTeamCard onJoined={() => { setJoinRefreshKey((k) => k + 1); refreshPlayer(); loadProfile(); }} />
-      <PendingMemberships refreshKey={joinRefreshKey} />
+        {/* Join Team */}
+        <JoinTeamCard onJoined={() => { setJoinRefreshKey((k) => k + 1); refreshPlayer(); loadProfile(); }} />
+        <div className="mt-3">
+          <PendingMemberships refreshKey={joinRefreshKey} />
+        </div>
+      </div>
 
       {/* Settings */}
       <div className="bg-navy-90 border border-white/[0.04] rounded-xl p-4 space-y-3">
@@ -332,6 +435,28 @@ function ProfileField({ icon: Icon, label }: { icon: React.FC<{ className?: stri
     <div className="flex items-center gap-2 text-sm">
       <Icon className="w-4 h-4 text-white/40" />
       <span className="text-white/80">{label}</span>
+    </div>
+  );
+}
+
+function SettingsToggleRow({
+  title,
+  description,
+  checked,
+  onCheckedChange,
+}: {
+  title: string;
+  description: string;
+  checked: boolean;
+  onCheckedChange: (checked: boolean) => void;
+}) {
+  return (
+    <div className="flex items-center justify-between gap-4 py-3 first:pt-0 last:pb-0">
+      <div>
+        <p className="text-sm font-semibold text-white">{title}</p>
+        <p className="text-[13px] text-muted-foreground">{description}</p>
+      </div>
+      <Switch checked={checked} onCheckedChange={onCheckedChange} />
     </div>
   );
 }

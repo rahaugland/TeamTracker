@@ -15,6 +15,7 @@ import { QuickStatsGrid } from '@/components/player/QuickStatsGrid';
 import { ScheduleItem } from '@/components/schedule/ScheduleItem';
 import { QuickRSVPButtons } from '@/components/player/QuickRSVPButtons';
 import { AnnouncementsFeed } from '@/components/player/AnnouncementsFeed';
+import { SectionTitle } from '@/components/ui/section-title';
 import { JoinTeamCard } from '@/components/player/JoinTeamCard';
 import { PendingMemberships } from '@/components/player/PendingMemberships';
 import type { Event, Rsvp, PlayerGoal, AttendanceRecord } from '@/types/database.types';
@@ -31,6 +32,8 @@ export function PlayerHomePage() {
   const [attendanceRate, setAttendanceRate] = useState(0);
   const [gamesPlayed, setGamesPlayed] = useState(0);
   const [streak, setStreak] = useState(0);
+  const [totalEvents, setTotalEvents] = useState(0);
+  const [completedGoals, setCompletedGoals] = useState(0);
   const [rating, setRating] = useState<PlayerRating | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [refreshKey, setRefreshKey] = useState(0);
@@ -71,6 +74,7 @@ export function PlayerHomePage() {
       // Attendance rate
       const presentCount = attendanceData.filter((r) => r.status === 'present').length;
       const total = attendanceData.length;
+      setTotalEvents(total);
       setAttendanceRate(total > 0 ? Math.round((presentCount / total) * 100) : 0);
 
       // Attendance streak
@@ -97,6 +101,7 @@ export function PlayerHomePage() {
         try {
           const goalsData = await getPlayerGoals(player.id, teamIds[0]);
           setGoals(goalsData);
+          setCompletedGoals(goalsData.filter((g) => g.completed_at).length);
         } catch {
           // Goals may not exist
         }
@@ -180,6 +185,8 @@ export function PlayerHomePage() {
             attendanceRate={attendanceRate}
             activeGoals={activeGoals}
             gamesPlayed={gamesPlayed}
+            totalEvents={totalEvents}
+            completedGoals={completedGoals}
           />
         </div>
       </div>
@@ -187,9 +194,7 @@ export function PlayerHomePage() {
       {/* Schedule Preview */}
       {events.length > 1 && (
         <div>
-          <h2 className="text-sm font-display font-bold uppercase tracking-wider text-white/50 mb-3">
-            {t('navigation.schedule')}
-          </h2>
+          <SectionTitle title={t('navigation.schedule')} />
           <div className="space-y-2">
             {events.slice(1, 5).map((event) => {
               const dt = new Date(event.start_time);
@@ -228,9 +233,7 @@ export function PlayerHomePage() {
       {/* Recent Announcements */}
       {announcements.length > 0 && (
         <div>
-          <h2 className="text-sm font-display font-bold uppercase tracking-wider text-white/50 mb-3">
-            {t('playerExperience.announcements.title')}
-          </h2>
+          <SectionTitle title={t('playerExperience.announcements.title')} />
           <AnnouncementsFeed announcements={announcements.slice(0, 3)} />
         </div>
       )}

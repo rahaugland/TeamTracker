@@ -145,10 +145,14 @@ export function PlayerReportCard({
           {/* Sub-Rating Bars */}
           {rating && (
             <div className="mt-6 space-y-2 max-w-md">
-              <RatingBar label={t('reports.playerReport.attack')} value={rating.subRatings.attack} />
-              <RatingBar label={t('reports.playerReport.serve')} value={rating.subRatings.serve} />
-              <RatingBar label={t('reports.playerReport.reception')} value={rating.subRatings.reception} />
-              <RatingBar label={t('reports.playerReport.consistency')} value={rating.subRatings.consistency} />
+              <RatingBar label={t('playerExperience.skills.serve')} value={rating.subRatings.serve} />
+              <RatingBar label={t('playerExperience.skills.receive')} value={rating.subRatings.receive} />
+              <RatingBar label={t('playerExperience.skills.set')} value={rating.subRatings.set} />
+              <RatingBar label={t('playerExperience.skills.block')} value={rating.subRatings.block} />
+              <RatingBar label={t('playerExperience.skills.attack')} value={rating.subRatings.attack} />
+              <RatingBar label={t('playerExperience.skills.dig')} value={rating.subRatings.dig} />
+              <RatingBar label={t('playerExperience.skills.mental')} value={rating.subRatings.mental} />
+              <RatingBar label={t('playerExperience.skills.physique')} value={rating.subRatings.physique} />
             </div>
           )}
 

@@ -53,14 +53,14 @@ export function PlayerComparison({ players, isLoading = false }: PlayerCompariso
             player2: player2.rating.subRatings.serve,
           },
           {
-            category: t('team.dashboard.reception'),
-            player1: player1.rating.subRatings.reception,
-            player2: player2.rating.subRatings.reception,
+            category: 'Receive',
+            player1: player1.rating.subRatings.receive,
+            player2: player2.rating.subRatings.receive,
           },
           {
-            category: t('team.dashboard.consistency'),
-            player1: player1.rating.subRatings.consistency,
-            player2: player2.rating.subRatings.consistency,
+            category: 'Mental',
+            player1: player1.rating.subRatings.mental,
+            player2: player2.rating.subRatings.mental,
           },
         ]
       : [];
@@ -217,45 +217,45 @@ export function PlayerComparison({ players, isLoading = false }: PlayerCompariso
                 </div>
               </div>
 
-              {/* Reception */}
+              {/* Receive */}
               <div>
                 <div className="flex items-center justify-between text-sm mb-1">
-                  <span>{t('team.dashboard.reception')}</span>
+                  <span>Receive</span>
                   <div className="flex gap-4">
                     <span className="text-vq-teal font-medium">
-                      {player1.rating?.subRatings.reception || 0}
+                      {player1.rating?.subRatings.receive || 0}
                     </span>
                     <span className="text-club-primary font-medium">
-                      {player2.rating?.subRatings.reception || 0}
+                      {player2.rating?.subRatings.receive || 0}
                     </span>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-2">
-                  <Progress value={player1.rating?.subRatings.reception || 0} className="bg-vq-teal/20" />
-                  <Progress value={player2.rating?.subRatings.reception || 0} className="bg-club-primary/20" />
+                  <Progress value={player1.rating?.subRatings.receive || 0} className="bg-vq-teal/20" />
+                  <Progress value={player2.rating?.subRatings.receive || 0} className="bg-club-primary/20" />
                 </div>
               </div>
 
-              {/* Consistency */}
+              {/* Mental */}
               <div>
                 <div className="flex items-center justify-between text-sm mb-1">
-                  <span>{t('team.dashboard.consistency')}</span>
+                  <span>Mental</span>
                   <div className="flex gap-4">
                     <span className="text-vq-teal font-medium">
-                      {player1.rating?.subRatings.consistency || 0}
+                      {player1.rating?.subRatings.mental || 0}
                     </span>
                     <span className="text-club-primary font-medium">
-                      {player2.rating?.subRatings.consistency || 0}
+                      {player2.rating?.subRatings.mental || 0}
                     </span>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   <Progress
-                    value={player1.rating?.subRatings.consistency || 0}
+                    value={player1.rating?.subRatings.mental || 0}
                     className="bg-vq-teal/20"
                   />
                   <Progress
-                    value={player2.rating?.subRatings.consistency || 0}
+                    value={player2.rating?.subRatings.mental || 0}
                     className="bg-club-primary/20"
                   />
                 </div>
